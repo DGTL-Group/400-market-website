@@ -6,23 +6,25 @@
 
 ## Account & Integration Checklist
 
+> Legend: [x] = confirmed access / complete · [ ] = action still needed
+
 | # | Service | Purpose | Action Needed | Owner | Done |
 |---|---|---|---|---|---|
-| 1 | **Neon PostgreSQL** | Payload CMS database | Create project, retrieve `DATABASE_URI` connection string, add to env vars | DGTL | [ ] |
+| 1 | **PostgreSQL** (self-hosted, VPS) | Payload CMS database — replaces Neon | Provision PostgreSQL container on DGTL VPS, create DB + user, set `DATABASE_URI` in env | DGTL | [ ] |
 | 2 | **Cloudinary** | Image CDN and asset storage | Confirm free 25 GB tier active, retrieve Cloud Name + API Key + API Secret | DGTL | [ ] |
-| 3 | **Stripe** | Online shop payments | Confirm account active, create 3 Products + Prices (parking pass, $5 gift cert, $10 gift cert), retrieve publishable + secret keys + webhook secret | DGTL | [ ] |
-| 4 | **AWS SES** | Transactional email (order confirmations, contact forms) | Confirm existing account access, verify sending domain, retrieve SMTP/SDK credentials, confirm out of sandbox mode | DGTL | [ ] |
-| 5 | **SendMails** | Newsletter campaigns | Confirm existing account access, retrieve API key or signup form embed code, validate subscriber list is intact | Client + DGTL | [ ] |
-| 6 | **n8n** | Automation workflows (form submissions, vendor sync, notifications) | Confirm self-hosted instance is running, define required workflows, retrieve webhook URLs | DGTL | [ ] |
-| 7 | **OpenClaw** | Self-hosted AI live chat widget | Confirm instance is running, configure knowledge base for 400 Market content, retrieve embed script / API endpoint | DGTL | [ ] |
-| 8 | **Hostinger Business (Node.js)** | Production hosting | Confirm Node.js plan active, confirm SSH access, confirm Node.js 18+ support, confirm env variable configuration method | DGTL | [ ] |
-| 9 | **Gitea (git.dgtlgroup.io)** | Source control | Repo exists ✓ — add all team members with correct permissions, configure CI/CD webhook | DGTL | [ ] |
-| 10 | **Gitea Actions / CI/CD** | Auto-deploy to Hostinger on push | Configure Actions runner, create deploy workflow (build → SSH → Hostinger), store secrets (HOST, SSH key, env vars) | DGTL | [ ] |
-| 11 | **Domain DNS** | Cutover from WordPress to new site | Identify registrar + login credentials, document current DNS records (A, CNAME, MX, TXT), plan cutover timing | Client + DGTL | [ ] |
-| 12 | **Google Analytics 4** | Traffic analytics | Confirm GA4 property exists (or create), retrieve Measurement ID (`G-XXXXXXX`), confirm Client has Admin access | Client + DGTL | [ ] |
-| 13 | **Google Search Console** | SEO continuity and sitemap submission | Confirm domain property is verified, add DGTL as owner during build, plan sitemap re-submission post-launch | Client + DGTL | [ ] |
-| 14 | **Meta Pixel** | Paid social retargeting | Confirm if Meta Ads are active — if yes, retrieve Pixel ID from Meta Business Manager | Client | [ ] |
-| 15 | **WordPress (current site)** | Existing live site — to be replaced | Confirm WP admin credentials, perform full export + database + file backup before cutover | Client | [ ] |
+| 3 | **Stripe** | Online shop payments | Access confirmed ✓ — create 3 Products + Prices (parking pass, $5 gift cert, $10 gift cert), retrieve publishable + secret keys + webhook secret | DGTL | [x] |
+| 4 | **AWS SES** | Transactional email | Access confirmed ✓ — verify sending domain is active, confirm out of sandbox mode, retrieve credentials | DGTL | [x] |
+| 5 | **SendMails** | Newsletter campaigns | Access confirmed ✓ — retrieve API key or signup embed code, confirm subscriber list is intact | DGTL | [x] |
+| 6 | **n8n** (self-hosted, client VPS) | Automation workflows | Will be installed on client VPS — access confirmed ✓. Define workflows: contact form → SES, vendor application → notification, newsletter signup → SendMails | DGTL | [x] |
+| 7 | **OpenClaw** (self-hosted, client VPS) | AI live chat widget | Will be installed on client VPS — access confirmed ✓. Configure knowledge base for 400 Market content, retrieve embed script | DGTL | [x] |
+| 8 | **Hostinger Business** | Staging/production hosting | DGTL account ✓ — confirm Node.js 20+ slot is available for the Next.js app | DGTL | [x] |
+| 9 | **Gitea + GitHub** | Source control (dual remote) | Both repos created and configured ✓ — dual push to git.dgtlgroup.io + github.com/will-dgtl on every commit | DGTL | [x] |
+| 10 | **CI/CD** (Gitea Actions → Hostinger) | Auto-deploy on push | Configure Actions runner, create deploy workflow, store env secrets in repo — to be set up in Phase 4 | DGTL | [ ] |
+| 11 | **Domain DNS** | Cutover from old site to new | Full DNS control confirmed ✓ — document current records (A, CNAME, MX, TXT), plan cutover timing for Week 14 | DGTL | [x] |
+| 12 | **Plausible Analytics** (self-hosted) | Privacy-first analytics — replaces GA4 | Install Plausible on DGTL VPS, create site for `400market.com`, add tracking snippet to Next.js, set `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | DGTL | [ ] |
+| 13 | **Google Search Console** | SEO continuity during migration | Verify domain ownership via DNS TXT record (DGTL controls DNS ✓), submit new sitemap post-launch, monitor 301 redirect pickup and re-indexing | DGTL | [ ] |
+| 14 | **Meta Pixel** | Paid social retargeting | Access confirmed ✓ — retrieve Pixel ID, add to Next.js via `NEXT_PUBLIC_META_PIXEL_ID` | DGTL | [x] |
+| 15 | **WordPress** | Existing live site | Fully backed up ✓ — keep live until new site validated in production. Freeze date to be agreed before Phase 4 cutover | DGTL | [x] |
 
 ---
 
@@ -117,13 +119,8 @@
 
 ### WordPress — Pre-Cutover Archive Tasks
 
-- [ ] Export full WordPress XML (Posts, Pages, Media) via Tools → Export
-- [ ] Full database backup (phpMyAdmin or hosting panel)
-- [ ] Full `/wp-content/` file backup (themes, plugins, uploads)
-- [ ] Document all currently installed plugins (feature reference)
+- [x] Full WordPress backup complete (confirmed by client)
 - [ ] Screenshot or PDF archive of all existing pages (copy reference)
-- [ ] Export any contact form submissions / lead data
-- [ ] Record all existing .htaccess redirect rules
-- [ ] Confirm WordPress admin credentials and hosting panel access are documented
+- [ ] Record all existing .htaccess redirect rules (compare against `docs/301-redirect-map.csv`)
 - [ ] Agree on content **freeze date** — no new content added to WordPress after this point
 - [ ] Keep WordPress live until new site is fully validated in production

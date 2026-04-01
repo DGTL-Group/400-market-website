@@ -12,7 +12,7 @@ A full migration from WordPress to a modern **Next.js + Payload CMS v3** monorep
 |---|---|
 | Frontend | Next.js + React (SSR) |
 | CMS | Payload CMS v3 (same monorepo) |
-| Database | Neon PostgreSQL (serverless) |
+| Database | PostgreSQL (self-hosted on VPS) |
 | Styling | Tailwind CSS |
 | Media CDN | Cloudinary |
 | Payments | Stripe |
@@ -21,7 +21,8 @@ A full migration from WordPress to a modern **Next.js + Payload CMS v3** monorep
 | Automation | n8n |
 | Live Chat | OpenClaw (self-hosted AI) |
 | Hosting | Hostinger Business (Node.js) |
-| CI/CD | GitHub Actions → Hostinger auto-deploy |
+| Analytics | Plausible (self-hosted) + Google Search Console |
+| CI/CD | Gitea Actions → Hostinger auto-deploy |
 
 ---
 
