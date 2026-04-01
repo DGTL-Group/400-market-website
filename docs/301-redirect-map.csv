@@ -3,7 +3,7 @@ PAGE,https://400market.com/,https://400market.com/,—,Homepage — no redirect 
 PAGE,https://400market.com/vendors/,https://400market.com/vendors/,—,No change
 PAGE,https://400market.com/about-us/,https://400market.com/about-us/,—,No change
 PAGE,https://400market.com/become-a-vendor/,https://400market.com/become-a-vendor/,—,No change
-PAGE,https://400market.com/contact-us/,https://400market.com/contact/,301,Slug simplified — confirm final slug before go-live
+PAGE,https://400market.com/contact-us/,https://400market.com/contact-us/,—,No change — keeping /contact-us/ slug
 PAGE,https://400market.com/faq/,https://400market.com/faq/,—,No change
 PAGE,https://400market.com/privacy-policy/,https://400market.com/privacy-policy/,—,No change
 PAGE,https://400market.com/shop/,https://400market.com/shop/,—,WooCommerce → Stripe shop — same slug
@@ -14,9 +14,9 @@ PAGE,https://400market.com/my-account/,https://400market.com/,301,WooCommerce ac
 POST,https://400market.com/news/,https://400market.com/news/,—,News archive — no change
 POST,https://400market.com/from-basement-to-bustle-why-you-should-set-up-shop-at-the-400-market/,https://400market.com/news/from-basement-to-bustle-why-you-should-set-up-shop-at-the-400-market/,301,WordPress posts at root → moved under /news/
 POST,https://400market.com/the-400-market-chronicles-why-selling-grandmas-stuff-is-the-ultimate-tribute/,https://400market.com/news/the-400-market-chronicles-why-selling-grandmas-stuff-is-the-ultimate-tribute/,301,WordPress posts at root → moved under /news/
-PRODUCT,https://400market.com/product/400-market-parking-pass/,https://400market.com/shop/parking-pass/,301,WooCommerce /product/ slug → new /shop/ structure
-PRODUCT,https://400market.com/product/5-400-market-gift-certificate/,https://400market.com/shop/gift-certificate-5/,301,Slug cleaned — confirm product slug during Phase 4
-PRODUCT,https://400market.com/product/10-400-market-gift-certificate/,https://400market.com/shop/gift-certificate-10/,301,Slug cleaned — confirm product slug during Phase 4
+PRODUCT,https://400market.com/product/400-market-parking-pass/,https://400market.com/shop/parking-pass/,301,WooCommerce /product/ slug → new /shop/ structure — Stripe integration
+PRODUCT,https://400market.com/product/5-400-market-gift-certificate/,https://400market.com/shop/gift-certificate-5/,301,Slug cleaned — Stripe integration
+PRODUCT,https://400market.com/product/10-400-market-gift-certificate/,https://400market.com/shop/gift-certificate-10/,301,Slug cleaned — Stripe integration
 PATTERN,https://400market.com/*?add-to-cart=*,https://400market.com/shop/,301,WooCommerce query string — catch-all via Next.js middleware
 PATTERN,https://400market.com/wp-admin/*,https://400market.com/admin,301,Payload CMS admin is at /admin — redirect old WP admin attempts
-LOCAL,https://400market.com/locations.kml,https://400market.com/contact/,301,KML file removed — redirect to contact/location page
+LOCAL,https://400market.com/locations.kml,https://400market.com/contact-us/,301,KML file removed — redirect to contact/location page
