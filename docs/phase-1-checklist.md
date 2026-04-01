@@ -10,7 +10,7 @@
 
 | # | Service | Purpose | Action Needed | Owner | Done |
 |---|---|---|---|---|---|
-| 1 | **PostgreSQL** (self-hosted, VPS) | Payload CMS database — replaces Neon | Provision PostgreSQL container on DGTL VPS, create DB + user, set `DATABASE_URI` in env | DGTL | [ ] |
+| 1 | **PostgreSQL** (self-hosted, VPS) | Payload CMS database — replaces Neon | Installed on VPS ✓ — set `DATABASE_URI` in `.env.local` with connection string | DGTL | [x] |
 | 2 | **Cloudinary** | Image CDN and asset storage | Confirm free 25 GB tier active, retrieve Cloud Name + API Key + API Secret | DGTL | [ ] |
 | 3 | **Stripe** | Online shop payments | Access confirmed ✓ — create 3 Products + Prices (parking pass, $5 gift cert, $10 gift cert), retrieve publishable + secret keys + webhook secret | DGTL | [x] |
 | 4 | **AWS SES** | Transactional email | Access confirmed ✓ — verify sending domain is active, confirm out of sandbox mode, retrieve credentials | DGTL | [x] |
@@ -21,8 +21,8 @@
 | 9 | **Gitea + GitHub** | Source control (dual remote) | Both repos created and configured ✓ — dual push to git.dgtlgroup.io + github.com/will-dgtl on every commit | DGTL | [x] |
 | 10 | **CI/CD** (Gitea Actions → Hostinger) | Auto-deploy on push | Configure Actions runner, create deploy workflow, store env secrets in repo — to be set up in Phase 4 | DGTL | [ ] |
 | 11 | **Domain DNS** | Cutover from old site to new | Full DNS control confirmed ✓ — document current records (A, CNAME, MX, TXT), plan cutover timing for Week 14 | DGTL | [x] |
-| 12 | **Plausible Analytics** (self-hosted) | Privacy-first analytics — replaces GA4 | Install Plausible on DGTL VPS, create site for `400market.com`, add tracking snippet to Next.js, set `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | DGTL | [ ] |
-| 13 | **Google Search Console** | SEO continuity during migration | Verify domain ownership via DNS TXT record (DGTL controls DNS ✓), submit new sitemap post-launch, monitor 301 redirect pickup and re-indexing | DGTL | [ ] |
+| 12 | **Plausible Analytics** (self-hosted) | Privacy-first analytics — replaces GA4 | Installed ✓ — API key stored in `.env.local`, tracking snippet to be added in Phase 4 | DGTL | [x] |
+| 13 | **Google Search Console** | SEO continuity during migration | Domain claimed ✓ — submit new XML sitemap post-launch, monitor 301 redirect pickup and re-indexing | DGTL | [x] |
 | 14 | **Meta Pixel** | Paid social retargeting | Access confirmed ✓ — retrieve Pixel ID, add to Next.js via `NEXT_PUBLIC_META_PIXEL_ID` | DGTL | [x] |
 | 15 | **WordPress** | Existing live site | Fully backed up ✓ — keep live until new site validated in production. Freeze date to be agreed before Phase 4 cutover | DGTL | [x] |
 
