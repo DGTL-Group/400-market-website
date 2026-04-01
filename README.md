@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000) — the Payload admin panel 
 ## Environment Variables
 
 See `.env.example` for required keys:
-- `DATABASE_URI` — Neon PostgreSQL connection string
+- `DATABASE_URI` — PostgreSQL connection string (self-hosted on VPS)
 - `PAYLOAD_SECRET` — Payload CMS secret
 - `CLOUDINARY_*` — Cloudinary credentials
 - `STRIPE_SECRET_KEY` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
