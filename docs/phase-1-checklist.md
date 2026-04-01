@@ -11,7 +11,7 @@
 | # | Service | Purpose | Action Needed | Owner | Done |
 |---|---|---|---|---|---|
 | 1 | **PostgreSQL** (self-hosted, VPS) | Payload CMS database — replaces Neon | Installed on VPS ✓ — set `DATABASE_URI` in `.env.local` with connection string | DGTL | [x] |
-| 2 | **Cloudinary** | Image CDN and asset storage | Confirm free 25 GB tier active, retrieve Cloud Name + API Key + API Secret | DGTL | [ ] |
+| 2 | **Cloudinary** | Image CDN and asset storage | API Key + Secret confirmed ✓ — retrieve Cloud Name to complete `.env.local` | DGTL | [x] |
 | 3 | **Stripe** | Online shop payments | Access confirmed ✓ — create 3 Products + Prices (parking pass, $5 gift cert, $10 gift cert), retrieve publishable + secret keys + webhook secret | DGTL | [x] |
 | 4 | **AWS SES** | Transactional email | Access confirmed ✓ — verify sending domain is active, confirm out of sandbox mode, retrieve credentials | DGTL | [x] |
 | 5 | **SendMails** | Newsletter campaigns | Access confirmed ✓ — retrieve API key or signup embed code, confirm subscriber list is intact | DGTL | [x] |
