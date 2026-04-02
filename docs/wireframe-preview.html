@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>400 Market — Wireframe Content Preview</title>
+<style>
+  :root {
+    --yellow: #F7D117;
+    --orange: #F7941D;
+    --mango: #E57200;
+    --dark: #2C2C2C;
+    --gray: #606060;
+    --light: #EBEBEB;
+    --placeholder: #CCCCCC;
+    --white: #FFFFFF;
+    --sub: #A6A6A6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f0f0; color: var(--dark); }
+
+  /* Table of Contents */
+  .toc { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--dark); padding: 24px 20px; overflow-y: auto; z-index: 100; }
+  .toc h2 { color: var(--yellow); font-size: 14px; margin-bottom: 16px; letter-spacing: 1px; }
+  .toc a { display: block; color: #ccc; text-decoration: none; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #3a3a3a; transition: color .2s; }
+  .toc a:hover { color: var(--yellow); }
+  .toc a .opt { color: var(--orange); font-size: 10px; margin-left: 4px; }
+  .toc .note { color: #888; font-size: 11px; margin-top: 16px; line-height: 1.5; }
+
+  .main { margin-left: 260px; padding: 40px; }
+
+  /* Page wrapper */
+  .page { background: #fff; width: 1440px; margin: 0 auto 60px; box-shadow: 0 4px 24px rgba(0,0,0,.12); position: relative; overflow: hidden; transform-origin: top left; }
+  .page-label { background: var(--dark); color: var(--yellow); padding: 12px 24px; font-size: 14px; font-weight: 700; letter-spacing: 1px; position: sticky; top: 0; z-index: 10; }
+  .page-label span { color: #aaa; font-weight: 400; margin-left: 12px; font-size: 12px; }
+
+  /* Scale wrapper for fitting */
+  .scale-wrap { width: 100%; overflow-x: auto; }
+
+  /* Nav */
+  .nav { display: flex; align-items: center; height: 80px; background: var(--dark); padding: 0 40px; }
+  .nav .logo { width: 48px; height: 48px; background: var(--yellow); border-radius: 4px; flex-shrink: 0; }
+  .nav .brand { color: #fff; font-size: 18px; font-weight: 700; margin-left: 12px; }
+  .nav .links { display: flex; gap: 32px; margin-left: 80px; }
+  .nav .links a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+  .nav .cta { margin-left: auto; background: var(--yellow); color: var(--dark); padding: 14px 24px; font-size: 13px; font-weight: 700; border-radius: 4px; text-decoration: none; }
+
+  /* Footer */
+  .footer { background: var(--dark); padding: 40px 80px 24px; display: grid; grid-template-columns: 280px 1fr 300px; gap: 40px; }
+  .footer .brand-block h3 { color: var(--yellow); font-size: 40px; font-weight: 700; }
+  .footer .brand-block h4 { color: #fff; font-size: 22px; margin-top: 4px; }
+  .footer .brand-block .est { color: var(--orange); font-size: 11px; margin-top: 6px; }
+  .footer .brand-block .tagline { color: var(--sub); font-size: 13px; margin-top: 12px; line-height: 1.6; }
+  .footer .cols { display: flex; gap: 40px; }
+  .footer .col h5 { color: var(--yellow); font-size: 12px; font-weight: 700; margin-bottom: 12px; letter-spacing: .5px; }
+  .footer .col a { display: block; color: var(--sub); font-size: 13px; text-decoration: none; margin-bottom: 8px; }
+  .footer .newsletter h5 { color: var(--yellow); font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .footer .newsletter .email-row { display: flex; gap: 0; }
+  .footer .newsletter input { background: #444; border: none; color: #aaa; padding: 12px 16px; font-size: 13px; width: 180px; }
+  .footer .newsletter button { background: var(--yellow); color: var(--dark); border: none; padding: 12px 20px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .footer-bottom { background: var(--dark); border-top: 1px solid #555; padding: 16px 80px; display: flex; justify-content: space-between; }
+  .footer-bottom span { color: #707070; font-size: 12px; }
+
+  /* Common elements */
+  .btn { display: inline-block; padding: 14px 28px; font-size: 13px; font-weight: 700; border-radius: 4px; text-decoration: none; }
+  .btn-y { background: var(--yellow); color: var(--dark); }
+  .btn-o { background: var(--orange); color: #fff; }
+  .btn-d { background: var(--dark); color: #fff; }
+  .btn-l { background: var(--light); color: var(--dark); }
+  .placeholder { background: var(--placeholder); display: flex; align-items: center; justify-content: center; color: var(--gray); font-size: 13px; }
+  .section { padding: 60px 80px; }
+  .section-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .section-sub { font-size: 15px; color: var(--gray); margin-bottom: 32px; }
+  .divider { border: none; border-top: 1px solid var(--placeholder); margin: 0; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+
+  /* Newsletter banner */
+  .newsletter-banner { background: var(--yellow); padding: 40px 80px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  .newsletter-banner h2 { font-size: 32px; }
+  .newsletter-banner p { font-size: 15px; max-width: 600px; }
+  .newsletter-banner .input-row { display: flex; gap: 0; }
+  .newsletter-banner input { padding: 16px; font-size: 14px; width: 260px; border: none; }
+  .newsletter-banner button { background: var(--dark); color: #fff; border: none; padding: 16px 24px; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+  /* Info strip */
+  .info-strip { background: var(--yellow); display: grid; grid-template-columns: repeat(4, 1fr); padding: 20px 80px; }
+  .info-strip span { font-size: 14px; font-weight: 700; }
+
+  /* Cards */
+  .card { background: #fff; overflow: hidden; }
+  .card .thumb { height: 200px; }
+  .card .body { padding: 16px; }
+  .card .badge { display: inline-block; background: var(--yellow); padding: 2px 10px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+  .card h3 { font-size: 16px; margin-bottom: 4px; }
+  .card .desc { font-size: 13px; color: var(--gray); margin-bottom: 8px; }
+  .card .link { font-size: 13px; color: var(--orange); font-weight: 600; text-decoration: none; }
+
+  /* Review cards */
+  .review-card { background: #fff; padding: 24px; border-top: 4px solid var(--yellow); }
+  .review-card .stars { color: var(--yellow); font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+  .review-card .text { font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+  .review-card .author { font-size: 13px; font-weight: 600; color: var(--gray); }
+  .review-card .source { font-size: 11px; color: var(--gray); }
+
+  /* Map */
+  .map-placeholder { background: var(--light); margin: 0 80px; overflow: hidden; }
+  .map-header { background: var(--dark); color: #fff; padding: 14px 16px; font-size: 14px; font-weight: 700; }
+  .map-zones { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; padding: 8px; min-height: 260px; }
+  .map-zones .zone { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--dark); padding: 12px; text-align: center; }
+  .map-note { text-align: center; color: var(--gray); font-size: 12px; padding: 12px; }
+
+  /* FAQ */
+  .faq-item { display: flex; align-items: center; background: var(--light); padding: 16px 32px; border-bottom: 1px solid var(--placeholder); }
+  .faq-item span { flex: 1; font-size: 14px; }
+  .faq-item .plus { font-size: 22px; font-weight: 700; color: var(--gray); width: 40px; text-align: center; flex-shrink: 0; margin-left: auto; }
+
+  /* Shop product cards — fixed height description + pinned button */
+  .product-card { background: #fff; border: 1px solid var(--light); display: flex; flex-direction: column; }
+  .product-card .body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+  .product-card .product-desc { height: 60px; overflow: hidden; font-size: 13px; color: var(--gray); margin-bottom: 16px; }
+  .product-card .btn { margin-top: auto; }
+
+  /* Pagination */
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 32px 80px; }
+  .pagination .pg-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; border-radius: 4px; cursor: pointer; text-decoration: none; }
+  .pagination .pg-btn.active { background: var(--yellow); color: var(--dark); }
+  .pagination .pg-btn:not(.active) { background: #fff; color: var(--gray); border: 1px solid var(--light); }
+  .pagination .pg-arrow { font-size: 14px; font-weight: 600; color: var(--orange); text-decoration: none; padding: 0 12px; }
+  .pagination .pg-arrow.disabled { color: var(--placeholder); pointer-events: none; }
+  .pagination .pg-info { font-size: 13px; color: var(--gray); margin: 0 16px; }
+  .faq-section-title { font-size: 18px; font-weight: 700; padding: 16px 80px 0; margin-top: 16px; }
+
+  /* Table */
+  .pricing-table { width: 100%; border-collapse: collapse; }
+  .pricing-table th { background: var(--dark); color: #fff; text-align: left; padding: 14px 24px; font-size: 13px; }
+  .pricing-table td { padding: 14px 24px; font-size: 13px; }
+  .pricing-table tr:nth-child(even) { background: var(--light); }
+
+  /* Form fields */
+  .form-field { margin-bottom: 20px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+  .form-field input, .form-field textarea, .form-field select { width: 100%; padding: 14px; background: var(--light); border: none; font-size: 14px; font-family: inherit; }
+  .form-field textarea { min-height: 100px; resize: vertical; }
+
+  /* Contact info */
+  .contact-info { background: var(--light); padding: 32px; }
+  .contact-info h3 { font-size: 18px; margin-bottom: 20px; }
+  .contact-info .item { margin-bottom: 24px; }
+  .contact-info .item strong { font-size: 13px; display: block; margin-bottom: 4px; }
+  .contact-info .item p { font-size: 14px; color: var(--gray); line-height: 1.5; }
+
+  /* Hero variants */
+  .hero-dark { background: var(--dark); position: relative; overflow: hidden; }
+  .hero-yellow { background: var(--yellow); padding: 40px 80px; }
+
+  /* Optional banner */
+  .optional-banner { background: var(--orange); color: #fff; padding: 12px 80px; font-size: 13px; font-weight: 700; }
+
+  /* Event rows */
+  .event-row { display: flex; gap: 24px; padding: 24px 80px; align-items: flex-start; border-bottom: 1px solid var(--placeholder); }
+  .event-row .date-box { width: 72px; height: 72px; background: var(--yellow); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+  .event-row .date-box .month { font-size: 11px; font-weight: 700; }
+  .event-row .date-box .day { font-size: 28px; font-weight: 700; }
+  .event-row .content { flex: 1; }
+  .event-row .content h3 { font-size: 20px; margin-bottom: 4px; }
+  .event-row .content .meta { font-size: 13px; color: var(--gray); margin-bottom: 4px; }
+  .event-row .content .desc { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
+  .event-row .thumb { width: 280px; height: 160px; flex-shrink: 0; }
+  .featured-badge { display: inline-block; background: var(--orange); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 12px; margin-bottom: 8px; }
+
+  /* Blog */
+  .blog-body { max-width: 1040px; margin: 0 auto; padding: 40px 0; }
+  .blog-body h2 { font-size: 28px; margin: 32px 0 16px; }
+  .blog-body h3 { font-size: 18px; margin: 24px 0 8px; }
+  .blog-body p { font-size: 16px; line-height: 1.7; color: var(--dark); margin-bottom: 16px; }
+  .blog-body .reason { margin-bottom: 24px; }
+  .blog-body .reason h3 { margin-bottom: 4px; }
+  .blog-body .reason p { color: var(--gray); }
+  .cta-box { background: var(--yellow); padding: 32px; display: flex; align-items: center; justify-content: space-between; margin: 40px 0; }
+  .cta-box h3 { font-size: 20px; }
+  .cta-box p { font-size: 15px; margin-top: 4px; }
+
+  /* Vendor profile */
+  .tag { display: inline-block; background: var(--yellow); padding: 4px 14px; font-size: 12px; margin-right: 8px; margin-bottom: 8px; }
+
+  /* Gallery row */
+  .gallery-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding: 0 80px; margin-bottom: 40px; }
+  .gallery-row .placeholder { height: 200px; }
+
+  /* Responsive scale */
+  @media (max-width: 1740px) {
+    .page { transform: scale(0.75); margin-bottom: -25%; width: 1440px; }
+    .main { padding: 20px; }
+  }
+  @media (max-width: 1360px) {
+    .page { transform: scale(0.6); margin-bottom: -40%; }
+  }
+
+  /* Editable highlight */
+  [contenteditable]:hover { outline: 2px dashed var(--orange); outline-offset: 2px; cursor: text; }
+  [contenteditable]:focus { outline: 2px solid var(--orange); outline-offset: 2px; background: #fff8e0; }
+
+  /* ── HEADER VARIATIONS ── */
+  .header-compare { width: 1440px; margin: 0 auto 60px; }
+  .header-compare .variant-label {
+    background: var(--orange); color: #fff; padding: 10px 24px; font-size: 13px; font-weight: 700; letter-spacing: .5px;
+  }
+  .header-compare .variant-label span { font-weight: 400; opacity: .8; margin-left: 8px; }
+
+  /* Nav B — Bigger */
+  .nav-b { display: flex; align-items: center; height: 100px; background: var(--dark); padding: 0 48px; }
+  .nav-b .logo-b { width: 64px; height: 64px; background: var(--yellow); border-radius: 6px; flex-shrink: 0; }
+  .nav-b .brand-b { color: #fff; font-size: 24px; font-weight: 700; margin-left: 14px; line-height: 1.1; }
+  .nav-b .brand-b small { display: block; font-size: 10px; font-weight: 400; color: var(--orange); letter-spacing: 2px; margin-top: 2px; }
+  .nav-b .links-b { display: flex; gap: 36px; margin-left: 80px; }
+  .nav-b .links-b a { color: #c8c8c8; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
+  .nav-b .cta-b { margin-left: auto; background: var(--yellow); color: var(--dark); padding: 16px 28px; font-size: 14px; font-weight: 700; border-radius: 4px; text-decoration: none; }
+
+  /* Nav C — Centered logo, split menu */
+  .nav-c { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 90px; background: var(--dark); padding: 0 48px; }
+  .nav-c .links-left { display: flex; gap: 32px; justify-content: flex-end; padding-right: 40px; }
+  .nav-c .links-left a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+  .nav-c .center-logo { display: flex; flex-direction: column; align-items: center; }
+  .nav-c .logo-c { width: 52px; height: 52px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .nav-c .logo-c span { font-size: 14px; font-weight: 700; color: var(--dark); }
+  .nav-c .brand-c { color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 3px; margin-top: 4px; }
+  .nav-c .links-right { display: flex; gap: 32px; padding-left: 40px; align-items: center; }
+  .nav-c .links-right a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+  .nav-c .merchant-pill { background: var(--yellow); color: var(--dark); padding: 10px 20px; font-size: 11px; font-weight: 700; border-radius: 24px; text-decoration: none; letter-spacing: .5px; margin-left: 12px; }
+
+  /* Nav C — Top accent bar */
+  .nav-c-top { height: 4px; background: linear-gradient(90deg, var(--yellow) 0%, var(--orange) 100%); }
+
+  /* Nav D — Merchant as menu item, no separate CTA */
+  .nav-d { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 90px; background: var(--dark); padding: 0 48px; }
+  .nav-d .links-left { display: flex; gap: 32px; justify-content: flex-end; padding-right: 40px; }
+  .nav-d .links-left a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+  .nav-d .center-logo { display: flex; flex-direction: column; align-items: center; }
+  .nav-d .logo-d { width: 52px; height: 52px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .nav-d .logo-d span { font-size: 14px; font-weight: 700; color: var(--dark); }
+  .nav-d .brand-d { color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 3px; margin-top: 4px; }
+  .nav-d .links-right { display: flex; gap: 32px; padding-left: 40px; align-items: center; }
+  .nav-d .links-right a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+  .nav-d .links-right a.merchant-link { color: var(--yellow); }
+</style>
+</head>
+<body>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc">
+  <h2>WIREFRAME PAGES</h2>
+  <a href="#headers" style="color:var(--orange);">HEADER VARIATIONS (4)</a>
+  <a href="#pg01">01 — Homepage</a>
+  <a href="#pg02">02 — Vendors Directory</a>
+  <a href="#pg03">03 — Vendor Profile <span class="opt">OPTIONAL</span></a>
+  <a href="#pg04">04 — Events</a>
+  <a href="#pg05">05 — Shop</a>
+  <a href="#pg06">06 — Become a Merchant</a>
+  <a href="#pg07a">07A — Contact Us (Version A)</a>
+  <a href="#pg07b">07B — Contact Us (Version B)</a>
+  <a href="#pg08">08 — FAQ</a>
+  <a href="#pg09">09 — About Us</a>
+  <a href="#pg10">10 — News Archive</a>
+  <a href="#pg11">11A — News Post (Narrow)</a>
+  <a href="#pg11b">11B — News Post (Wide)</a>
+  <p class="note">Click any text to edit it directly.</p>
+  <button id="saveBtn" style="margin-top:16px;width:100%;padding:12px;background:var(--yellow);color:var(--dark);border:none;font-weight:700;font-size:13px;cursor:pointer;border-radius:4px;">SAVE CHANGES (Download HTML)</button>
+  <button id="resetBtn" style="margin-top:8px;width:100%;padding:10px;background:transparent;color:#888;border:1px solid #555;font-size:12px;cursor:pointer;border-radius:4px;">Reset to original</button>
+  <div id="changeCount" style="margin-top:12px;color:var(--yellow);font-size:11px;"></div>
+</nav>
+
+<div class="main">
+
+<!-- ============================================================ -->
+<!-- HEADER VARIATIONS -->
+<!-- ============================================================ -->
+<div id="headers" class="header-compare" style="background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.12);overflow:hidden;">
+  <div style="background:var(--dark);padding:16px 24px;">
+    <span style="color:var(--yellow);font-size:14px;font-weight:700;letter-spacing:1px;">HEADER VARIATIONS</span>
+    <span style="color:#aaa;font-size:12px;margin-left:12px;">Compare all 4 options — pick one for the final build</span>
+  </div>
+
+  <!-- VARIANT A — Current (compact) -->
+  <div class="variant-label">A — CURRENT <span>Compact · 80px · Logo left, CTA right</span></div>
+  <nav class="nav">
+    <div class="logo"></div>
+    <span class="brand">400 MARKET</span>
+    <div class="links">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
+    </div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div style="height:32px;background:#f5f5f5;"></div>
+
+  <!-- VARIANT B — Bigger header, bigger logo -->
+  <div class="variant-label">B — EXPANDED <span>Taller · 100px · Larger logo with tagline · Bolder CTA</span></div>
+  <nav class="nav-b">
+    <div class="logo-b"></div>
+    <div class="brand-b">
+      400 MARKET
+      <small>EST. 1986</small>
+    </div>
+    <div class="links-b">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
+    </div>
+    <a class="cta-b">BECOME A MERCHANT</a>
+  </nav>
+
+  <div style="height:32px;background:#f5f5f5;"></div>
+
+  <!-- VARIANT C — Centered logo, split menu, pill CTA -->
+  <div class="variant-label">C — CENTERED LOGO + PILL CTA <span>Logo centered · Menu split · "Become a Merchant" as pill button on right</span></div>
+  <div class="nav-c-top"></div>
+  <nav class="nav-c">
+    <div class="links-left">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
+    </div>
+    <div class="center-logo">
+      <div class="logo-c"><span>400</span></div>
+      <span class="brand-c">MARKET</span>
+    </div>
+    <div class="links-right">
+      <a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
+      <a class="merchant-pill">BECOME A MERCHANT</a>
+    </div>
+  </nav>
+
+  <div style="height:32px;background:#f5f5f5;"></div>
+
+  <!-- VARIANT D — Centered logo, merchant as menu item (no separate CTA) -->
+  <div class="variant-label">D — CENTERED LOGO + MERCHANT IN MENU <span>Logo centered · All items in menu · "Become a Merchant" highlighted in yellow text</span></div>
+  <div class="nav-c-top"></div>
+  <nav class="nav-d">
+    <div class="links-left">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
+    </div>
+    <div class="center-logo">
+      <div class="logo-d"><span>400</span></div>
+      <span class="brand-d">MARKET</span>
+    </div>
+    <div class="links-right">
+      <a>NEWS</a><a>ABOUT</a><a>CONTACT</a><a class="merchant-link">BECOME A MERCHANT</a>
+    </div>
+  </nav>
+
+  <div style="padding:20px 24px;background:#f5f5f5;border-top:1px solid #ddd;">
+    <p style="font-size:12px;color:var(--gray);">All variations are 1440px wide. The chosen header will be applied to every page. Variants C &amp; D include a gradient accent bar at the top.</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 01 — HOMEPAGE -->
+<!-- ============================================================ -->
+<div id="pg01" class="page">
+  <div class="page-label">01 — HOMEPAGE <span>1440px Desktop</span></div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="logo"></div>
+    <span class="brand">400 MARKET</span>
+    <div class="links">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
+    </div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero-dark" style="padding: 100px 80px 80px; min-height: 640px;">
+    <div class="placeholder" style="position:absolute;top:0;left:680px;right:0;bottom:0;opacity:.3;">[ Hero Background Photo ]</div>
+    <h1 style="color:var(--yellow);font-size:60px;max-width:580px;line-height:1.05;" contenteditable>FOOD, FINDS & FUN.</h1>
+    <p style="color:#fff;font-size:26px;margin-top:80px;max-width:560px;" contenteditable>Ontario's #1 Indoor Weekend Market</p>
+    <p style="color:#bbb;font-size:16px;margin-top:12px;" contenteditable>Sat & Sun 9AM-5PM</p>
+    <p style="color:#bbb;font-size:16px;margin-top:4px;" contenteditable>2207 Industrial Park Rd, Innisfil ON</p>
+    <div style="margin-top:40px;display:flex;gap:16px;">
+      <a class="btn btn-y">PLAN YOUR VISIT</a>
+      <a class="btn btn-o">BECOME A MERCHANT</a>
+    </div>
+  </div>
+
+  <!-- Info Strip -->
+  <div class="info-strip">
+    <span contenteditable>SAT-SUN 9AM-5PM</span>
+    <span contenteditable>2207 Industrial Park Rd, Innisfil ON</span>
+    <span contenteditable>105,000 SQ FT OF SHOPPING</span>
+    <span contenteditable>HUNDREDS OF UNIQUE VENDORS</span>
+  </div>
+
+  <!-- Featured Vendors -->
+  <div class="section">
+    <h2 class="section-title" contenteditable>FEATURED VENDORS</h2>
+    <p class="section-sub" contenteditable>Discover the makers, growers, and artisans of 400 Market.</p>
+    <div class="grid-3">
+      <div class="card">
+        <div class="thumb placeholder">[ Vendor Photo ]</div>
+        <div class="body">
+          <span class="badge">ANTIQUES</span>
+          <h3 contenteditable>Vendor Name 1</h3>
+          <p class="desc" contenteditable>Booth collectibles & curios</p>
+          <a class="link">View profile &rarr;</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb placeholder">[ Vendor Photo ]</div>
+        <div class="body">
+          <span class="badge">ANTIQUES</span>
+          <h3 contenteditable>Vendor Name 2</h3>
+          <p class="desc" contenteditable>Booth collectibles & curios</p>
+          <a class="link">View profile &rarr;</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb placeholder">[ Vendor Photo ]</div>
+        <div class="body">
+          <span class="badge">ANTIQUES</span>
+          <h3 contenteditable>Vendor Name 3</h3>
+          <p class="desc" contenteditable>Booth collectibles & curios</p>
+          <a class="link">View profile &rarr;</a>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:32px;"><a class="btn btn-d">VIEW ALL VENDORS</a></div>
+  </div>
+
+  <!-- Market Map -->
+  <div class="section" style="padding-bottom:20px;">
+    <h2 class="section-title" contenteditable>EXPLORE THE MARKET</h2>
+    <p class="section-sub" contenteditable>Interactive floor plan — tap a section to explore.</p>
+  </div>
+  <div class="map-placeholder">
+    <div class="map-zones">
+      <div class="zone" style="background:#F7941D;">FOOD COURT</div>
+      <div class="zone" style="background:#C0D1A6;">VENDOR SECTION</div>
+      <div class="zone" style="background:#A6C0D9;">VENDOR SECTION</div>
+    </div>
+    <p class="map-note">[ Interactive SVG Map — zones are clickable ]</p>
+  </div>
+
+  <!-- Events -->
+  <div class="section" style="background:var(--light);margin-top:40px;">
+    <h2 class="section-title" contenteditable>UPCOMING EVENTS</h2>
+    <p class="section-sub" contenteditable>Special weekends, seasonal markets, and community days.</p>
+    <div class="grid-3">
+      <div class="card" style="background:#fff;">
+        <div style="display:flex;gap:12px;padding:16px;">
+          <div style="width:72px;height:72px;background:var(--yellow);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-size:11px;font-weight:700;">APR</span><span style="font-size:28px;font-weight:700;">12</span>
+          </div>
+          <div>
+            <h3 contenteditable>Market Event 1</h3>
+            <p style="font-size:12px;color:var(--gray);" contenteditable>Sat & Sun 9AM-5PM</p>
+            <p style="font-size:13px;color:var(--gray);margin-top:8px;" contenteditable>A brief event description goes here telling visitors what to expect.</p>
+            <a class="link" style="display:block;margin-top:12px;">Details & add to calendar &rarr;</a>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:#fff;">
+        <div style="display:flex;gap:12px;padding:16px;">
+          <div style="width:72px;height:72px;background:var(--yellow);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-size:11px;font-weight:700;">APR</span><span style="font-size:28px;font-weight:700;">19</span>
+          </div>
+          <div>
+            <h3 contenteditable>Market Event 2</h3>
+            <p style="font-size:12px;color:var(--gray);" contenteditable>Sat & Sun 9AM-5PM</p>
+            <p style="font-size:13px;color:var(--gray);margin-top:8px;" contenteditable>A brief event description goes here telling visitors what to expect.</p>
+            <a class="link" style="display:block;margin-top:12px;">Details & add to calendar &rarr;</a>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:#fff;">
+        <div style="display:flex;gap:12px;padding:16px;">
+          <div style="width:72px;height:72px;background:var(--yellow);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-size:11px;font-weight:700;">APR</span><span style="font-size:28px;font-weight:700;">26</span>
+          </div>
+          <div>
+            <h3 contenteditable>Market Event 3</h3>
+            <p style="font-size:12px;color:var(--gray);" contenteditable>Sat & Sun 9AM-5PM</p>
+            <p style="font-size:13px;color:var(--gray);margin-top:8px;" contenteditable>A brief event description goes here telling visitors what to expect.</p>
+            <a class="link" style="display:block;margin-top:12px;">Details & add to calendar &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:32px;"><a class="btn btn-d">VIEW ALL EVENTS</a></div>
+  </div>
+
+  <!-- Google Reviews -->
+  <div class="section">
+    <h2 class="section-title" contenteditable>WHAT PEOPLE ARE SAYING</h2>
+    <p class="section-sub" contenteditable>Real reviews from real visitors — straight from Google.</p>
+    <div class="grid-3">
+      <div class="review-card">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="text" contenteditable>"Amazing market! So many unique vendors and great food. We come every weekend with the family."</p>
+        <p class="author" contenteditable>— Sarah M.</p>
+        <p class="source">Google Review</p>
+      </div>
+      <div class="review-card">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="text" contenteditable>"Love the variety here. Found incredible antiques and handmade crafts. The atmosphere is fantastic."</p>
+        <p class="author" contenteditable>— James T.</p>
+        <p class="source">Google Review</p>
+      </div>
+      <div class="review-card">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="text" contenteditable>"Best flea market in Ontario. Huge space, friendly vendors, and always something new to discover."</p>
+        <p class="author" contenteditable>— Lisa K.</p>
+        <p class="source">Google Review</p>
+      </div>
+    </div>
+    <p style="text-align:center;color:var(--gray);font-size:13px;margin-top:20px;">[ Animated carousel — auto-scrolling reviews pulled from Google ]</p>
+  </div>
+
+  <!-- Newsletter -->
+  <div class="newsletter-banner">
+    <div>
+      <h2 contenteditable>STAY IN THE LOOP</h2>
+      <p contenteditable>Market news, merchant spotlights, and event updates to your inbox.</p>
+    </div>
+    <div class="input-row">
+      <input type="text" placeholder="your@email.com">
+      <button>SUBSCRIBE</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="brand-block">
+      <h3>400</h3>
+      <h4>MARKET</h4>
+      <p class="est">EST. 1986</p>
+      <p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <h5>EXPLORE</h5>
+        <a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a>
+      </div>
+      <div class="col">
+        <h5>MARKET</h5>
+        <a>About Us</a><a>FAQ</a><a>Contact Us</a>
+      </div>
+      <div class="col">
+        <h5>POLICIES</h5>
+        <a>Privacy Policy</a><a>Terms of Use</a>
+      </div>
+      <div class="col">
+        <h5>VISIT US</h5>
+        <a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a>
+      </div>
+    </div>
+    <div class="newsletter">
+      <h5>STAY IN THE LOOP</h5>
+      <div class="email-row">
+        <input placeholder="your@email.com">
+        <button>SUBSCRIBE</button>
+      </div>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <span>&copy; 2026 The 400 Market. All rights reserved.</span>
+    <span>Designed with love by DGTL Group</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 02 — VENDORS DIRECTORY -->
+<!-- ============================================================ -->
+<div id="pg02" class="page">
+  <div class="page-label">02 — VENDORS DIRECTORY <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div style="background:var(--dark);padding:40px 80px 50px;">
+    <h1 style="color:var(--yellow);font-size:48px;" contenteditable>OUR VENDORS</h1>
+    <p style="color:#bbb;font-size:17px;margin-top:16px;" contenteditable>Hundreds of unique makers, growers, and artisans under one roof.</p>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="background:var(--light);padding:20px 80px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:13px;font-weight:600;">Filter:</span>
+    <span class="btn btn-y" style="padding:8px 14px;font-size:11px;">ALL</span>
+    <span class="btn" style="padding:8px 14px;font-size:11px;background:#fff;color:var(--gray);">ANTIQUES</span>
+    <span class="btn" style="padding:8px 14px;font-size:11px;background:#fff;color:var(--gray);">CLOTHING</span>
+    <span class="btn" style="padding:8px 14px;font-size:11px;background:#fff;color:var(--gray);">FOOD</span>
+    <span class="btn" style="padding:8px 14px;font-size:11px;background:#fff;color:var(--gray);">COLLECTIBLES</span>
+    <span class="btn" style="padding:8px 14px;font-size:11px;background:#fff;color:var(--gray);">JEWELRY</span>
+    <span class="btn" style="padding:8px 14px;font-size:11px;background:#fff;color:var(--gray);">HOME GOODS</span>
+    <span class="btn" style="padding:8px 14px;font-size:11px;background:#fff;color:var(--gray);">CRAFTS</span>
+    <div style="margin-left:auto;background:#fff;padding:10px 16px;font-size:13px;color:var(--gray);min-width:200px;">Search vendors...</div>
+  </div>
+
+  <!-- Vendor Grid (4 rows x 3 cols = 12) -->
+  <div class="section">
+    <div class="grid-3" style="row-gap:40px;">
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 1</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 2</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 3</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 4</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 5</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 6</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 7</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 8</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 9</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 10</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 11</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+      <div class="card" style="background:var(--light);"><div class="thumb placeholder">[ Vendor Photo ]</div><div class="body"><span class="badge">ANTIQUES</span><h3 contenteditable>Vendor Business 12</h3><p class="desc" contenteditable>Antiques, curios & vintage finds</p><a class="link">View profile &rarr;</a></div></div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <a class="pg-arrow disabled">&larr; Previous</a>
+      <a class="pg-btn active">1</a>
+      <a class="pg-btn">2</a>
+      <a class="pg-btn">3</a>
+      <a class="pg-btn">4</a>
+      <span class="pg-info">...</span>
+      <a class="pg-btn">12</a>
+      <a class="pg-arrow">Next &rarr;</a>
+    </div>
+    <p style="text-align:center;font-size:13px;color:var(--gray);margin-bottom:24px;">Showing 1–12 of 140 vendors</p>
+  </div>
+
+  <!-- Map -->
+  <div class="section" style="padding-bottom:20px;">
+    <h2 class="section-title" contenteditable>EXPLORE THE MARKET</h2>
+    <p class="section-sub" contenteditable>Interactive floor plan — tap a section to explore.</p>
+  </div>
+  <div class="map-placeholder">
+    <div class="map-zones">
+      <div class="zone" style="background:#F7941D;">FOOD COURT</div>
+      <div class="zone" style="background:#C0D1A6;">VENDOR SECTION</div>
+      <div class="zone" style="background:#A6C0D9;">VENDOR SECTION</div>
+    </div>
+    <p class="map-note">[ Interactive SVG Map — zones are clickable ]</p>
+  </div>
+
+  <!-- CTA -->
+  <div style="background:var(--yellow);padding:48px 80px;display:flex;align-items:center;justify-content:space-between;margin-top:40px;">
+    <div>
+      <h2 style="font-size:36px;" contenteditable>WANT A BOOTH?</h2>
+      <p style="font-size:16px;margin-top:8px;" contenteditable>Join hundreds of merchants. Affordable rates, thousands of weekend shoppers.</p>
+    </div>
+    <a class="btn btn-d">APPLY NOW</a>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 03 — VENDOR PROFILE (OPTIONAL) -->
+<!-- ============================================================ -->
+<div id="pg03" class="page">
+  <div class="page-label">03 — VENDOR PROFILE <span style="color:var(--orange);">OPTIONAL</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div class="optional-banner" contenteditable>WARNING: OPTIONAL PAGE — Fast-moving vendor list may make individual vendor pages unviable. Included for GM consideration.</div>
+
+  <p style="padding:12px 80px;font-size:12px;color:var(--gray);" contenteditable>Home  &rsaquo;  Vendors  &rsaquo;  Vendor Name</p>
+
+  <!-- Vendor Hero -->
+  <div class="hero-dark" style="padding: 60px 80px; min-height:320px;">
+    <h1 style="color:var(--yellow);font-size:44px;" contenteditable>VENDOR BUSINESS NAME</h1>
+    <div style="margin-top:16px;display:flex;align-items:center;gap:16px;">
+      <span style="background:var(--orange);color:#fff;padding:4px 14px;font-size:12px;font-weight:700;" contenteditable>ANTIQUES</span>
+      <span style="color:#ccc;font-size:13px;" contenteditable>Booth B-14</span>
+    </div>
+  </div>
+
+  <!-- Description + Map -->
+  <div class="section" style="display:grid;grid-template-columns:1fr 360px;gap:40px;">
+    <div style="background:var(--light);padding:24px;border-left:5px solid var(--yellow);">
+      <h3 style="font-size:20px;margin-bottom:12px;" contenteditable>About This Vendor</h3>
+      <p style="font-size:14px;color:var(--gray);line-height:1.6;" contenteditable>A detailed description of the vendor — their story, what they sell, and why visitors should stop by. Managed in Payload CMS.</p>
+      <p style="font-size:13px;font-weight:600;margin-top:24px;">Product categories:</p>
+      <div style="margin-top:8px;">
+        <span class="tag" contenteditable>Antiques</span>
+        <span class="tag" contenteditable>Vintage</span>
+        <span class="tag" contenteditable>Collectibles</span>
+        <span class="tag" contenteditable>Estate Sales</span>
+      </div>
+      <p style="color:var(--orange);font-size:14px;margin-top:20px;" contenteditable>vendor-website.com    @vendorhandle</p>
+    </div>
+    <div style="background:var(--light);overflow:hidden;">
+      <div style="background:var(--dark);color:#fff;padding:12px 16px;font-size:13px;font-weight:700;">FIND BOOTH B-14</div>
+      <div class="placeholder" style="height:240px;">[ Market Floor Map ]</div>
+    </div>
+  </div>
+
+  <!-- Photos -->
+  <div class="section" style="padding-top:0;">
+    <h2 style="font-size:24px;margin-bottom:16px;" contenteditable>PHOTOS FROM THE BOOTH</h2>
+    <div class="gallery-row" style="padding:0;">
+      <div class="placeholder" style="height:220px;">[ Photo 1 ]</div>
+      <div class="placeholder" style="height:220px;">[ Photo 2 ]</div>
+      <div class="placeholder" style="height:220px;">[ Photo 3 ]</div>
+      <div class="placeholder" style="height:220px;">[ Photo 4 ]</div>
+    </div>
+    <a class="btn btn-l" style="margin-top:16px;">&larr; BACK TO VENDORS</a>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 04 — EVENTS -->
+<!-- ============================================================ -->
+<div id="pg04" class="page">
+  <div class="page-label">04 — EVENTS <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div class="hero-yellow">
+    <h1 style="font-size:56px;" contenteditable>EVENTS</h1>
+    <p style="font-size:17px;margin-top:16px;" contenteditable>Special market days, themed weekends & seasonal events.</p>
+  </div>
+
+  <!-- Tab bar -->
+  <div style="background:var(--light);padding:16px 80px;display:flex;gap:16px;align-items:center;">
+    <span class="btn" style="padding:10px 20px;font-size:13px;background:#fff;color:var(--gray);">ALL EVENTS</span>
+    <span class="btn btn-y" style="padding:10px 20px;font-size:13px;">UPCOMING</span>
+    <span class="btn" style="padding:10px 20px;font-size:13px;background:#fff;color:var(--gray);">THIS MONTH</span>
+    <span class="btn" style="padding:10px 20px;font-size:13px;background:#fff;color:var(--gray);">PAST</span>
+    <a class="btn btn-d" style="margin-left:auto;padding:12px 24px;font-size:13px;">+ ADD ALL TO CALENDAR</a>
+  </div>
+
+  <!-- Event rows -->
+  <div class="event-row" style="background:var(--light);">
+    <div class="date-box"><span class="month">APR</span><span class="day">12</span></div>
+    <div class="content">
+      <span class="featured-badge">FEATURED</span>
+      <h3 contenteditable>Market Event: Spring Flea</h3>
+      <p class="meta" contenteditable>Saturday & Sunday  9AM-5PM  2207 Industrial Park Rd, Innisfil ON</p>
+      <p class="desc" contenteditable>What makes this market day special, featured merchants, activities, and what visitors can expect.</p>
+      <a class="btn btn-y" style="padding:10px 20px;font-size:13px;">EVENT DETAILS</a>
+      <a style="color:var(--orange);font-size:13px;margin-left:16px;">+ Add to Calendar</a>
+    </div>
+    <div class="thumb placeholder">[ Event Photo 1 ]</div>
+  </div>
+  <div class="event-row">
+    <div class="date-box"><span class="month">APR</span><span class="day">19</span></div>
+    <div class="content">
+      <h3 contenteditable>Market Event: Mothers Day Market</h3>
+      <p class="meta" contenteditable>Saturday & Sunday  9AM-5PM  2207 Industrial Park Rd, Innisfil ON</p>
+      <p class="desc" contenteditable>What makes this market day special, featured merchants, activities, and what visitors can expect.</p>
+      <a class="btn btn-y" style="padding:10px 20px;font-size:13px;">EVENT DETAILS</a>
+      <a style="color:var(--orange);font-size:13px;margin-left:16px;">+ Add to Calendar</a>
+    </div>
+    <div class="thumb placeholder">[ Event Photo 2 ]</div>
+  </div>
+  <div class="event-row">
+    <div class="date-box"><span class="month">APR</span><span class="day">26</span></div>
+    <div class="content">
+      <h3 contenteditable>Market Event: Vintage Weekend</h3>
+      <p class="meta" contenteditable>Saturday & Sunday  9AM-5PM  2207 Industrial Park Rd, Innisfil ON</p>
+      <p class="desc" contenteditable>What makes this market day special, featured merchants, activities, and what visitors can expect.</p>
+      <a class="btn btn-y" style="padding:10px 20px;font-size:13px;">EVENT DETAILS</a>
+      <a style="color:var(--orange);font-size:13px;margin-left:16px;">+ Add to Calendar</a>
+    </div>
+    <div class="thumb placeholder">[ Event Photo 3 ]</div>
+  </div>
+  <div class="event-row">
+    <div class="date-box"><span class="month">APR</span><span class="day">33</span></div>
+    <div class="content">
+      <h3 contenteditable>Market Event: Holiday Preview</h3>
+      <p class="meta" contenteditable>Saturday & Sunday  9AM-5PM  2207 Industrial Park Rd, Innisfil ON</p>
+      <p class="desc" contenteditable>What makes this market day special, featured merchants, activities, and what visitors can expect.</p>
+      <a class="btn btn-y" style="padding:10px 20px;font-size:13px;">EVENT DETAILS</a>
+      <a style="color:var(--orange);font-size:13px;margin-left:16px;">+ Add to Calendar</a>
+    </div>
+    <div class="thumb placeholder">[ Event Photo 4 ]</div>
+  </div>
+  <div class="event-row">
+    <div class="date-box"><span class="month">APR</span><span class="day">40</span></div>
+    <div class="content">
+      <h3 contenteditable>Market Event: Summer Kickoff</h3>
+      <p class="meta" contenteditable>Saturday & Sunday  9AM-5PM  2207 Industrial Park Rd, Innisfil ON</p>
+      <p class="desc" contenteditable>What makes this market day special, featured merchants, activities, and what visitors can expect.</p>
+      <a class="btn btn-y" style="padding:10px 20px;font-size:13px;">EVENT DETAILS</a>
+      <a style="color:var(--orange);font-size:13px;margin-left:16px;">+ Add to Calendar</a>
+    </div>
+    <div class="thumb placeholder">[ Event Photo 5 ]</div>
+  </div>
+
+  <!-- Newsletter -->
+  <div class="newsletter-banner">
+    <div><h2 contenteditable>STAY IN THE LOOP</h2><p contenteditable>Market news, merchant spotlights, and event updates to your inbox.</p></div>
+    <div class="input-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 05 — SHOP -->
+<!-- ============================================================ -->
+<div id="pg05" class="page">
+  <div class="page-label">05 — SHOP <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div style="background:var(--dark);padding:40px 80px 50px;">
+    <h1 style="color:var(--yellow);font-size:48px;" contenteditable>SHOP THE MARKET</h1>
+    <p style="color:#bbb;font-size:17px;margin-top:12px;" contenteditable>Parking passes and gift certificates — pick up before your next visit.</p>
+  </div>
+
+  <div class="section">
+    <div class="grid-3">
+      <div class="product-card">
+        <div class="placeholder" style="height:280px;">[ Parking Pass ]</div>
+        <div class="body">
+          <h3 style="font-size:20px;" contenteditable>Parking Pass</h3>
+          <p style="font-size:28px;font-weight:700;color:var(--orange);margin:8px 0;" contenteditable>$5.00</p>
+          <p class="product-desc" contenteditable>Pre-paid parking for one vehicle, one visit to 400 Market.</p>
+          <a class="btn btn-y" style="display:block;text-align:center;">BUY NOW</a>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="placeholder" style="height:280px;">[ $5 Gift Certificate ]</div>
+        <div class="body">
+          <h3 style="font-size:20px;" contenteditable>$5 Gift Certificate</h3>
+          <p style="font-size:28px;font-weight:700;color:var(--orange);margin:8px 0;" contenteditable>$5.00</p>
+          <p class="product-desc" contenteditable>Redeemable with any merchant at 400 Market. Perfect for first-timers.</p>
+          <a class="btn btn-y" style="display:block;text-align:center;">BUY NOW</a>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="placeholder" style="height:280px;">[ $10 Gift Certificate ]</div>
+        <div class="body">
+          <h3 style="font-size:20px;" contenteditable>$10 Gift Certificate</h3>
+          <p style="font-size:28px;font-weight:700;color:var(--orange);margin:8px 0;" contenteditable>$10.00</p>
+          <p class="product-desc" contenteditable>Redeemable with any merchant. The ultimate market gift.</p>
+          <a class="btn btn-y" style="display:block;text-align:center;">BUY NOW</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section" style="padding-top:0;">
+    <h2 style="font-size:24px;margin-bottom:16px;" contenteditable>COMMON QUESTIONS</h2>
+    <div class="faq-item"><span contenteditable>How do I redeem a gift certificate at the market?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Does a parking pass expire?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Can I purchase for someone else as a gift?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Do all merchants accept gift certificates?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Can I use multiple gift certificates in one visit?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>What happens if I lose my certificate?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Is there a limit on how many I can buy?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Can I get a refund on a gift certificate or parking pass?</span><span class="plus">+</span></div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 06 — BECOME A MERCHANT -->
+<!-- ============================================================ -->
+<div id="pg06" class="page">
+  <div class="page-label">06 — BECOME A MERCHANT <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero-dark" style="padding:80px;min-height:360px;position:relative;">
+    <div class="placeholder" style="position:absolute;top:0;left:50%;right:0;bottom:0;opacity:.3;">[ Market Scene Photo ]</div>
+    <h1 style="color:var(--yellow);font-size:48px;line-height:1.1;max-width:580px;position:relative;" contenteditable>BECOME A MERCHANT</h1>
+    <p style="color:#ccc;font-size:15px;margin-top:20px;line-height:1.6;max-width:560px;position:relative;" contenteditable>For over 35 years, the 400 Market has been the heart of Simcoe County's local economy, uniting entrepreneurs, small businesses, and food artisans in one thriving community.</p>
+  </div>
+
+  <!-- Why sell -->
+  <div class="section">
+    <h2 class="section-title" contenteditable>WHY SELL AT 400 MARKET?</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;">
+      <div style="background:var(--light);padding:24px;border-left:5px solid var(--yellow);">
+        <h3 style="font-size:18px;" contenteditable>Established Traffic</h3>
+        <p style="font-size:13px;color:var(--gray);margin-top:8px;" contenteditable>Thousands of shoppers every weekend. No building your own audience.</p>
+      </div>
+      <div style="background:var(--light);padding:24px;border-left:5px solid var(--yellow);">
+        <h3 style="font-size:18px;" contenteditable>Flexible Rentals</h3>
+        <p style="font-size:13px;color:var(--gray);margin-top:8px;" contenteditable>New merchants enjoy flexible options — one-day, weekend, or monthly rentals. No long-term leases.</p>
+      </div>
+      <div style="background:var(--light);padding:24px;border-left:5px solid var(--yellow);">
+        <h3 style="font-size:18px;" contenteditable>Indoor Year-Round</h3>
+        <p style="font-size:13px;color:var(--gray);margin-top:8px;" contenteditable>Rain or shine — the market is fully indoors. Never lose a market day to weather.</p>
+      </div>
+      <div style="background:var(--light);padding:24px;border-left:5px solid var(--yellow);">
+        <h3 style="font-size:18px;" contenteditable>Low Commitment</h3>
+        <p style="font-size:13px;color:var(--gray);margin-top:8px;" contenteditable>Only first and last month's rent as deposit. 30-day notice to leave — that's it.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Rates -->
+  <div class="section" style="padding-top:0;">
+    <h2 class="section-title" contenteditable>MONTHLY RATES</h2>
+    <table class="pricing-table" style="margin-top:16px;">
+      <tr><th>Booth Type</th><th>Size</th><th>Monthly Rate</th><th>Taxes</th></tr>
+      <tr><td contenteditable>Outdoor - Wooden Stall / Parking Lot</td><td contenteditable>--</td><td contenteditable>$350/month</td><td contenteditable>Included</td></tr>
+      <tr><td contenteditable>Indoor Booth</td><td contenteditable>8'x8'</td><td contenteditable>$500/month</td><td contenteditable>Included</td></tr>
+      <tr><td contenteditable>Indoor Booth</td><td contenteditable>8'x16'</td><td contenteditable>$975/month</td><td contenteditable>Included</td></tr>
+      <tr><td contenteditable>Indoor Booth</td><td contenteditable>8'x24'</td><td contenteditable>$1,200/month</td><td contenteditable>Included</td></tr>
+      <tr><td contenteditable>Indoor Booth</td><td contenteditable>8'x32'</td><td contenteditable>$1,450/month</td><td contenteditable>Included</td></tr>
+    </table>
+  </div>
+
+  <!-- Daily Rates -->
+  <div class="section" style="padding-top:0;">
+    <h2 class="section-title" contenteditable>DAILY & WEEKEND RATES</h2>
+    <table class="pricing-table" style="margin-top:16px;">
+      <tr><th>Booth Type</th><th>Saturday</th><th>Sunday</th><th>Full Weekend</th></tr>
+      <tr><td contenteditable>Outdoor - Parking Lot (20x20, no tables)</td><td contenteditable>$50</td><td contenteditable>$50</td><td contenteditable>$100</td></tr>
+      <tr><td contenteditable>Outdoor - Wooden Stall</td><td contenteditable>$50</td><td contenteditable>$50</td><td contenteditable>$100</td></tr>
+      <tr><td contenteditable>Indoor - 8'x8' Booth</td><td contenteditable>$75</td><td contenteditable>$75</td><td contenteditable>$150</td></tr>
+    </table>
+    <p style="font-size:13px;color:var(--gray);margin-top:16px;" contenteditable>Payment is due prior to set up. Set up is between 7:30-8:30 AM.</p>
+    <p style="font-size:13px;color:var(--gray);margin-top:4px;" contenteditable>Permanent merchants: first and last month's rent as deposit. 30-day notice upon leaving.</p>
+  </div>
+
+  <!-- Market Map -->
+  <div class="section" style="padding-bottom:20px;">
+    <h2 class="section-title" contenteditable>AVAILABLE BOOTHS</h2>
+    <p class="section-sub" contenteditable>See where the open spaces are — contact us to reserve yours.</p>
+  </div>
+  <div class="map-placeholder">
+    <div style="background:var(--dark);color:#fff;padding:14px 16px;font-size:14px;font-weight:700;">MARKET FLOOR PLAN</div>
+    <div class="map-zones">
+      <div class="zone" style="background:#F7941D;">FOOD COURT</div>
+      <div class="zone" style="background:#9DC4E0;">VENDOR SECTION</div>
+      <div class="zone" style="background:#C0D1A6;">VENDOR SECTION</div>
+    </div>
+    <p class="map-note">[ Interactive SVG — clickable zones ]</p>
+  </div>
+
+  <!-- Application Form -->
+  <div class="section">
+    <h2 class="section-title" contenteditable>APPLY FOR A BOOTH</h2>
+    <p class="section-sub" contenteditable>Fill out the form and our team will be in touch within 2 business days.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div class="form-field"><label contenteditable>First Name</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Last Name</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Business Name</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Email Address</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Phone Number</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Business Description</label><textarea></textarea></div>
+    </div>
+    <div style="margin-top:24px;display:flex;align-items:center;gap:16px;">
+      <a class="btn btn-y" style="padding:18px 36px;">SUBMIT APPLICATION</a>
+      <span style="font-size:12px;color:var(--gray);" contenteditable>By submitting you agree to our Terms of Use and Privacy Policy.</span>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 07A — CONTACT US (VERSION A) -->
+<!-- ============================================================ -->
+<div id="pg07a" class="page">
+  <div class="page-label">07A — CONTACT US (Version A: Form left, Info right) <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div class="hero-yellow">
+    <h1 style="font-size:48px;" contenteditable>CONTACT US</h1>
+    <p style="font-size:16px;margin-top:12px;" contenteditable>We'd love to hear from you. Questions, merchant inquiries, or just saying hello.</p>
+  </div>
+
+  <div class="section" style="display:grid;grid-template-columns:1fr 1fr;gap:60px;">
+    <!-- Form -->
+    <div>
+      <h2 style="font-size:22px;margin-bottom:20px;" contenteditable>SEND US A MESSAGE</h2>
+      <div class="form-field"><label contenteditable>Your Name</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Email Address</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Subject</label><input type="text"></div>
+      <div class="form-field"><label contenteditable>Message</label><textarea></textarea></div>
+      <a class="btn btn-y">SEND MESSAGE</a>
+    </div>
+    <!-- Info -->
+    <div class="contact-info">
+      <h3 contenteditable>GET IN TOUCH</h3>
+      <div class="item"><strong contenteditable>Address</strong><p contenteditable>The 400 Market<br>2207 Industrial Park Road<br>Innisfil, Ontario, L9S 3V9</p></div>
+      <div class="item"><strong contenteditable>Phone</strong><p contenteditable>705-436-1010</p></div>
+      <div class="item"><strong contenteditable>Email</strong><p contenteditable>manager@400market.com</p></div>
+      <div class="item"><strong contenteditable>Hours</strong><p contenteditable>Sat & Sun  9:00 AM - 5:00 PM<br>Rain or shine  Year-round</p></div>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div style="padding:0 80px 40px;">
+    <div class="placeholder" style="height:340px;width:100%;">[ Google Maps Embed — 2207 Industrial Park Road, Innisfil ON ]</div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 07B — CONTACT US (VERSION B) -->
+<!-- ============================================================ -->
+<div id="pg07b" class="page">
+  <div class="page-label">07B — CONTACT US (Version B: Info top, Map middle, Form below) <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div class="hero-yellow">
+    <h1 style="font-size:48px;" contenteditable>CONTACT US</h1>
+    <p style="font-size:16px;margin-top:12px;" contenteditable>We'd love to hear from you. Questions, merchant inquiries, or just saying hello.</p>
+  </div>
+
+  <!-- Info panel horizontal -->
+  <div style="background:var(--light);padding:32px 80px;">
+    <h3 style="font-size:22px;margin-bottom:20px;" contenteditable>GET IN TOUCH</h3>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+      <div><strong style="font-size:13px;display:block;margin-bottom:4px;" contenteditable>Address</strong><p style="font-size:14px;color:var(--gray);line-height:1.5;" contenteditable>The 400 Market<br>2207 Industrial Park Road<br>Innisfil, Ontario, L9S 3V9</p></div>
+      <div><strong style="font-size:13px;display:block;margin-bottom:4px;" contenteditable>Phone</strong><p style="font-size:14px;color:var(--gray);" contenteditable>705-436-1010</p></div>
+      <div><strong style="font-size:13px;display:block;margin-bottom:4px;" contenteditable>Email</strong><p style="font-size:14px;color:var(--gray);" contenteditable>manager@400market.com</p></div>
+      <div><strong style="font-size:13px;display:block;margin-bottom:4px;" contenteditable>Hours</strong><p style="font-size:14px;color:var(--gray);line-height:1.5;" contenteditable>Sat & Sun  9:00 AM - 5:00 PM<br>Rain or shine  Year-round</p></div>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div style="padding:40px 80px;">
+    <div class="placeholder" style="height:320px;width:100%;">[ Google Maps Embed — 2207 Industrial Park Road, Innisfil ON ]</div>
+  </div>
+
+  <!-- Form below -->
+  <div class="section" style="padding-top:0;">
+    <h2 style="font-size:22px;margin-bottom:20px;" contenteditable>SEND US A MESSAGE</h2>
+    <div class="form-field"><label contenteditable>Your Name</label><input type="text" style="width:100%;"></div>
+    <div class="form-field"><label contenteditable>Email Address</label><input type="text" style="width:100%;"></div>
+    <div class="form-field"><label contenteditable>Subject</label><input type="text" style="width:100%;"></div>
+    <div class="form-field"><label contenteditable>Message</label><textarea style="width:100%;"></textarea></div>
+    <a class="btn btn-y">SEND MESSAGE</a>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 08 — FAQ -->
+<!-- ============================================================ -->
+<div id="pg08" class="page">
+  <div class="page-label">08 — FAQ <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div class="hero-yellow">
+    <h1 style="font-size:40px;" contenteditable>FREQUENTLY ASKED QUESTIONS</h1>
+    <p style="font-size:16px;margin-top:12px;" contenteditable>Everything you need to know about visiting and selling at 400 Market.</p>
+  </div>
+
+  <div style="padding:40px 80px;">
+    <h3 class="faq-section-title" style="padding:0;margin-top:0;" contenteditable>VISITING THE MARKET</h3>
+    <hr class="divider" style="margin:8px 0 0;">
+    <div class="faq-item"><span contenteditable>What are your hours?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Where do I park?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Is the market pet-friendly?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Do you accept credit cards?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Is the market indoor or outdoor?</span><span class="plus">+</span></div>
+
+    <h3 class="faq-section-title" style="padding:0;" contenteditable>MERCHANTS & BOOTHS</h3>
+    <hr class="divider" style="margin:8px 0 0;">
+    <div class="faq-item"><span contenteditable>How do I apply for a booth?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>What are the booth rates?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>What can I sell?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Can I try a day before committing?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Do I need insurance?</span><span class="plus">+</span></div>
+
+    <h3 class="faq-section-title" style="padding:0;" contenteditable>SHOP & GIFT CERTIFICATES</h3>
+    <hr class="divider" style="margin:8px 0 0;">
+    <div class="faq-item"><span contenteditable>How do I redeem a gift certificate?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>When does a parking pass expire?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Can I get a refund?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Do all merchants accept gift certificates?</span><span class="plus">+</span></div>
+
+    <h3 class="faq-section-title" style="padding:0;" contenteditable>LOCATION & ACCESSIBILITY</h3>
+    <hr class="divider" style="margin:8px 0 0;">
+    <div class="faq-item"><span contenteditable>Where exactly is 400 Market located?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Is the market wheelchair accessible?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Is there public transit?</span><span class="plus">+</span></div>
+    <div class="faq-item"><span contenteditable>Where do I park?</span><span class="plus">+</span></div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 09 — ABOUT US -->
+<!-- ============================================================ -->
+<div id="pg09" class="page">
+  <div class="page-label">09 — ABOUT US <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero-dark" style="padding:80px;min-height:400px;position:relative;">
+    <div class="placeholder" style="position:absolute;inset:0;opacity:.2;">[ Market Interior — Wide Shot ]</div>
+    <h1 style="color:var(--yellow);font-size:52px;position:relative;" contenteditable>OUR STORY</h1>
+    <p style="color:#bbb;font-size:18px;margin-top:16px;position:relative;" contenteditable>Est. 1986  &middot;  Innisfil, Ontario</p>
+  </div>
+
+  <!-- Story -->
+  <div class="section" style="display:grid;grid-template-columns:1fr 540px;gap:60px;">
+    <div>
+      <h2 style="font-size:30px;margin-bottom:16px;" contenteditable>FROM HUMBLE BEGINNINGS</h2>
+      <p style="font-size:14px;color:var(--gray);line-height:1.8;" contenteditable>For over 35 years, the 400 Market has been the heart of Simcoe County's local economy, uniting entrepreneurs, small businesses, and food artisans in one thriving community.</p>
+      <p style="font-size:14px;color:var(--gray);line-height:1.8;margin-top:16px;" contenteditable>With hundreds of unique vendor spaces, thousands of weekly visitors, and a dedicated team committed to the market experience, 400 Market is more than a shopping destination — it's where community happens.</p>
+      <p style="font-size:14px;color:var(--gray);line-height:1.8;margin-top:16px;" contenteditable>Today, the market is managed by Scott Saunders, General Manager.</p>
+    </div>
+    <div class="placeholder" style="height:380px;">[ Market History Photo ]</div>
+  </div>
+
+  <!-- Mission -->
+  <div style="background:var(--yellow);padding:48px 80px;">
+    <h2 style="font-size:28px;margin-bottom:16px;" contenteditable>OUR MISSION</h2>
+    <p style="font-size:18px;line-height:1.6;" contenteditable>To provide a vibrant, accessible, and welcoming marketplace where local vendors thrive and community members discover unique finds, fresh food, and lasting connections — every single weekend.</p>
+  </div>
+
+  <!-- Visit Us -->
+  <div class="section">
+    <h2 class="section-title" contenteditable>VISIT US</h2>
+    <div class="grid-3" style="margin-top:24px;">
+      <div style="background:var(--light);padding:24px;border-top:5px solid var(--yellow);">
+        <h3 style="font-size:16px;margin-bottom:12px;" contenteditable>Hours</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;" contenteditable>Saturday & Sunday<br>9:00 AM - 5:00 PM<br>Year-round, rain or shine</p>
+      </div>
+      <div style="background:var(--light);padding:24px;border-top:5px solid var(--yellow);">
+        <h3 style="font-size:16px;margin-bottom:12px;" contenteditable>Location</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;" contenteditable>The 400 Market<br>2207 Industrial Park Road<br>Innisfil, Ontario, L9S 3V9</p>
+      </div>
+      <div style="background:var(--light);padding:24px;border-top:5px solid var(--yellow);">
+        <h3 style="font-size:16px;margin-bottom:12px;" contenteditable>Space</h3>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;" contenteditable>105,000 SQ FT of shopping<br>Accessible spaces available</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery -->
+  <div class="section" style="padding-top:0;">
+    <h2 style="font-size:26px;margin-bottom:16px;" contenteditable>INSIDE THE MARKET</h2>
+    <div class="gallery-row" style="padding:0;">
+      <div class="placeholder" style="height:200px;">[ Gallery 1 ]</div>
+      <div class="placeholder" style="height:200px;">[ Gallery 2 ]</div>
+      <div class="placeholder" style="height:200px;">[ Gallery 3 ]</div>
+      <div class="placeholder" style="height:200px;">[ Gallery 4 ]</div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 10 — NEWS ARCHIVE -->
+<!-- ============================================================ -->
+<div id="pg10" class="page">
+  <div class="page-label">10 — NEWS ARCHIVE <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <div style="background:var(--dark);padding:40px 80px 50px;">
+    <h1 style="color:var(--yellow);font-size:56px;" contenteditable>NEWS</h1>
+    <p style="color:#bbb;font-size:17px;margin-top:12px;" contenteditable>Stories, updates, and tips from the 400 Market community.</p>
+  </div>
+
+  <!-- Featured post -->
+  <div class="section">
+    <div style="display:grid;grid-template-columns:640px 1fr;background:var(--light);">
+      <div class="placeholder" style="height:400px;">[ Featured Post Image ]</div>
+      <div style="padding:32px;border-left:6px solid var(--yellow);">
+        <p style="font-size:12px;color:var(--gray);margin-bottom:12px;" contenteditable>September 18, 2024</p>
+        <h2 style="font-size:22px;margin-bottom:16px;" contenteditable>From Basement To Bustle: Why You Should Set Up Shop At The 400 Market</h2>
+        <p style="font-size:14px;color:var(--gray);line-height:1.6;" contenteditable>Greetings, fellow entrepreneurs! Today, I'm here to advocate for a relocation that might sound outlandish at first — moving your business from the cozy confines of your basement to the bustling bonanza of the 400 Market.</p>
+        <a class="link" style="display:block;margin-top:24px;">Read more &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Older posts -->
+  <div class="section" style="padding-top:0;">
+    <h2 style="font-size:22px;margin-bottom:20px;" contenteditable>OLDER POSTS</h2>
+    <div class="grid-3">
+      <div class="card" style="background:#fff;border:1px solid var(--light);">
+        <div class="placeholder" style="height:200px;">[ Post Image ]</div>
+        <div class="body">
+          <p style="font-size:11px;color:var(--gray);" contenteditable>January 15, 2025</p>
+          <h3 contenteditable>Blog Post Title 2</h3>
+          <p class="desc" contenteditable>A short excerpt of the blog post content goes here. Just enough to entice the reader to click through.</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="card" style="background:#fff;border:1px solid var(--light);">
+        <div class="placeholder" style="height:200px;">[ Post Image ]</div>
+        <div class="body">
+          <p style="font-size:11px;color:var(--gray);" contenteditable>January 15, 2025</p>
+          <h3 contenteditable>Blog Post Title 3</h3>
+          <p class="desc" contenteditable>A short excerpt of the blog post content goes here. Just enough to entice the reader to click through.</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="card" style="background:#fff;border:1px solid var(--light);">
+        <div class="placeholder" style="height:200px;">[ Post Image ]</div>
+        <div class="body">
+          <p style="font-size:11px;color:var(--gray);" contenteditable>January 15, 2025</p>
+          <h3 contenteditable>Blog Post Title 4</h3>
+          <p class="desc" contenteditable>A short excerpt of the blog post content goes here. Just enough to entice the reader to click through.</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div style="padding:0 80px 40px;display:flex;justify-content:space-between;">
+    <a style="color:var(--orange);font-weight:600;font-size:14px;">&larr; Previous</a>
+    <span style="font-size:14px;color:var(--gray);">Page 1 of 1</span>
+    <a style="color:var(--orange);font-weight:600;font-size:14px;">Next &rarr;</a>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 11 — NEWS POST -->
+<!-- ============================================================ -->
+<div id="pg11" class="page">
+  <div class="page-label">11A — NEWS POST — Version A: Narrow body <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <p style="padding:12px 80px;font-size:12px;color:var(--gray);" contenteditable>Home  &rsaquo;  News  &rsaquo;  From Basement To Bustle</p>
+
+  <!-- Post hero -->
+  <div class="hero-dark" style="min-height:400px;padding:0;position:relative;">
+    <div class="placeholder" style="position:absolute;inset:0;opacity:.2;">[ Shopping at the 400 Market - Summer ]</div>
+    <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(20,20,20,.9);padding:32px 80px;">
+      <p style="color:#bbb;font-size:13px;" contenteditable>September 18, 2024</p>
+      <h1 style="color:#fff;font-size:36px;margin-top:8px;" contenteditable>From Basement To Bustle: Why You Should Set Up Shop At The 400 Market</h1>
+    </div>
+  </div>
+
+  <!-- Post body -->
+  <div class="blog-body" style="padding:40px 200px;">
+    <p contenteditable>Greetings, fellow entrepreneurs, aspiring business moguls, and basement-dwellers! Today, I'm here to advocate for a relocation that might sound a bit outlandish at first, but bear with me: moving your business from the cozy confines of your basement to the bustling bonanza of the 400 Market.</p>
+
+    <p contenteditable>Picture this: you, surrounded by boxes, your cat judgmentally sitting on your inventory, and the ever-present aroma of whatever your partner is microwaving. Is this truly the environment for your entrepreneurial ambitions?</p>
+
+    <h2 contenteditable>Five Reasons to Make the Move</h2>
+
+    <div class="reason">
+      <h3 contenteditable>1. Visibility Galore</h3>
+      <p contenteditable>Your business gains exposure to a diverse customer audience rather than remaining hidden away. At the 400 Market, thousands of potential customers walk past every weekend.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>2. Instant Feedback</h3>
+      <p contenteditable>Direct observation of customer reactions provides real-time market insights. No surveys needed — watch how people interact with your products.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>3. Networking Nirvana</h3>
+      <p contenteditable>Opportunities for collaboration and partnership emerge through regular contact with fellow merchants and entrepreneurs.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>4. Unleash Your Inner Showman</h3>
+      <p contenteditable>The marketplace is your stage. Engage customers, tell your story, and build a following through charismatic salesmanship.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>5. Embrace the Chaos</h3>
+      <p contenteditable>Every weekend promises excitement and unpredictability. No two market days are the same — and that's what makes it an adventure.</p>
+    </div>
+
+    <p contenteditable>So there you have it. Five compelling reasons to pack up your basement operation and join the 400 Market family. Your entrepreneurial adventure awaits — see you this weekend!</p>
+
+    <!-- CTA box -->
+    <div style="background:var(--yellow);padding:32px 40px;margin:40px 0;border-radius:4px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;">
+        <div>
+          <h3 style="font-size:20px;" contenteditable>READY TO JOIN THE MARKET?</h3>
+          <p style="font-size:15px;margin-top:6px;" contenteditable>Apply for a booth today and join hundreds of thriving merchants.</p>
+        </div>
+        <a class="btn btn-d" style="white-space:nowrap;padding:16px 32px;font-size:14px;">BECOME A MERCHANT</a>
+      </div>
+    </div>
+
+    <!-- Related posts -->
+    <h2 style="font-size:22px;margin-top:40px;" contenteditable>MORE FROM THE MARKET</h2>
+    <div class="grid-3" style="margin-top:16px;">
+      <div class="card" style="background:var(--light);">
+        <div class="placeholder" style="height:120px;">[ Post Image ]</div>
+        <div class="body">
+          <h3 contenteditable>Related Blog Post 1</h3>
+          <p class="desc" contenteditable>A related post excerpt...</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="card" style="background:var(--light);">
+        <div class="placeholder" style="height:120px;">[ Post Image ]</div>
+        <div class="body">
+          <h3 contenteditable>Related Blog Post 2</h3>
+          <p class="desc" contenteditable>A related post excerpt...</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="card" style="background:var(--light);">
+        <div class="placeholder" style="height:120px;">[ Post Image ]</div>
+        <div class="body">
+          <h3 contenteditable>Related Blog Post 3</h3>
+          <p class="desc" contenteditable>A related post excerpt...</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 11B — NEWS POST (WIDER) -->
+<!-- ============================================================ -->
+<div id="pg11b" class="page">
+  <div class="page-label">11B — NEWS POST — Version B: Wide body (75%) <span>1440px Desktop</span></div>
+  <nav class="nav">
+    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
+    <a class="cta">BECOME A MERCHANT</a>
+  </nav>
+
+  <p style="padding:12px 80px;font-size:12px;color:var(--gray);" contenteditable>Home  &rsaquo;  News  &rsaquo;  From Basement To Bustle</p>
+
+  <!-- Post hero -->
+  <div class="hero-dark" style="min-height:400px;padding:0;position:relative;">
+    <div class="placeholder" style="position:absolute;inset:0;opacity:.2;">[ Shopping at the 400 Market - Summer ]</div>
+    <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(20,20,20,.9);padding:32px 80px;">
+      <p style="color:#bbb;font-size:13px;" contenteditable>September 18, 2024</p>
+      <h1 style="color:#fff;font-size:36px;margin-top:8px;" contenteditable>From Basement To Bustle: Why You Should Set Up Shop At The 400 Market</h1>
+    </div>
+  </div>
+
+  <!-- Post body — WIDER: 75% width = ~1080px, centered -->
+  <div class="blog-body" style="max-width:1080px;padding:40px 80px;">
+    <p contenteditable>Greetings, fellow entrepreneurs, aspiring business moguls, and basement-dwellers! Today, I'm here to advocate for a relocation that might sound a bit outlandish at first, but bear with me: moving your business from the cozy confines of your basement to the bustling bonanza of the 400 Market.</p>
+
+    <p contenteditable>Picture this: you, surrounded by boxes, your cat judgmentally sitting on your inventory, and the ever-present aroma of whatever your partner is microwaving. Is this truly the environment for your entrepreneurial ambitions?</p>
+
+    <h2 contenteditable>Five Reasons to Make the Move</h2>
+
+    <div class="reason">
+      <h3 contenteditable>1. Visibility Galore</h3>
+      <p contenteditable>Your business gains exposure to a diverse customer audience rather than remaining hidden away. At the 400 Market, thousands of potential customers walk past every weekend.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>2. Instant Feedback</h3>
+      <p contenteditable>Direct observation of customer reactions provides real-time market insights. No surveys needed — watch how people interact with your products.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>3. Networking Nirvana</h3>
+      <p contenteditable>Opportunities for collaboration and partnership emerge through regular contact with fellow merchants and entrepreneurs.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>4. Unleash Your Inner Showman</h3>
+      <p contenteditable>The marketplace is your stage. Engage customers, tell your story, and build a following through charismatic salesmanship.</p>
+    </div>
+    <div class="reason">
+      <h3 contenteditable>5. Embrace the Chaos</h3>
+      <p contenteditable>Every weekend promises excitement and unpredictability. No two market days are the same — and that's what makes it an adventure.</p>
+    </div>
+
+    <p contenteditable>So there you have it. Five compelling reasons to pack up your basement operation and join the 400 Market family. Your entrepreneurial adventure awaits — see you this weekend!</p>
+
+    <!-- CTA box -->
+    <div style="background:var(--yellow);padding:32px 40px;margin:40px 0;border-radius:4px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;">
+        <div>
+          <h3 style="font-size:20px;" contenteditable>READY TO JOIN THE MARKET?</h3>
+          <p style="font-size:15px;margin-top:6px;" contenteditable>Apply for a booth today and join hundreds of thriving merchants.</p>
+        </div>
+        <a class="btn btn-d" style="white-space:nowrap;padding:16px 32px;font-size:14px;">BECOME A MERCHANT</a>
+      </div>
+    </div>
+
+    <!-- Related posts -->
+    <h2 style="font-size:22px;margin-top:40px;" contenteditable>MORE FROM THE MARKET</h2>
+    <div class="grid-3" style="margin-top:16px;">
+      <div class="card" style="background:var(--light);">
+        <div class="placeholder" style="height:120px;">[ Post Image ]</div>
+        <div class="body">
+          <h3 contenteditable>Related Blog Post 1</h3>
+          <p class="desc" contenteditable>A related post excerpt...</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="card" style="background:var(--light);">
+        <div class="placeholder" style="height:120px;">[ Post Image ]</div>
+        <div class="body">
+          <h3 contenteditable>Related Blog Post 2</h3>
+          <p class="desc" contenteditable>A related post excerpt...</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+      <div class="card" style="background:var(--light);">
+        <div class="placeholder" style="height:120px;">[ Post Image ]</div>
+        <div class="body">
+          <h3 contenteditable>Related Blog Post 3</h3>
+          <p class="desc" contenteditable>A related post excerpt...</p>
+          <a class="link">Read more &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="brand-block"><h3>400</h3><h4>MARKET</h4><p class="est">EST. 1986</p><p class="tagline">FOOD, FINDS & FUN.<br>OPEN EVERY WEEK-END.</p></div><div class="cols"><div class="col"><h5>EXPLORE</h5><a>Home</a><a>Vendors</a><a>Events</a><a>Shop</a><a>News</a></div><div class="col"><h5>MARKET</h5><a>About Us</a><a>FAQ</a><a>Contact Us</a></div><div class="col"><h5>POLICIES</h5><a>Privacy Policy</a><a>Terms of Use</a></div><div class="col"><h5>VISIT US</h5><a>The 400 Market</a><a>2207 Industrial Park Rd</a><a>Innisfil, ON L9S 3V9</a><a>705-436-1010</a></div></div><div class="newsletter"><h5>STAY IN THE LOOP</h5><div class="email-row"><input placeholder="your@email.com"><button>SUBSCRIBE</button></div></div></footer>
+  <div class="footer-bottom"><span>&copy; 2026 The 400 Market. All rights reserved.</span><span>Designed with love by DGTL Group</span></div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Fix navigation — scroll to pages on click
+document.querySelectorAll('.toc a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const id = link.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Highlight active
+      document.querySelectorAll('.toc a').forEach(a => a.style.color = '');
+      link.style.color = '#F7D117';
+    }
+  });
+});
+
+// Track edits
+let editCount = 0;
+const originals = new Map();
+document.querySelectorAll('[contenteditable]').forEach((el, i) => {
+  originals.set(i, el.innerHTML);
+  el.addEventListener('input', () => {
+    editCount++;
+    document.getElementById('changeCount').textContent = editCount + ' edit(s) made — don\'t forget to save!';
+  });
+});
+
+// Save — download the current HTML with all edits baked in
+document.getElementById('saveBtn').addEventListener('click', () => {
+  // Remove contenteditable before saving for clean output
+  const clone = document.documentElement.cloneNode(true);
+  // Keep contenteditable so they can re-edit after download
+  const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'wireframe-preview-edited.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  document.getElementById('changeCount').textContent = 'Saved! File downloaded.';
+  document.getElementById('changeCount').style.color = '#4CAF50';
+});
+
+// Reset
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Reset all text to original? This cannot be undone.')) {
+    document.querySelectorAll('[contenteditable]').forEach((el, i) => {
+      if (originals.has(i)) el.innerHTML = originals.get(i);
+    });
+    editCount = 0;
+    document.getElementById('changeCount').textContent = 'Reset to original.';
+    document.getElementById('changeCount').style.color = '#F7D117';
+  }
+});
+
+// Highlight current page on scroll
+const pages = document.querySelectorAll('.page[id]');
+const tocLinks = document.querySelectorAll('.toc a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      tocLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + id ? '#F7D117' : '';
+      });
+    }
+  });
+}, { threshold: 0.15 });
+pages.forEach(p => observer.observe(p));
+</script>
+</body>
+</html>
