@@ -122,8 +122,6 @@ export const Vendors: CollectionConfig = {
             { label: 'Facebook', value: 'facebook' },
             { label: 'Instagram', value: 'instagram' },
             { label: 'TikTok', value: 'tiktok' },
-            { label: 'Threads', value: 'threads' },
-            { label: 'LinkedIn', value: 'linkedin' },
             { label: 'Twitter / X', value: 'twitter' },
             { label: 'Other', value: 'other' },
           ],

@@ -31,10 +31,8 @@ headers = [
     "Instagram URL",
     "Facebook URL",
     "TikTok URL",
-    "Threads URL",
-    "LinkedIn URL",
 ]
-widths = [32, 28, 36, 18, 42, 55, 30, 30, 30, 30, 30, 30]
+widths = [32, 28, 36, 18, 42, 55, 30, 30, 30, 30]
 
 for col, (h, w) in enumerate(zip(headers, widths), 1):
     c = ws.cell(row=1, column=col, value=h)
@@ -206,7 +204,7 @@ for i, (name, booth, email) in enumerate(vendors, 2):
     ws.cell(row=i, column=2).border = thin_border
     ws.cell(row=i, column=3, value=email if email else None).font = cell_font
     ws.cell(row=i, column=3).border = thin_border
-    for col in range(4, 13):
+    for col in range(4, 11):
         c = ws.cell(row=i, column=col)
         c.font = cell_font
         c.fill = yellow_fill
@@ -214,7 +212,7 @@ for i, (name, booth, email) in enumerate(vendors, 2):
         c.alignment = cell_align
 
 ws.freeze_panes = "A2"
-ws.auto_filter.ref = f"A1:L{len(vendors)+1}"
+ws.auto_filter.ref = f"A1:J{len(vendors)+1}"
 ws.sheet_properties.tabColor = "F7D117"
 
 out = "//Truenas/raid/Storage/DGTL Group/DGTL Development/400 Market/Website Rebuild/docs/vendor-data-template.xlsx"
