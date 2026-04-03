@@ -1,0 +1,222 @@
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.comments import Comment
+from openpyxl.utils import get_column_letter
+
+wb = Workbook()
+ws = wb.active
+ws.title = "Vendors"
+
+hdr_font = Font(name="Arial", bold=True, color="FFFFFF", size=11)
+hdr_fill = PatternFill("solid", fgColor="2B2B2B")
+hdr_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
+cell_font = Font(name="Arial", size=10)
+cell_align = Alignment(vertical="top", wrap_text=True)
+thin_border = Border(
+    left=Side(style="thin", color="D9D9D9"),
+    right=Side(style="thin", color="D9D9D9"),
+    top=Side(style="thin", color="D9D9D9"),
+    bottom=Side(style="thin", color="D9D9D9"),
+)
+yellow_fill = PatternFill("solid", fgColor="FFF9E6")
+
+headers = [
+    "Vendor Name",
+    "Booth Number",
+    "Email",
+    "Phone",
+    "Category (see note)",
+    "Short Description (max 300 chars)",
+    "Website",
+    "Instagram URL",
+    "Facebook URL",
+    "TikTok URL",
+    "Threads URL",
+    "LinkedIn URL",
+]
+widths = [32, 28, 36, 18, 42, 55, 30, 30, 30, 30, 30, 30]
+
+for col, (h, w) in enumerate(zip(headers, widths), 1):
+    c = ws.cell(row=1, column=col, value=h)
+    c.font = hdr_font
+    c.fill = hdr_fill
+    c.alignment = hdr_align
+    c.border = thin_border
+    ws.column_dimensions[get_column_letter(col)].width = w
+
+ws["E1"].comment = Comment(
+    "Allowed categories (pick one or more, comma-separated):\n\n"
+    "- Antiques\n- Collectibles\n- Clothing & Accessories\n- Food & Beverages\n"
+    "- Home Decor\n- Jewelry\n- Arts & Crafts\n- Electronics\n- Books & Media\n"
+    "- Health & Beauty\n- Sports & Outdoors\n- Toys & Games\n- Services\n- Other",
+    "DGTL Group",
+)
+
+vendors = [
+    ("Roadshow Antiques", "Building B", "gbugs@rogers.com"),
+    ("Kelsey Trail Trucking", "Parking Lot", "igiguere@tfiintl.com"),
+    ("Tempo Plastic", "Parking Lot", "accounting@tempoflexiblepackaging.com"),
+    ("Soncin Construction", "Parking Lot", "gmitelman@soncin.ca"),
+    ("Chunky Fries (J.Adel) YPMC", "Concession", "qurvanali@hotmail.com"),
+    ("ATV 4 Fun", "Outside", "drew@atv4fun.ca"),
+    ("John's Clothing", "Outside", ""),
+    ("Fireworks", "Outside", ""),
+    ("Jerrold Burns", "Outside", ""),
+    ("Winston", "Outside", ""),
+    ("Salty's Diner", "1000", "sds120188@gmail.com"),
+    ("Mundo Cafe", "1700", ""),
+    ("Sunrise Kitchen", "3000", "sopheapnysovann@yahoo.com"),
+    ("Concord Rugs", "202, 203, 204, 205, 207", ""),
+    ("Farmasi", "207", "sviterbo58@gmail.com"),
+    ("Fragrances Store", "209B, 210", "perfumeplus@mail.com"),
+    ("Creative Expressions", "208, 209A", ""),
+    ("Chaze Trading", "211, 212, 213", "anwar_chaze@outlook.com"),
+    ("Sonia Hair", "215", "sopheaman05@gmail.com"),
+    ("Aromatic Fumes", "214, 216, 217, 218, 219, 220", "sales@juvenileway.com"),
+    ("Fungicopia", "223, 224", "fungiarethefurture@yahoo.com"),
+    ("Daniel Becky D's Party Rental & Home Decor", "225", "dall@live.ca"),
+    ("Royal Fashions", "227, 228, 229", "puirpal@hotmail.com"),
+    ("Mad River Apiary", "232", "madriverbuzzapiary@gmail.com"),
+    ("B.J.'s Die Cast & Hotwheels", "233, 234, 235", "jeffflear@hotmail.com"),
+    ("Muslim AMJ Can.", "236", "salman.mangla@gmail.com"),
+    ("Tony's Carpets (Purans Carpets)", "238, 239, 240, 241, 242", ""),
+    ("Linda's Cosmetics", "244, 244A, 243", "lindasuliyakham@hotmail.com"),
+    ("Lost In Time", "244B, 245", "01blaster@live.ca"),
+    ("Dean Renowden", "246", "renowden@rogers.com"),
+    ("Catrina Mcphee", "247", "cdugue@hotmail.com"),
+    ("Daisy Health Care", "248", "jenniferbuchare@hotmail.com"),
+    ("Nicky's 3 for 10", "251, 252, 253", ""),
+    ("Lotto / K-Cups", "254, 255", "civic30@hotmail.com"),
+    ("Harvest Treasures", "256, 257", "info@harvesttreasures.com"),
+    ("Naked K9 Nutrition", "260", "info@nakedk9nutrition.com"),
+    ("Herbal Remedies", "303, 304", ""),
+    ("Thai Massage", "307, 308", "chadaphakenwong@gmail.com"),
+    ("Maximum Darts", "402, 403, 405, 406, 407, 408", "rick_smith@maximumdarts.com"),
+    ("Paul's Collectables", "404", ""),
+    ("Bukhari (Cell Accessories Village)", "503, 504, 505, 506, 2303, 2304, 2305, 2306", "syedahzaf@hotmail.com"),
+    ("Kavita's Jewellery", "501, 502, 507, 508", "raju72@rogers.com"),
+    ("Veronica's (Cute Cute Store)", "601, 602", "choytan@hotmail.com"),
+    ("Bob's Collectables", "603, 604", ""),
+    ("Matt's Surplus", "605, 606", "mattpoppe117@hotmail.com"),
+    ("Milkcrate Vinyl", "607, 608", "milkcratealleyrecords@gmail.com"),
+    ("Section 8 (Nascar John)", "701, 702, 703, 704", "section8apparel@rogers.com"),
+    ("Stylin Sunglasses", "708", "abrark_76@hotmail.com"),
+    ("Winston (Main)", "901, 902, 903, 904, 905, 906, 907, 908", "ng.winston@yahoo.ca"),
+    ("Winston (Building 2)", "221, 222", "ng.winston@yahoo.ca"),
+    ("Blanket World", "1001, 1002, 1007, 1008", "celltech100@hotmail.com"),
+    ("Magic Accounting & Tax", "1005, 1006", "info@magic-accounting.ca"),
+    ("Value Bins / Bargain Binz", "1101, 1102, 1103, 1104", "ujayed@gmail.com"),
+    ("Watillery", "1105, 1106", "ferhan_qureshi@hotmail.com"),
+    ("Norm's Lazer", "1107, 1108", ""),
+    ("Tatiana Gordon", "1201", "tatianapgordon@gmail.com"),
+    ("Kanda & Co.", "1207, 1208", "kandaco.inc@gmail.com"),
+    ("Y2K Computers", "1203, 1204, 1205, 1206", "y2kcomputers911@gmail.com"),
+    ("Hollywood Closets (RTD Designs)", "1301, 1302", "robyndear11@gmail.com"),
+    ("Think Young Design", "1303, 1304", "thinkyoungdesign@outlook.com"),
+    ("Claren Zee", "1305, 1306", "tracychong81@gmail.com"),
+    ("Stan's Paintings", "1307, 1308", "satsr13@gmail.com"),
+    ("Bobby / Tanya", "1401, 1402, 1407, 1408", "tls723@gmail.com"),
+    ("Profile Digital", "1403, 1404, 1405, 1406", "lipladycanada@gmail.com"),
+    ("Oza Sugar Cellular", "1501, 1502, 1507, 1508", "aakash1703@gmail.com"),
+    ("World Famous Astrologer", "1503, 1504", "ramswamy1000@gmail.com"),
+    ("Tres Chic Boutique", "1601, 1602", "chicboutique1of1@gmail.com"),
+    ("James Video Games", "1603, 1604", "hugewrestlingfan1976@gmail.com"),
+    ("Simcoe Numismatics", "1607, 1608", "simcoecoin@hotmail.com"),
+    ("J.T. Deli", "1701, 1702", "maxmarkh@gmail.com"),
+    ("Mr. Canela", "1703, 1704", "regpat@gmail.com"),
+    ("M.V. Produce", "1705", "tonypiterna@gmail.com"),
+    ("A & D Bioaire (Fudge & Nuts)", "1706", "adhess@sympatico.ca"),
+    ("Heal & Eat", "1707", "heateatenjoy@gmail.com"),
+    ("Yeti Puffs", "1708, 1709", "yetipuffs@gmail.com"),
+    ("Maya Artisan Bakery (Mad Bites)", "1710, 1711", "pkutukoglu@gmail.com"),
+    ("Snowie By Cherry", "1712", "snowiebycherry@outlook.com"),
+    ("Zio's", "1713, 2531", "brandygreco30@gmail.com"),
+    ("Sea Lux Inc (Seven Sea's)", "1714, 1715", "info@sealuxproducts.com"),
+    ("Olivia's Teas & Herbs", "1716", "oliviasteaznherbs@gmail.com"),
+    ("Golden Whisk", "1717", "goldenwhisk@rogers.com"),
+    ("Vekelstien Meats", "1718", "evguenivekselchtein@gmail.com"),
+    ("Smoothies", "1720", "fashionjewelry@gmail.com"),
+    ("RFS Trading", "1721", ""),
+    ("The Print Hut", "1722", "printhut@outlook.com"),
+    ("Loaded Baked Potato", "1723", "loadedlockd@gmail.com"),
+    ("Scottish Products (Jackie's)", "1724A, 1724B, 1725A", "j.edwards1724@gmail.com"),
+    ("Zio's Part 2 (Pomodoro)", "1725B, 2530", "pomodoroitaliansauce@gmail.com"),
+    ("See Georgian Bay", "1801, 1802", ""),
+    ("BookMan (Grant McKay)", "1803, 1804", ""),
+    ("QSC", "1805, 1806, 1807", "fashionjewelry@gmail.com"),
+    ("All Things Dead", "1808", "atdinquires@outlook.com"),
+    ("Witch Plz", "1901, 1902, 1907, 1908", "witchplz@icloud.com"),
+    ("D. Enman Collectibles", "2001", "davidenman24@gmail.com"),
+    ("3D Distribution", "2002, 2003, 2004, 2005, 2006", "roop@rogers.com"),
+    ("Camp Hill", "2007, 2008", "finance@camphill.on.ca"),
+    ("JD Marketing", "2101, 2102", "johndahmer@live.com"),
+    ("Innisfil Creek Honey", "2104", "brian@innisfilcreekhoney.com"),
+    ("Xtreme Music", "2105, 2106, 2111, 2112", "xtremeaudior441@gmail.com"),
+    ("Pang's", "2107, 2108, 2109, 2110", "rpang20041@hotmail.com"),
+    ("Garelli Leather", "2201, 2202, 2207, 2208", "garenkeunelian@yahoo.com"),
+    ("Chris Moyer (Pharmacy)", "2203, 2204, 2205, 2206", "chris.moyer94@gmail.com"),
+    ("Perfume Warehouse Limited", "2301, 2302", ""),
+    ("Yaffa Skin Care", "2307, 2308", "sales@yaffa-skincare.com"),
+    ("Jose Mucho Latin Products", "2403, 2404", ""),
+    ("Scarlett Crafts", "2405, 2406, 2407, 2408, 2528, 2529", "admin@thescarlettphoenix.ca"),
+    ("Georgian Bay Liquidation", "1801, 1802, 2501, 2502, 2503", ""),
+    ("Art Place", "2505, 2506, 2507, 2508, 2509", "artplace@hotmail.com"),
+    ("Eckankar", "2510, 2511", "cosmic.window@hotmail.com"),
+    ("Jerry's Sign Factory", "2512", "thesignfactory@hotmail.ca"),
+    ("Plant Shop", "2514", "elbarra@live.ca"),
+    ("Video 101", "2515", "ryangenno@hotmail.com"),
+    ("Northern Realm", "2516, 2517", "northernrealmccg@gmail.com"),
+    ("Brookstone Academy", "2518", "youbelong@brookstoneacademy.ca"),
+    ("Wolfie's Fishing Lures", "2519", ""),
+    ("All Steel Windows", "2520, 2521", "renosaver@gmail.com"),
+    ("Susan Wade (JW)", "2522, 2523A", "andrew.wade12984@outlook.com"),
+    ("Dogel Bricks", "2524", "kralefamily@gmail.com"),
+    ("Growise Hydroponics", "2526, 2527, 2533", "chadbutler@rogers.com"),
+    ("Lisa's Jewellery", "2539", "kristinapniewski26@icloud.com"),
+    ("Ed's Knife Sharpening", "2600", ""),
+    ("Comics, Toys & Collectibles", "2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608", "domg514@yahoo.com"),
+    ("Mystic Crayon", "2701", "mysticcrayonlady@hotmail.com"),
+    ("EFT Farms", "2702, 2703, 2704", ""),
+    ("Master Quality (Lina's Clothing)", "2705, 2706, 2707, 2708", "chhunsrypich@yahoo.com"),
+    ("The Computer Store", "2801, 2802, 2807, 2808", "userlo105@aol.com"),
+    ("Retrocade", "2805, 2806", "jorge.cabezas25@gmail.com"),
+    ("Buzz Boxes", "2901", "sales@buzzboxes.ca"),
+    ("Toulison Nutraceuticals", "2902", "support@toulison.com"),
+    ("Krafty Kreations", "2903", "kraftykreations400@yahoo.com"),
+    ("Nashit Kalva Cellular", "3001, 3002, 3007, 3008", "nkalva@gmail.com"),
+    ("Earth Elements", "3003, 3004, 3005, 3006", "vahledoris@gmail.com"),
+    ("Sanmark Network", "3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108", "sanmarnetwork@gmail.com"),
+    ("Eze Dockers / Rex's Corner", "2536, 2537, 2538, 3201, 3503, 3504, 3505, 3506", "wayne@dennis.financial"),
+    ("Farshin Table Cloths & Designs", "3204", ""),
+    ("Rainbow Jewellers", "3301, 3303, 3304", "choeng.but@gmail.com"),
+    ("Rasta Closet", "3401, 3402", "rastacloset@yahoo.ca"),
+    ("Ty's Blechlab", "3403", "tysblechlab@gmail.com"),
+    ("You & Magnets 4 Ever", "3404", ""),
+    ("Polestar", "3501, 3502, 3507, 3508", "michell@polestarconsulting.ca"),
+    ("Farm Fresh Diet", "3601, 3602, 3603, 3604", ""),
+    ("Dave Graham", "3607, 3608", ""),
+    ("Pocket Knives", "3703, 3704, 3705, 3706", "sales@thepocketblade.com"),
+    ("Birdman Victor", "141", ""),
+]
+
+for i, (name, booth, email) in enumerate(vendors, 2):
+    ws.cell(row=i, column=1, value=name).font = cell_font
+    ws.cell(row=i, column=1).border = thin_border
+    ws.cell(row=i, column=2, value=booth).font = cell_font
+    ws.cell(row=i, column=2).border = thin_border
+    ws.cell(row=i, column=3, value=email if email else None).font = cell_font
+    ws.cell(row=i, column=3).border = thin_border
+    for col in range(4, 13):
+        c = ws.cell(row=i, column=col)
+        c.font = cell_font
+        c.fill = yellow_fill
+        c.border = thin_border
+        c.alignment = cell_align
+
+ws.freeze_panes = "A2"
+ws.auto_filter.ref = f"A1:L{len(vendors)+1}"
+ws.sheet_properties.tabColor = "F7D117"
+
+out = "//Truenas/raid/Storage/DGTL Group/DGTL Development/400 Market/Website Rebuild/docs/vendor-data-template.xlsx"
+wb.save(out)
+print(f"Saved {len(vendors)} vendors to {out}")
