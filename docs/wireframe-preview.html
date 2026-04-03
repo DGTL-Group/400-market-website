@@ -40,7 +40,8 @@
 
   /* Nav */
   .nav { display: flex; align-items: center; height: 80px; background: var(--dark); padding: 0 40px; }
-  .nav .logo { width: 48px; height: 48px; background: var(--yellow); border-radius: 4px; flex-shrink: 0; }
+  .nav .logo { width: 48px; height: 48px; flex-shrink: 0; }
+  .nav .logo img { width: 100%; height: 100%; object-fit: contain; }
   .nav .brand { color: #fff; font-size: 18px; font-weight: 700; margin-left: 12px; }
   .nav .links { display: flex; gap: 32px; margin-left: 80px; }
   .nav .links a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
@@ -210,39 +211,82 @@
 
   /* Nav B — Bigger */
   .nav-b { display: flex; align-items: center; height: 100px; background: var(--dark); padding: 0 48px; }
-  .nav-b .logo-b { width: 64px; height: 64px; background: var(--yellow); border-radius: 6px; flex-shrink: 0; }
+  .nav-b .logo-b { width: 64px; height: 64px; flex-shrink: 0; }
+  .nav-b .logo-b img { width: 100%; height: 100%; object-fit: contain; }
   .nav-b .brand-b { color: #fff; font-size: 24px; font-weight: 700; margin-left: 14px; line-height: 1.1; }
   .nav-b .brand-b small { display: block; font-size: 10px; font-weight: 400; color: var(--orange); letter-spacing: 2px; margin-top: 2px; }
   .nav-b .links-b { display: flex; gap: 36px; margin-left: 80px; }
   .nav-b .links-b a { color: #c8c8c8; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
   .nav-b .cta-b { margin-left: auto; background: var(--yellow); color: var(--dark); padding: 16px 28px; font-size: 14px; font-weight: 700; border-radius: 4px; text-decoration: none; }
 
-  /* Nav C — Centered logo, split menu */
+  /* Nav C — Centered logo, split menu, rectangular CTA (compact) */
   .nav-c { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 90px; background: var(--dark); padding: 0 48px; }
   .nav-c .links-left { display: flex; gap: 32px; justify-content: flex-end; padding-right: 40px; }
   .nav-c .links-left a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
   .nav-c .center-logo { display: flex; flex-direction: column; align-items: center; }
-  .nav-c .logo-c { width: 52px; height: 52px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .nav-c .logo-c span { font-size: 14px; font-weight: 700; color: var(--dark); }
-  .nav-c .brand-c { color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 3px; margin-top: 4px; }
+  .nav-c .logo-c { width: 62px; height: 62px; }
+  .nav-c .logo-c img { width: 100%; height: 100%; object-fit: contain; }
   .nav-c .links-right { display: flex; gap: 32px; padding-left: 40px; align-items: center; }
   .nav-c .links-right a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
-  .nav-c .merchant-pill { background: var(--yellow); color: var(--dark); padding: 10px 20px; font-size: 11px; font-weight: 700; border-radius: 24px; text-decoration: none; letter-spacing: .5px; margin-left: 12px; }
+  .nav-c .links-right a.cta-c { background: var(--yellow); color: #1a1a1a; padding: 12px 22px; font-size: 12px; font-weight: 700; border-radius: 4px; text-decoration: none; letter-spacing: .5px; margin-left: 16px; white-space: nowrap; }
 
-  /* Nav C — Top accent bar */
+  /* Top accent bar */
   .nav-c-top { height: 4px; background: linear-gradient(90deg, var(--yellow) 0%, var(--orange) 100%); }
 
-  /* Nav D — Merchant as menu item, no separate CTA */
+  /* Nav D — Centered logo, merchant as yellow text menu item (compact) */
   .nav-d { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 90px; background: var(--dark); padding: 0 48px; }
   .nav-d .links-left { display: flex; gap: 32px; justify-content: flex-end; padding-right: 40px; }
   .nav-d .links-left a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
   .nav-d .center-logo { display: flex; flex-direction: column; align-items: center; }
-  .nav-d .logo-d { width: 52px; height: 52px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .nav-d .logo-d span { font-size: 14px; font-weight: 700; color: var(--dark); }
-  .nav-d .brand-d { color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 3px; margin-top: 4px; }
+  .nav-d .logo-d { width: 62px; height: 62px; }
+  .nav-d .logo-d img { width: 100%; height: 100%; object-fit: contain; }
   .nav-d .links-right { display: flex; gap: 32px; padding-left: 40px; align-items: center; }
   .nav-d .links-right a { color: #c8c8c8; text-decoration: none; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
   .nav-d .links-right a.merchant-link { color: var(--yellow); }
+
+  /* Nav E — Centered logo, expanded, rectangular CTA */
+  .nav-e { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 110px; background: var(--dark); padding: 0 56px; }
+  .nav-e .links-left { display: flex; gap: 36px; justify-content: flex-end; padding-right: 48px; }
+  .nav-e .links-left a { color: #c8c8c8; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
+  .nav-e .center-logo { display: flex; flex-direction: column; align-items: center; }
+  .nav-e .logo-e { width: 78px; height: 78px; }
+  .nav-e .logo-e img { width: 100%; height: 100%; object-fit: contain; }
+  .nav-e .links-right { display: flex; gap: 36px; padding-left: 48px; align-items: center; }
+  .nav-e .links-right a { color: #c8c8c8; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
+  .nav-e .links-right a.cta-e { background: var(--yellow); color: #1a1a1a; padding: 14px 26px; font-size: 13px; font-weight: 700; border-radius: 4px; text-decoration: none; letter-spacing: .5px; margin-left: 20px; white-space: nowrap; }
+
+  /* Nav F — Centered logo, expanded, merchant as yellow text */
+  .nav-f { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 110px; background: var(--dark); padding: 0 56px; }
+  .nav-f .links-left { display: flex; gap: 36px; justify-content: flex-end; padding-right: 48px; }
+  .nav-f .links-left a { color: #c8c8c8; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
+  .nav-f .center-logo { display: flex; flex-direction: column; align-items: center; }
+  .nav-f .logo-f { width: 78px; height: 78px; }
+  .nav-f .logo-f img { width: 100%; height: 100%; object-fit: contain; }
+  .nav-f .links-right { display: flex; gap: 36px; padding-left: 48px; align-items: center; }
+  .nav-f .links-right a { color: #c8c8c8; text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
+  .nav-f .links-right a.merchant-link { color: var(--yellow); }
+
+  /* Nav G — Centered logo, extra-large (F + ~18%) */
+  .nav-g { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 130px; background: var(--dark); padding: 0 64px; }
+  .nav-g .links-left { display: flex; gap: 40px; justify-content: flex-end; padding-right: 56px; }
+  .nav-g .links-left a { color: #c8c8c8; text-decoration: none; font-size: 15px; font-weight: 600; letter-spacing: .5px; }
+  .nav-g .center-logo { display: flex; flex-direction: column; align-items: center; }
+  .nav-g .logo-g { width: 92px; height: 92px; }
+  .nav-g .logo-g img { width: 100%; height: 100%; object-fit: contain; }
+  .nav-g .links-right { display: flex; gap: 40px; padding-left: 56px; align-items: center; }
+  .nav-g .links-right a { color: #c8c8c8; text-decoration: none; font-size: 15px; font-weight: 600; letter-spacing: .5px; }
+  .nav-g .links-right a.merchant-link { color: var(--yellow); font-size: 15px; }
+
+  /* Nav H — Extra-large centered + CTA button (like G but with E-style button) */
+  .nav-h { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 130px; background: var(--dark); padding: 0 64px; }
+  .nav-h .links-left { display: flex; gap: 40px; justify-content: flex-end; padding-right: 56px; }
+  .nav-h .links-left a { color: #c8c8c8; text-decoration: none; font-size: 15px; font-weight: 600; letter-spacing: .5px; }
+  .nav-h .center-logo { display: flex; flex-direction: column; align-items: center; }
+  .nav-h .logo-h { width: 92px; height: 92px; }
+  .nav-h .logo-h img { width: 100%; height: 100%; object-fit: contain; }
+  .nav-h .links-right { display: flex; gap: 40px; padding-left: 56px; align-items: center; }
+  .nav-h .links-right a { color: #c8c8c8; text-decoration: none; font-size: 15px; font-weight: 600; letter-spacing: .5px; }
+  .nav-h .links-right a.cta-h { background: var(--yellow); color: #1a1a1a; padding: 16px 30px; font-size: 15px; font-weight: 700; border-radius: 4px; text-decoration: none; letter-spacing: .5px; margin-left: 24px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -250,7 +294,7 @@
 <!-- TABLE OF CONTENTS -->
 <nav class="toc">
   <h2>WIREFRAME PAGES</h2>
-  <a href="#headers" style="color:var(--orange);">HEADER VARIATIONS (4)</a>
+  <a href="#headers" style="color:var(--orange);">HEADER VARIATIONS (8)</a>
   <a href="#pg01">01 — Homepage</a>
   <a href="#pg02">02 — Vendors Directory</a>
   <a href="#pg03">03 — Vendor Profile <span class="opt">OPTIONAL</span></a>
@@ -278,13 +322,13 @@
 <div id="headers" class="header-compare" style="background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.12);overflow:hidden;">
   <div style="background:var(--dark);padding:16px 24px;">
     <span style="color:var(--yellow);font-size:14px;font-weight:700;letter-spacing:1px;">HEADER VARIATIONS</span>
-    <span style="color:#aaa;font-size:12px;margin-left:12px;">Compare all 4 options — pick one for the final build</span>
+    <span style="color:#aaa;font-size:12px;margin-left:12px;">Compare all 6 options — pick one for the final build</span>
   </div>
 
-  <!-- VARIANT A — Current (compact) -->
-  <div class="variant-label">A — CURRENT <span>Compact · 80px · Logo left, CTA right</span></div>
+  <!-- VARIANT A — Current (compact, logo left) -->
+  <div class="variant-label">A — COMPACT LEFT <span>80px · Logo left · Menu · CTA button right</span></div>
   <nav class="nav">
-    <div class="logo"></div>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div>
     <span class="brand">400 MARKET</span>
     <div class="links">
       <a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
@@ -294,10 +338,10 @@
 
   <div style="height:32px;background:#f5f5f5;"></div>
 
-  <!-- VARIANT B — Bigger header, bigger logo -->
-  <div class="variant-label">B — EXPANDED <span>Taller · 100px · Larger logo with tagline · Bolder CTA</span></div>
+  <!-- VARIANT B — Expanded (logo left, bigger) -->
+  <div class="variant-label">B — EXPANDED LEFT <span>100px · Larger logo + "EST. 1986" tagline · Bolder CTA</span></div>
   <nav class="nav-b">
-    <div class="logo-b"></div>
+    <div class="logo-b"><img src="logo-400market.svg" alt="400 Market"></div>
     <div class="brand-b">
       400 MARKET
       <small>EST. 1986</small>
@@ -310,43 +354,111 @@
 
   <div style="height:32px;background:#f5f5f5;"></div>
 
-  <!-- VARIANT C — Centered logo, split menu, pill CTA -->
-  <div class="variant-label">C — CENTERED LOGO + PILL CTA <span>Logo centered · Menu split · "Become a Merchant" as pill button on right</span></div>
+  <!-- VARIANT C — Centered logo, compact, rectangular CTA button -->
+  <div class="variant-label">C — COMPACT CENTERED + CTA BUTTON <span>90px · Logo centered · Menu split · Rectangular CTA button on right</span></div>
   <div class="nav-c-top"></div>
   <nav class="nav-c">
     <div class="links-left">
       <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
     </div>
     <div class="center-logo">
-      <div class="logo-c"><span>400</span></div>
-      <span class="brand-c">MARKET</span>
+      <div class="logo-c"><img src="logo-400market.svg" alt="400 Market"></div>
     </div>
     <div class="links-right">
       <a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
-      <a class="merchant-pill">BECOME A MERCHANT</a>
+      <a class="cta-c">BECOME A MERCHANT</a>
     </div>
   </nav>
 
   <div style="height:32px;background:#f5f5f5;"></div>
 
-  <!-- VARIANT D — Centered logo, merchant as menu item (no separate CTA) -->
-  <div class="variant-label">D — CENTERED LOGO + MERCHANT IN MENU <span>Logo centered · All items in menu · "Become a Merchant" highlighted in yellow text</span></div>
+  <!-- VARIANT D — Centered logo, compact, merchant as yellow text -->
+  <div class="variant-label">D — COMPACT CENTERED + MERCHANT IN MENU <span>90px · Logo centered · Menu split · "Become a Merchant" as yellow menu item</span></div>
   <div class="nav-c-top"></div>
   <nav class="nav-d">
     <div class="links-left">
       <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
     </div>
     <div class="center-logo">
-      <div class="logo-d"><span>400</span></div>
-      <span class="brand-d">MARKET</span>
+      <div class="logo-d"><img src="logo-400market.svg" alt="400 Market"></div>
     </div>
     <div class="links-right">
       <a>NEWS</a><a>ABOUT</a><a>CONTACT</a><a class="merchant-link">BECOME A MERCHANT</a>
     </div>
   </nav>
 
+  <div style="height:32px;background:#f5f5f5;"></div>
+
+  <!-- VARIANT E — Centered logo, expanded, rectangular CTA button -->
+  <div class="variant-label">E — EXPANDED CENTERED + CTA BUTTON <span>110px · Larger centered logo + tagline · Menu split · Rectangular CTA button</span></div>
+  <div class="nav-c-top"></div>
+  <nav class="nav-e">
+    <div class="links-left">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
+    </div>
+    <div class="center-logo">
+      <div class="logo-e"><img src="logo-400market.svg" alt="400 Market"></div>
+    </div>
+    <div class="links-right">
+      <a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
+      <a class="cta-e">BECOME A MERCHANT</a>
+    </div>
+  </nav>
+
+  <div style="height:32px;background:#f5f5f5;"></div>
+
+  <!-- VARIANT F — Centered logo, expanded, merchant as yellow text -->
+  <div class="variant-label">F — EXPANDED CENTERED + MERCHANT IN MENU <span>110px · Larger centered logo + tagline · Menu split · "Become a Merchant" as yellow menu item</span></div>
+  <div class="nav-c-top"></div>
+  <nav class="nav-f">
+    <div class="links-left">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
+    </div>
+    <div class="center-logo">
+      <div class="logo-f"><img src="logo-400market.svg" alt="400 Market"></div>
+    </div>
+    <div class="links-right">
+      <a>NEWS</a><a>ABOUT</a><a>CONTACT</a><a class="merchant-link">BECOME A MERCHANT</a>
+    </div>
+  </nav>
+
+  <div style="height:32px;background:#f5f5f5;"></div>
+
+  <!-- VARIANT G — Centered logo, extra-large, merchant as yellow text -->
+  <div class="variant-label">G — EXTRA-LARGE CENTERED + MERCHANT IN MENU <span>130px · Oversized centered logo · Menu split · "Become a Merchant" as yellow menu item</span></div>
+  <div class="nav-c-top"></div>
+  <nav class="nav-g">
+    <div class="links-left">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
+    </div>
+    <div class="center-logo">
+      <div class="logo-g"><img src="logo-400market.svg" alt="400 Market"></div>
+    </div>
+    <div class="links-right">
+      <a>NEWS</a><a>ABOUT</a><a>CONTACT</a><a class="merchant-link">BECOME A MERCHANT</a>
+    </div>
+  </nav>
+
+  <div style="height:32px;background:#f5f5f5;"></div>
+
+  <!-- VARIANT H — Extra-large centered + CTA button -->
+  <div class="variant-label">H — EXTRA-LARGE CENTERED + CTA BUTTON <span>130px · Oversized centered logo · Menu split · Rectangular CTA button on right</span></div>
+  <div class="nav-c-top"></div>
+  <nav class="nav-h">
+    <div class="links-left">
+      <a>VENDORS</a><a>EVENTS</a><a>SHOP</a>
+    </div>
+    <div class="center-logo">
+      <div class="logo-h"><img src="logo-400market.svg" alt="400 Market"></div>
+    </div>
+    <div class="links-right">
+      <a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
+      <a class="cta-h">BECOME A MERCHANT</a>
+    </div>
+  </nav>
+
   <div style="padding:20px 24px;background:#f5f5f5;border-top:1px solid #ddd;">
-    <p style="font-size:12px;color:var(--gray);">All variations are 1440px wide. The chosen header will be applied to every page. Variants C &amp; D include a gradient accent bar at the top.</p>
+    <p style="font-size:12px;color:var(--gray);">All variations are 1440px wide. The chosen header will be applied to every page. Centered variants (C–H) include a gradient accent bar at the top.</p>
   </div>
 </div>
 
@@ -358,7 +470,7 @@
 
   <!-- Nav -->
   <nav class="nav">
-    <div class="logo"></div>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div>
     <span class="brand">400 MARKET</span>
     <div class="links">
       <a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a>
@@ -570,7 +682,7 @@
 <div id="pg02" class="page">
   <div class="page-label">02 — VENDORS DIRECTORY <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -658,7 +770,7 @@
 <div id="pg03" class="page">
   <div class="page-label">03 — VENDOR PROFILE <span style="color:var(--orange);">OPTIONAL</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -718,7 +830,7 @@
 <div id="pg04" class="page">
   <div class="page-label">04 — EVENTS <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -811,7 +923,7 @@
 <div id="pg05" class="page">
   <div class="page-label">05 — SHOP <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -876,7 +988,7 @@
 <div id="pg06" class="page">
   <div class="page-label">06 — BECOME A MERCHANT <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -980,7 +1092,7 @@
 <div id="pg07a" class="page">
   <div class="page-label">07A — CONTACT US (Version A: Form left, Info right) <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -1025,7 +1137,7 @@
 <div id="pg07b" class="page">
   <div class="page-label">07B — CONTACT US (Version B: Info top, Map middle, Form below) <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -1071,7 +1183,7 @@
 <div id="pg08" class="page">
   <div class="page-label">08 — FAQ <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -1123,7 +1235,7 @@
 <div id="pg09" class="page">
   <div class="page-label">09 — ABOUT US <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -1192,7 +1304,7 @@
 <div id="pg10" class="page">
   <div class="page-label">10 — NEWS ARCHIVE <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -1266,7 +1378,7 @@
 <div id="pg11" class="page">
   <div class="page-label">11A — NEWS POST — Version A: Narrow body <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
@@ -1364,7 +1476,7 @@
 <div id="pg11b" class="page">
   <div class="page-label">11B — NEWS POST — Version B: Wide body (75%) <span>1440px Desktop</span></div>
   <nav class="nav">
-    <div class="logo"></div><span class="brand">400 MARKET</span>
+    <div class="logo"><img src="logo-400market.svg" alt="400 Market"></div><span class="brand">400 MARKET</span>
     <div class="links"><a>VENDORS</a><a>EVENTS</a><a>SHOP</a><a>NEWS</a><a>ABOUT</a><a>CONTACT</a></div>
     <a class="cta">BECOME A MERCHANT</a>
   </nav>
