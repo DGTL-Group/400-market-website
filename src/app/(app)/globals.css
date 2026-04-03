@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-white font-body text-body-md text-text-primary antialiased;
+  }
+
+  /* Headlines always use display font (METAFORA) in uppercase */
+  h1, h2, h3, h4 {
+    @apply font-display uppercase tracking-wide;
+  }
+
+  h1 {
+    @apply text-display-xl;
+  }
+
+  h2 {
+    @apply text-display-lg;
+  }
+
+  h3 {
+    @apply text-display-md;
+  }
+
+  h4 {
+    @apply text-display-sm;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  /* Primary CTA — yellow background */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-button bg-brand-yellow px-6 py-3
+           font-display text-body-md uppercase tracking-wide text-brand-dark
+           hover:bg-brand-orange transition-colors duration-200;
+  }
+
+  /* Secondary CTA — orange background */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-button bg-brand-orange px-6 py-3
+           font-display text-body-md uppercase tracking-wide text-white
+           hover:bg-brand-mango transition-colors duration-200;
+  }
+
+  /* Dark CTA — dark background */
+  .btn-dark {
+    @apply inline-flex items-center justify-center rounded-button bg-brand-dark px-6 py-3
+           font-display text-body-md uppercase tracking-wide text-white
+           hover:bg-text-secondary transition-colors duration-200;
+  }
+
+  /* Outlined variant */
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-button border-2 border-brand-dark px-6 py-3
+           font-display text-body-md uppercase tracking-wide text-brand-dark
+           hover:bg-brand-dark hover:text-white transition-colors duration-200;
+  }
+
+  /* Page section wrapper */
+  .section {
+    @apply mx-auto max-w-content px-4 py-section sm:px-6 lg:px-8;
+  }
+
+  .section-sm {
+    @apply mx-auto max-w-content px-4 py-section-sm sm:px-6 lg:px-8;
+  }
+
+  /* Yellow highlight strip (newsletter banner, announcements) */
+  .strip-yellow {
+    @apply bg-brand-yellow px-4 py-section-sm text-brand-dark;
+  }
+
+  /* Dark section (footer, dark blocks) */
+  .strip-dark {
+    @apply bg-brand-dark px-4 py-section text-white;
+  }
+
+  /* Badge / tag */
+  .badge {
+    @apply inline-block rounded-button bg-brand-yellow px-3 py-1
+           font-display text-caption uppercase tracking-wider text-brand-dark;
+  }
+}
