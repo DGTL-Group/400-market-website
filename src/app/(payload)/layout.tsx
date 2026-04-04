@@ -6,6 +6,8 @@ import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts'
 import React from 'react'
 
 import { importMap } from './admin/importMap'
+import '@payloadcms/next/css'
+import './payload-admin-vars.css'
 
 type Args = {
   children: React.ReactNode
@@ -20,8 +22,10 @@ const serverFunction: ServerFunctionClient = async function (args) {
   })
 }
 
+// TODO: remove suppressHydrationWarning before production — workaround for browser extension hydration mismatch
 const Layout = ({ children }: Args) => (
-  <RootLayout config={config} importMap={importMap} serverFunction={serverFunction}>
+  <RootLayout config={config} importMap={importMap} serverFunction={serverFunction} htmlProps={{ suppressHydrationWarning: true }}>
+    <script dangerouslySetInnerHTML={{ __html: `document.body.removeAttribute('data-atm-ext-installed')` }} />
     {children}
   </RootLayout>
 )

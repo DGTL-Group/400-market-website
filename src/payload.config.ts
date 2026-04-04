@@ -12,6 +12,7 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: 'users',
+    suppressHydrationWarning: true, // TODO: remove before production — workaround for browser extension hydration mismatch
   },
   collections: [Users, Media, Vendors, Events, News, Products, FAQs, Pages],
   db: postgresAdapter({

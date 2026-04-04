@@ -40,7 +40,7 @@ export default function NewsletterForm() {
   }
 
   return (
-    <div>
+    <div className="relative">
       <form onSubmit={handleSubmit} className="flex">
         <input
           type="email"
@@ -49,24 +49,20 @@ export default function NewsletterForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={status === 'loading'}
-          className="bg-white border-none text-brand-dark px-4 py-4 text-[14px] w-[260px] outline-none placeholder:text-text-subtle focus:ring-2 focus:ring-brand-dark disabled:opacity-50"
+          className="bg-white border-none text-brand-dark px-4 py-4 text-[14px] w-[260px] outline-none placeholder:text-text-subtle focus:ring-2 focus:ring-brand-dark"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
           className="bg-brand-dark text-white px-6 py-4 font-bold text-[13px] hover:bg-text-secondary transition-colors duration-500 disabled:opacity-50"
         >
-          {status === 'loading' ? '...' : 'SUBSCRIBE'}
+          SUBSCRIBE
         </button>
       </form>
-      {status === 'success' && (
-        <p className="text-brand-dark text-[13px] mt-2 font-semibold">{message}</p>
-      )}
-      {status === 'already' && (
-        <p className="text-brand-dark text-[13px] mt-2 font-semibold">{message}</p>
-      )}
-      {status === 'error' && (
-        <p className="text-brand-mango text-[13px] mt-2 font-semibold">{message}</p>
+      {(status === 'success' || status === 'already' || status === 'error') && (
+        <p className={`absolute left-0 top-full mt-2 text-[13px] font-semibold whitespace-nowrap ${status === 'error' ? 'text-brand-mango' : 'text-brand-dark'}`}>
+          {message}
+        </p>
       )}
     </div>
   )

@@ -33,7 +33,7 @@ const variantConfig: Record<Variant, {
     padding: 'px-12',
     logoPad: 'pr-10',
     ctaStyle: 'button',
-    ctaClasses: 'bg-brand-yellow text-brand-dark px-[22px] py-3 text-[12px] font-bold rounded-button tracking-wide ml-4 whitespace-nowrap hover:bg-brand-orange transition-colors',
+    ctaClasses: 'bg-brand-yellow text-brand-dark px-[22px] py-3 text-[12px] font-bold rounded-button tracking-wide ml-4 whitespace-nowrap hover:bg-brand-orange transition-colors duration-500',
   },
   D: {
     height: 'h-[90px]',
@@ -43,7 +43,7 @@ const variantConfig: Record<Variant, {
     padding: 'px-12',
     logoPad: 'pr-10',
     ctaStyle: 'text',
-    ctaClasses: 'text-brand-yellow text-[12px] font-semibold tracking-wide hover:text-white transition-colors',
+    ctaClasses: 'text-brand-yellow text-[12px] font-semibold tracking-wide hover:text-white transition-colors duration-500',
   },
   E: {
     height: 'h-[110px]',
@@ -53,7 +53,7 @@ const variantConfig: Record<Variant, {
     padding: 'px-14',
     logoPad: 'pr-12',
     ctaStyle: 'button',
-    ctaClasses: 'bg-brand-yellow text-brand-dark px-[26px] py-3.5 text-[13px] font-bold rounded-button tracking-wide ml-5 whitespace-nowrap hover:bg-brand-orange transition-colors',
+    ctaClasses: 'bg-brand-yellow text-brand-dark px-[26px] py-3.5 text-[13px] font-bold rounded-button tracking-wide ml-5 whitespace-nowrap hover:bg-brand-orange transition-colors duration-500',
   },
   F: {
     height: 'h-[110px]',
@@ -63,7 +63,7 @@ const variantConfig: Record<Variant, {
     padding: 'px-14',
     logoPad: 'pr-12',
     ctaStyle: 'text',
-    ctaClasses: 'text-brand-yellow text-[13px] font-semibold tracking-wide hover:text-white transition-colors',
+    ctaClasses: 'text-brand-yellow text-[13px] font-semibold tracking-wide hover:text-white transition-colors duration-500',
   },
   G: {
     height: 'h-[130px]',
@@ -73,7 +73,7 @@ const variantConfig: Record<Variant, {
     padding: 'px-16',
     logoPad: 'pr-14',
     ctaStyle: 'text',
-    ctaClasses: 'text-brand-yellow text-[15px] font-semibold tracking-wide hover:text-white transition-colors',
+    ctaClasses: 'text-brand-yellow text-[15px] font-semibold tracking-wide hover:text-white transition-colors duration-500',
   },
   H: {
     height: 'h-[130px]',
@@ -83,13 +83,13 @@ const variantConfig: Record<Variant, {
     padding: 'px-16',
     logoPad: 'pr-14',
     ctaStyle: 'button',
-    ctaClasses: 'bg-brand-yellow text-brand-dark px-[30px] py-4 text-[15px] font-bold rounded-button tracking-wide ml-6 whitespace-nowrap hover:bg-brand-orange transition-colors',
+    ctaClasses: 'bg-brand-yellow text-brand-dark px-[30px] py-4 text-[15px] font-bold rounded-button tracking-wide ml-6 whitespace-nowrap hover:bg-brand-orange transition-colors duration-500',
   },
 }
 
 export default function Header({ variant = 'G' }: { variant?: Variant }) {
   const config = variantConfig[variant]
-  const linkClasses = `text-[#c8c8c8] ${config.fontSize} font-semibold tracking-wide hover:text-white transition-colors`
+  const linkClasses = `text-[#c8c8c8] ${config.fontSize} font-semibold tracking-wide hover:text-white transition-colors duration-500`
 
   return (
     <header>
