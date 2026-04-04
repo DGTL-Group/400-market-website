@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Logo from './Logo'
 import NewsletterForm from './NewsletterForm'
+import SocialIcons from './SocialIcons'
 
 const navColumns = [
   {
@@ -30,12 +31,27 @@ const navColumns = [
   },
 ]
 
-export default function Footer({ showTagline = true, headingClass = 'footer-heading' }: { showTagline?: boolean; headingClass?: string }) {
+export default function Footer({ showTagline = true, headingClass = 'footer-heading', socialLayout = 'horizontal' as 'horizontal' | 'vertical' }: { showTagline?: boolean; headingClass?: string; socialLayout?: 'horizontal' | 'vertical' }) {
   return (
     <footer>
-      {/* Main footer */}
-      <div className="bg-footer-bg px-6 md:px-20 pt-10 pb-6">
-        <div className="max-w-content mx-auto grid grid-cols-1 md:grid-cols-[280px_1fr_300px] gap-10">
+      {/* Yellow newsletter banner — "Stay in the Loop" */}
+      <div className="bg-brand-yellow px-6 md:px-20 py-10">
+        <div className="max-w-content mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h2 className="font-display text-display-md md:text-display-lg text-brand-dark font-black">
+              STAY IN THE LOOP
+            </h2>
+            <p className="font-body text-body-md text-text-primary mt-1">
+              Market news, merchant spotlights, and event updates to your inbox.
+            </p>
+          </div>
+          <NewsletterForm />
+        </div>
+      </div>
+
+      {/* Main dark footer */}
+      <div className="bg-footer-bg px-6 md:px-20 py-10">
+        <div className="max-w-content mx-auto grid grid-cols-1 md:grid-cols-[280px_1fr_auto] gap-10">
           {/* Brand block — logo + tagline */}
           <div className={`flex flex-col items-center ${showTagline ? '' : 'justify-center'}`}>
             <div className={`${showTagline ? 'w-28' : 'w-36'}`}>
@@ -61,7 +77,7 @@ export default function Footer({ showTagline = true, headingClass = 'footer-head
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="text-text-subtle text-[13px] hover:text-white transition-colors"
+                      className="footer-text"
                     >
                       {link.label}
                     </Link>
@@ -75,30 +91,30 @@ export default function Footer({ showTagline = true, headingClass = 'footer-head
               <h5 className={headingClass}>
                 VISIT US
               </h5>
-              <div className="flex flex-col gap-2 text-text-subtle text-[13px]">
+              <div className="flex flex-col gap-2">
                 <a
                   href="https://share.google/qGvHeXlwOD08Oodyb"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition-colors leading-relaxed"
+                  className="footer-text leading-relaxed"
                 >
                   The 400 Market<br />
                   2207 Industrial Park Rd<br />
                   Innisfil, ON L9S 3V9
                 </a>
-                <a href="tel:7054361010" className="hover:text-white transition-colors">
+                <a href="tel:7054361010" className="footer-text">
                   705-436-1010
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Newsletter */}
+          {/* Follow Us — social icons */}
           <div>
             <h5 className={headingClass}>
-              STAY IN THE LOOP
+              FOLLOW US ON SOCIALS
             </h5>
-            <NewsletterForm />
+            <SocialIcons layout={socialLayout} />
           </div>
         </div>
       </div>
@@ -106,16 +122,23 @@ export default function Footer({ showTagline = true, headingClass = 'footer-head
       {/* Footer bottom bar */}
       <div className="bg-footer-bg border-t border-[#555] px-6 md:px-20 py-4">
         <div className="max-w-content mx-auto flex flex-col sm:flex-row justify-between gap-2">
-          <span className="text-footer-bottom text-[12px]">
+          <span className="text-footer-bottom text-[14px]">
             &copy; 2026 The 400 Market. All rights reserved.
           </span>
           <a
             href="https://dgtlgroup.io"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-footer-bottom text-[12px] hover:text-white transition-colors"
+            className="group text-footer-bottom text-[14px] hover:text-white transition-colors duration-500 ease-in-out"
           >
-            Designed with love by <span className="underline">DGTL Group</span>
+            Designed with{' '}
+            <span className="inline-block relative">
+              <span className="group-hover:opacity-0 transition-opacity duration-300 ease-in-out">love</span>
+              <span className="absolute inset-0 flex items-center justify-center opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500 ease-in-out text-red-500 text-[20px]">
+                &#10084;
+              </span>
+            </span>
+            {' '}by <span className="underline group-hover:text-brand-yellow transition-colors duration-500 ease-in-out">DGTL Group</span>
           </a>
         </div>
       </div>
