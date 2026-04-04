@@ -1,74 +1,97 @@
 import Link from 'next/link'
 import { RichText } from '@payloadcms/richtext-lexical/react'
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
-type Block = {
-  blockType: string
+type RichContentBlock = {
+  blockType: 'richContent'
   id?: string
-  [key: string]: unknown
+  content: SerializedEditorState
 }
+
+type HeroBlock = {
+  blockType: 'hero'
+  id?: string
+  heading: string
+  subheading?: string
+  ctaLabel?: string
+  ctaLink?: string
+}
+
+type CallToActionBlock = {
+  blockType: 'callToAction'
+  id?: string
+  heading: string
+  body?: string
+  buttonLabel: string
+  buttonLink: string
+  style?: 'primary' | 'secondary'
+}
+
+type Block = RichContentBlock | HeroBlock | CallToActionBlock | { blockType: string; id?: string }
 
 export default function RenderBlocks({ blocks }: { blocks: Block[] }) {
   return (
     <>
       {blocks.map((block, i) => {
+        const key = ('id' in block && block.id) || i
+
         switch (block.blockType) {
-          case 'richContent':
+          case 'richContent': {
+            const b = block as RichContentBlock
             return (
-              <section key={block.id || i} className="prose mx-auto max-w-content px-6 md:px-20 py-12">
-                <RichText data={block.content as never} />
+              <section key={key} className="prose mx-auto max-w-content px-6 md:px-20 py-12">
+                <RichText data={b.content} />
               </section>
             )
+          }
 
-          case 'hero':
+          case 'hero': {
+            const b = block as HeroBlock
             return (
-              <section
-                key={block.id || i}
-                className="bg-brand-dark text-white px-6 md:px-20 py-16 text-center"
-              >
+              <section key={key} className="bg-brand-dark text-white px-6 md:px-20 py-16 text-center">
                 <h1 className="font-display text-display-xl uppercase tracking-wide mb-4">
-                  {block.heading as string}
+                  {b.heading}
                 </h1>
-                {typeof block.subheading === 'string' && (
+                {b.subheading && (
                   <p className="font-body text-body-lg text-text-subtle max-w-2xl mx-auto">
-                    {block.subheading}
+                    {b.subheading}
                   </p>
                 )}
-                {block.ctaLabel && block.ctaLink && (
-                  <Link href={block.ctaLink as string} className="btn-primary mt-8 inline-flex">
-                    {block.ctaLabel as string}
+                {b.ctaLabel && b.ctaLink && (
+                  <Link href={b.ctaLink} className="btn-primary mt-8 inline-flex">
+                    {b.ctaLabel}
                   </Link>
                 )}
               </section>
             )
+          }
 
-          case 'callToAction':
+          case 'callToAction': {
+            const b = block as CallToActionBlock
             return (
               <section
-                key={block.id || i}
+                key={key}
                 className={`px-6 md:px-20 py-16 text-center ${
-                  (block.style as string) === 'secondary'
-                    ? 'bg-brand-dark text-white'
-                    : 'bg-brand-yellow text-brand-dark'
+                  b.style === 'secondary' ? 'bg-brand-dark text-white' : 'bg-brand-yellow text-brand-dark'
                 }`}
               >
                 <h2 className="font-display text-display-md uppercase tracking-wide mb-4">
-                  {block.heading as string}
+                  {b.heading}
                 </h2>
-                {typeof block.body === 'string' && (
+                {b.body && (
                   <p className="font-body text-body-md max-w-2xl mx-auto mb-8">
-                    {block.body}
+                    {b.body}
                   </p>
                 )}
                 <Link
-                  href={block.buttonLink as string}
-                  className={
-                    (block.style as string) === 'secondary' ? 'btn-primary' : 'btn-dark'
-                  }
+                  href={b.buttonLink}
+                  className={b.style === 'secondary' ? 'btn-primary' : 'btn-dark'}
                 >
-                  {block.buttonLabel as string}
+                  {b.buttonLabel}
                 </Link>
               </section>
             )
+          }
 
           default:
             return null
