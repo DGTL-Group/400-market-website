@@ -28,9 +28,9 @@ export default function RenderBlocks({ blocks }: { blocks: Block[] }) {
                 <h1 className="font-display text-display-xl uppercase tracking-wide mb-4">
                   {block.heading as string}
                 </h1>
-                {block.subheading && (
+                {typeof block.subheading === 'string' && (
                   <p className="font-body text-body-lg text-text-subtle max-w-2xl mx-auto">
-                    {block.subheading as string}
+                    {block.subheading}
                   </p>
                 )}
                 {block.ctaLabel && block.ctaLink && (
@@ -54,9 +54,9 @@ export default function RenderBlocks({ blocks }: { blocks: Block[] }) {
                 <h2 className="font-display text-display-md uppercase tracking-wide mb-4">
                   {block.heading as string}
                 </h2>
-                {block.body && (
+                {typeof block.body === 'string' && (
                   <p className="font-body text-body-md max-w-2xl mx-auto mb-8">
-                    {block.body as string}
+                    {block.body}
                   </p>
                 )}
                 <Link
