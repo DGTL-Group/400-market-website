@@ -111,4 +111,61 @@
     @apply font-display text-brand-yellow font-bold tracking-wider mb-3;
     font-size: 18px;
   }
+
+  /* Prose / rich text content (legal pages, news articles) */
+  .prose {
+    @apply font-body text-text-primary text-body-md;
+  }
+
+  .prose h1 {
+    @apply font-display text-display-lg uppercase tracking-wide mt-12 mb-6;
+  }
+
+  .prose h2 {
+    @apply font-display text-display-md uppercase tracking-wide mt-10 mb-4;
+  }
+
+  .prose h3 {
+    @apply font-display text-display-sm uppercase tracking-wide mt-8 mb-3;
+  }
+
+  .prose h4 {
+    @apply font-body text-body-lg font-bold mt-6 mb-2;
+  }
+
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
+
+  .prose ul, .prose ol {
+    @apply mb-4 pl-6;
+  }
+
+  .prose ul {
+    @apply list-disc;
+  }
+
+  .prose ol {
+    @apply list-decimal;
+  }
+
+  .prose li {
+    @apply mb-2;
+  }
+
+  .prose a {
+    @apply text-brand-mango underline hover:text-brand-orange;
+  }
+
+  .prose strong {
+    @apply font-bold;
+  }
+
+  .prose hr {
+    @apply my-8 border-surface-light;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-brand-yellow pl-4 italic my-6;
+  }
 }
