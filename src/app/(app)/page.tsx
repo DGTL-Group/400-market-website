@@ -84,7 +84,7 @@ export default function Home() {
             href="https://dgtlgroup.io"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-text-secondary underline hover:text-brand-dark transition-colors"
+            className="text-brand-dark underline"
           >
             DGTL Group
           </a>
