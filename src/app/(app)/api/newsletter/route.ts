@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
           if (resubRes.ok) {
             return NextResponse.json({
               success: true,
-              message: 'Thanks for joining the email newsletter!',
+              message: 'Thanks for joining back the email newsletter!',
             })
           }
 
