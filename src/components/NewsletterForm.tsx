@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'already' | 'error'>('idle')
   const [message, setMessage] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
@@ -26,6 +26,9 @@ export default function NewsletterForm() {
         setStatus('success')
         setMessage(data.message || 'Subscribed!')
         setEmail('')
+      } else if (res.ok && data.alreadySubscribed) {
+        setStatus('already')
+        setMessage(data.message || 'You are already subscribed.')
       } else {
         setStatus('error')
         setMessage(data.message || data.error || 'Something went wrong.')
@@ -51,12 +54,15 @@ export default function NewsletterForm() {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="bg-brand-dark text-white px-6 py-4 font-bold text-[13px] hover:bg-text-secondary transition-colors disabled:opacity-50"
+          className="bg-brand-dark text-white px-6 py-4 font-bold text-[13px] hover:bg-text-secondary transition-colors duration-500 disabled:opacity-50"
         >
           {status === 'loading' ? '...' : 'SUBSCRIBE'}
         </button>
       </form>
       {status === 'success' && (
+        <p className="text-brand-dark text-[13px] mt-2 font-semibold">{message}</p>
+      )}
+      {status === 'already' && (
         <p className="text-brand-dark text-[13px] mt-2 font-semibold">{message}</p>
       )}
       {status === 'error' && (

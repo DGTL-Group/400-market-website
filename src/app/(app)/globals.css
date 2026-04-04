@@ -46,28 +46,28 @@
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-button bg-brand-yellow px-6 py-3
            font-display text-body-md uppercase tracking-wide text-brand-dark
-           hover:bg-brand-orange transition-colors duration-200;
+           hover:bg-brand-orange transition-colors duration-500;
   }
 
   /* Secondary CTA — orange background */
   .btn-secondary {
     @apply inline-flex items-center justify-center rounded-button bg-brand-orange px-6 py-3
            font-display text-body-md uppercase tracking-wide text-white
-           hover:bg-brand-mango transition-colors duration-200;
+           hover:bg-brand-mango transition-colors duration-500;
   }
 
   /* Dark CTA — dark background */
   .btn-dark {
     @apply inline-flex items-center justify-center rounded-button bg-brand-dark px-6 py-3
            font-display text-body-md uppercase tracking-wide text-white
-           hover:bg-text-secondary transition-colors duration-200;
+           hover:bg-text-secondary transition-colors duration-500;
   }
 
   /* Outlined variant */
   .btn-outline {
     @apply inline-flex items-center justify-center rounded-button border-2 border-brand-dark px-6 py-3
            font-display text-body-md uppercase tracking-wide text-brand-dark
-           hover:bg-brand-dark hover:text-white transition-colors duration-200;
+           hover:bg-brand-dark hover:text-white transition-colors duration-500;
   }
 
   /* Page section wrapper */
