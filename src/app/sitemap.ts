@@ -38,28 +38,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const vendorRoutes: MetadataRoute.Sitemap = vendors.docs.map((doc) => ({
     url: `${BASE_URL}/vendors/${doc.slug}`,
-    lastModified: new Date(doc.updatedAt),
+    lastModified: new Date(doc.updatedAt as string),
     changeFrequency: 'weekly',
     priority: 0.7,
   }))
 
   const eventRoutes: MetadataRoute.Sitemap = events.docs.map((doc) => ({
     url: `${BASE_URL}/events/${doc.slug}`,
-    lastModified: new Date(doc.updatedAt),
+    lastModified: new Date(doc.updatedAt as string),
     changeFrequency: 'weekly',
     priority: 0.7,
   }))
 
   const newsRoutes: MetadataRoute.Sitemap = news.docs.map((doc) => ({
     url: `${BASE_URL}/news/${doc.slug}`,
-    lastModified: new Date(doc.updatedAt),
+    lastModified: new Date(doc.updatedAt as string),
     changeFrequency: 'monthly',
     priority: 0.6,
   }))
 
   const productRoutes: MetadataRoute.Sitemap = products.docs.map((doc) => ({
     url: `${BASE_URL}/shop/${doc.slug}`,
-    lastModified: new Date(doc.updatedAt),
+    lastModified: new Date(doc.updatedAt as string),
     changeFrequency: 'monthly',
     priority: 0.7,
   }))
