@@ -67,6 +67,13 @@ app/
 ├── terms-of-use/                              ★ NEW
 │   └── page.tsx                               → /terms-of-use/
 │
+├── my-account/                                ★ NEW
+│   └── page.tsx                               → /my-account/
+│
+├── staff/                                     ★ NEW (private)
+│   └── verify/
+│       └── page.tsx                           → /staff/verify/
+│
 ├── sitemap.xml/
 │   └── route.ts                               → /sitemap.xml
 │
@@ -259,6 +266,34 @@ app/
 
 ---
 
+### My Account
+
+| Field | Value |
+|---|---|
+| **Route** | `/my-account/` |
+| **File** | `app/my-account/page.tsx` |
+| **Page Title** | My Account — The 400 Market |
+| **Content Type** | Dynamic (client-side, authenticated) |
+| **Payload Collection** | Orders (read-only customer view) |
+| **WordPress Equivalent** | `/my-account/` (WooCommerce — rebuilt as custom portal) |
+| **Notes** | ★ NEW. Customer purchase history portal; magic link auth (enter email → receive login link); shows past orders with serial codes, product type, amount, status; serves as proof of purchase for gift certificates and parking passes |
+
+---
+
+### Staff Verification
+
+| Field | Value |
+|---|---|
+| **Route** | `/staff/verify/` |
+| **File** | `app/staff/verify/page.tsx` |
+| **Page Title** | Verify Order — The 400 Market |
+| **Content Type** | Dynamic (authenticated staff only) |
+| **Payload Collection** | Orders |
+| **WordPress Equivalent** | None |
+| **Notes** | ★ NEW. Private staff page for market management; simple code lookup to verify gift certificates and parking passes; mark orders as used/delivered; protected by PIN or Payload user auth |
+
+---
+
 ### 404 Not Found
 
 | Field | Value |
@@ -405,6 +440,8 @@ The following routes have no WordPress equivalent and are net-new additions for 
 | `/vendors/[slug]/` | Individual vendor profiles enable vendor SEO, boost merchant buy-in, and support the floor map feature |
 | `/shop/order-confirmation/` | Required Stripe post-checkout landing page; WooCommerce handled this natively, Stripe requires an explicit return URL |
 | `/terms-of-use/` | Required legal page for e-commerce (gift certificates, parking pass); complements the existing privacy policy |
+| `/my-account/` | Customer purchase history portal with magic link auth; proof of purchase for gift certificates and parking passes |
+| `/staff/verify/` | Private staff page for market management to verify and mark orders as used |
 
 ---
 
@@ -416,7 +453,7 @@ The following WordPress URLs are removed from the new site. All are handled by 3
 |---|---|---|
 | `/cart/` | `/shop/` | WooCommerce removed; Stripe has no standalone cart page |
 | `/checkout/` | `/shop/` | WooCommerce removed; Stripe Checkout is modal/hosted |
-| `/my-account/` | `/` | No customer account portal in new stack |
+| `/my-account/` | `/my-account/` | Rebuilt as customer purchase history portal (no redirect) |
 | `/monthly-giveaway-100-gift-certificate/` | `/shop/` | One-off campaign page; no equivalent |
 | `/product/400-market-parking-pass/` | `/shop/parking-pass/` | WooCommerce `/product/` slug structure replaced |
 | `/product/5-400-market-gift-certificate/` | `/shop/gift-certificate-5/` | WooCommerce `/product/` slug structure replaced |

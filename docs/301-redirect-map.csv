@@ -10,7 +10,7 @@ PAGE,https://400market.com/shop/,https://400market.com/shop/,—,WooCommerce →
 PAGE,https://400market.com/monthly-giveaway-100-gift-certificate/,https://400market.com/shop/,301,Campaign page — no equivalent; redirect to shop
 PAGE,https://400market.com/cart/,https://400market.com/shop/,301,WooCommerce cart removed — redirect to shop
 PAGE,https://400market.com/checkout/,https://400market.com/shop/,301,WooCommerce checkout removed — Stripe handles inline checkout
-PAGE,https://400market.com/my-account/,https://400market.com/,301,WooCommerce account removed — no customer portal in new stack
+PAGE,https://400market.com/my-account/,https://400market.com/my-account/,—,Customer purchase history portal — magic link auth (no redirect)
 POST,https://400market.com/news/,https://400market.com/news/,—,News archive — no change
 POST,https://400market.com/from-basement-to-bustle-why-you-should-set-up-shop-at-the-400-market/,https://400market.com/news/from-basement-to-bustle-why-you-should-set-up-shop-at-the-400-market/,301,WordPress posts at root → moved under /news/
 POST,https://400market.com/the-400-market-chronicles-why-selling-grandmas-stuff-is-the-ultimate-tribute/,https://400market.com/news/the-400-market-chronicles-why-selling-grandmas-stuff-is-the-ultimate-tribute/,301,WordPress posts at root → moved under /news/
