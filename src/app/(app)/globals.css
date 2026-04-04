@@ -90,4 +90,15 @@
     @apply inline-block rounded-button bg-brand-yellow px-3 py-1
            font-display text-caption uppercase tracking-wider text-brand-dark;
   }
+
+  /* Footer column headings */
+  .footer-heading {
+    @apply font-display text-brand-yellow font-bold tracking-wider mb-3;
+    font-size: 16px;
+  }
+
+  .footer-heading-lg {
+    @apply font-display text-brand-yellow font-bold tracking-wider mb-3;
+    font-size: 18px;
+  }
 }
