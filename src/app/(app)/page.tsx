@@ -39,14 +39,20 @@ export default function Home() {
       <footer className="absolute bottom-6 left-0 right-0 text-caption text-brand-dark text-center">
         <p>&copy; 2026 The 400 Market. All rights reserved.</p>
         <p className="mt-1">
-          Designed with love by{' '}
           <a
             href="https://dgtlgroup.io"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-dark underline"
+            className="group"
           >
-            DGTL Group
+            Designed with{' '}
+            <span className="inline-block relative">
+              <span className="group-hover:opacity-0 transition-opacity duration-300 ease-in-out">love</span>
+              <span className="absolute inset-0 flex items-center justify-center opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500 ease-in-out text-red-500">
+                &#10084;
+              </span>
+            </span>
+            {' '}by <span className="underline">DGTL Group</span>
           </a>
         </p>
       </footer>
