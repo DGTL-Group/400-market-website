@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react'
 
 export default function ScrollProgress() {
-  const clipRef = useRef<HTMLDivElement>(null)
+  const barRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -11,7 +11,6 @@ export default function ScrollProgress() {
     let current = 0
     let target = 0
 
-    // Measure actual header height
     function getHeaderHeight() {
       const header = document.querySelector('header')
       return header ? header.offsetHeight : 133
@@ -34,14 +33,13 @@ export default function ScrollProgress() {
         current = target
       }
 
-      if (clipRef.current) {
-        clipRef.current.style.clipPath = `inset(0 ${100 - current}% 0 0)`
+      if (barRef.current) {
+        barRef.current.style.width = `${current}%`
       }
 
       raf = requestAnimationFrame(animate)
     }
 
-    // Set position based on actual header
     if (containerRef.current) {
       containerRef.current.style.top = `${getHeaderHeight()}px`
     }
@@ -58,9 +56,9 @@ export default function ScrollProgress() {
   return (
     <div ref={containerRef} className="fixed left-0 right-0 z-[55] h-[3px] pointer-events-none">
       <div
-        ref={clipRef}
-        className="h-full w-full bg-gradient-to-r from-brand-yellow to-brand-orange"
-        style={{ clipPath: 'inset(0 100% 0 0)', willChange: 'clip-path' }}
+        ref={barRef}
+        className="h-full bg-gradient-to-r from-brand-yellow to-brand-orange"
+        style={{ width: '0%' }}
       />
     </div>
   )
