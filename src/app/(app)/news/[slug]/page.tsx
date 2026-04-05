@@ -66,6 +66,7 @@ export default async function NewsPostPage({ params }: Props) {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'America/Toronto',
   })
 
   // Fetch related posts (3 most recent, excluding current)

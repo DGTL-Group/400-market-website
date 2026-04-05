@@ -16,6 +16,7 @@ export default function NewsCard({ title, slug, excerpt, featuredImage, publishD
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: 'America/Toronto',
   })
 
   return (
