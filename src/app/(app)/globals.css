@@ -209,12 +209,12 @@
 /* Logo wobble on hover */
 @keyframes wobble {
   0% { transform: rotate(0deg); }
-  15% { transform: rotate(0.9deg); }
-  30% { transform: rotate(-0.75deg); }
-  45% { transform: rotate(0.6deg); }
-  60% { transform: rotate(-0.45deg); }
-  75% { transform: rotate(0.3deg); }
-  90% { transform: rotate(-0.15deg); }
+  15% { transform: rotate(0.45deg); }
+  30% { transform: rotate(-0.375deg); }
+  45% { transform: rotate(0.3deg); }
+  60% { transform: rotate(-0.225deg); }
+  75% { transform: rotate(0.15deg); }
+  90% { transform: rotate(-0.075deg); }
   100% { transform: rotate(0deg); }
 }
 
@@ -233,4 +233,23 @@
 
 .animate-boop-pop {
   animation: boop-pop 2.5s ease-in-out forwards;
+}
+
+/* EST 1986 tooltip fade in */
+@keyframes est-fade {
+  0% { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.animate-est-fade {
+  animation: est-fade 300ms ease-out forwards;
+}
+
+@keyframes est-fade-out {
+  0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(4px); }
+}
+
+.animate-est-fade-out {
+  animation: est-fade-out 300ms ease-in forwards;
 }

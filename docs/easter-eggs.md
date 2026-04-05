@@ -35,9 +35,8 @@ Planned animations, hidden features, and delightful details for The 400 Market w
 
 ## Hidden Easter Eggs
 - [ ] **Konami code** (↑↑↓↓←→←→BA) — confetti explosion in market colors (yellow/orange)
-- [ ] **Logo boop** — click logo 5 times anywhere → "Hey, stop booping me!" animation
-- [ ] **EST 1986 tooltip** — hover shows "That's X years of food, finds & fun!" (auto-calculated)
-- [ ] **Scroll past footer** — tiny hidden message: "You scrolled all the way down? You'd love the market."
+- [x] **Logo boop** — click footer logo 3 times rapidly → "Hey, stop booping me!" (single click navigates home after 700ms)
+- [x] **EST 1986 tooltip** — hover footer logo 800ms → "That's X years of food, finds & fun!" (auto-calculated)
 - [ ] **Funnel cake search** — type "funnel cake" in vendor search → funnel cake emoji animation
 - [ ] **Additional search triggers** — more fun search terms TBD
 

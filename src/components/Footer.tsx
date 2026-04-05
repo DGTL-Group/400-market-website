@@ -54,7 +54,7 @@ export default function Footer({ showTagline = true, headingClass = 'footer-head
         <div className="max-w-content mx-auto grid grid-cols-1 md:grid-cols-[280px_1fr_auto] gap-10">
           {/* Brand block — logo + tagline */}
           <div className={`flex flex-col items-center ${showTagline ? '' : 'justify-center'}`}>
-            <LogoInteractive id={`footer-logo${showTagline ? '-a' : '-b'}`} className={`${showTagline ? 'w-28' : 'w-36'}`} />
+            <LogoInteractive id={`footer-logo${showTagline ? '-a' : '-b'}`} className={`${showTagline ? 'w-28' : 'w-36'}`} showEstTooltip />
             {showTagline && (
               <p className="font-display text-text-subtle font-bold tracking-wider mt-6 text-center text-[18px]">
                 FOOD, FINDS &amp; FUN.<br />
