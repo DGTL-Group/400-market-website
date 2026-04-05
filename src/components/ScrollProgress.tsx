@@ -8,33 +8,35 @@ export default function ScrollProgress() {
   useEffect(() => {
     let raf: number
     let current = 0
+    let target = 0
 
-    function update() {
+    function onScroll() {
       const scrollTop = window.scrollY
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const target = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+      target = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+    }
 
-      // Smooth interpolation — ease toward target
-      current += (target - current) * 0.15
+    function animate() {
+      // Smooth exponential ease — low factor = silky smooth
+      current += (target - current) * 0.06
+
+      // Snap when extremely close to avoid infinite loop
+      if (Math.abs(target - current) < 0.01) {
+        current = target
+      }
 
       if (barRef.current) {
-        barRef.current.style.width = `${current}%`
+        barRef.current.style.transform = `scaleX(${current / 100})`
       }
 
-      // Keep animating if not settled
-      if (Math.abs(target - current) > 0.1) {
-        raf = requestAnimationFrame(update)
-      }
+      raf = requestAnimationFrame(animate)
     }
 
-    function handleScroll() {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(update)
-    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    raf = requestAnimationFrame(animate)
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
-      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('scroll', onScroll)
       cancelAnimationFrame(raf)
     }
   }, [])
@@ -43,8 +45,8 @@ export default function ScrollProgress() {
     <div className="fixed left-0 right-0 z-[55] h-[4px] pointer-events-none" style={{ top: 'var(--header-height, 135px)' }}>
       <div
         ref={barRef}
-        className="h-full bg-brand-yellow"
-        style={{ width: '0%', willChange: 'width' }}
+        className="h-full bg-brand-yellow origin-left"
+        style={{ transform: 'scaleX(0)', willChange: 'transform' }}
       />
     </div>
   )
