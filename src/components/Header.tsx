@@ -94,7 +94,7 @@ export default function Header({ variant = 'G' }: { variant?: Variant }) {
   return (
     <header className="sticky top-0 z-50">
       {/* Gradient accent bar */}
-      <div className="h-[5px] bg-gradient-to-r from-brand-yellow to-brand-orange" />
+      <div className="h-[3px] bg-gradient-to-r from-brand-yellow to-brand-orange" />
 
       {/* Main nav */}
       <nav className={`grid grid-cols-[1fr_auto_1fr] items-center ${config.height} bg-brand-dark ${config.padding}`}>
