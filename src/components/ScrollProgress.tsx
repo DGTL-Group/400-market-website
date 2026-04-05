@@ -56,7 +56,7 @@ export default function ScrollProgress() {
   }, [])
 
   return (
-    <div ref={containerRef} className="fixed left-0 right-0 z-[55] h-[4px] pointer-events-none">
+    <div ref={containerRef} className="fixed left-0 right-0 z-[55] h-[3px] pointer-events-none">
       <div
         ref={clipRef}
         className="h-full w-full bg-gradient-to-r from-brand-yellow to-brand-orange"
