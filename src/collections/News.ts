@@ -90,11 +90,11 @@ export const News: CollectionConfig = {
       hasMany: true,
       index: true,
       options: [
-        { label: 'Market News', value: 'market-news' },
-        { label: 'Vendor Spotlight', value: 'vendor-spotlight' },
-        { label: 'Events', value: 'events' },
-        { label: 'Tips & Guides', value: 'tips' },
-        { label: 'Announcements', value: 'announcements' },
+        { label: 'Filter 1', value: 'filter1' },
+        { label: 'Filter 2', value: 'filter2' },
+        { label: 'Filter 3', value: 'filter3' },
+        { label: 'Filter 4', value: 'filter4' },
+        { label: 'Filter 5', value: 'filter5' },
       ],
       admin: {
         position: 'sidebar',
