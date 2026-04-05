@@ -36,7 +36,7 @@ export default async function NewsPage({ searchParams }: Props) {
   })
 
   return (
-    <PageLayout>
+    <PageLayout showCheckmark>
       <section className="max-w-content mx-auto px-6 md:px-20 py-12">
         <h1 className="font-display text-display-lg uppercase tracking-wide mb-8">NEWS</h1>
 

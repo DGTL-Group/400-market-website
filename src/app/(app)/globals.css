@@ -118,15 +118,15 @@
   }
 
   .prose h1 {
-    @apply font-display text-display-lg uppercase tracking-wide mt-12 mb-6;
+    @apply font-display text-display-lg uppercase tracking-wide font-bold mt-12 mb-6;
   }
 
   .prose h2 {
-    @apply font-display text-display-md uppercase tracking-wide mt-10 mb-4;
+    @apply font-display text-display-md uppercase tracking-wide font-semibold mt-10 mb-4;
   }
 
   .prose h3 {
-    @apply font-display text-display-sm uppercase tracking-wide mt-8 mb-3;
+    @apply font-display text-display-sm uppercase tracking-wide font-semibold mt-8 mb-3;
   }
 
   .prose h4 {
@@ -168,4 +168,38 @@
   .prose blockquote {
     @apply border-l-4 border-brand-yellow pl-4 italic my-6;
   }
+}
+
+/* Checkmark animation for newsletter subscribe */
+@keyframes checkmark-draw {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes checkmark-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-checkmark {
+  animation: checkmark-pop 500ms ease-in-out;
+}
+
+.checkmark-path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmark-draw 500ms ease-in-out 200ms forwards;
 }

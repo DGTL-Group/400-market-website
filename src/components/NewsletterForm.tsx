@@ -1,11 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function NewsletterForm() {
+export default function NewsletterForm({ showCheckmark = false }: { showCheckmark?: boolean }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'already' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [showCheck, setShowCheck] = useState(false)
+
+  useEffect(() => {
+    if (status === 'success' && showCheckmark) {
+      setShowCheck(true)
+      const timer = setTimeout(() => setShowCheck(false), 2500)
+      return () => clearTimeout(timer)
+    }
+  }, [status, showCheckmark])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -54,9 +63,26 @@ export default function NewsletterForm() {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="bg-brand-dark text-white px-6 py-4 font-bold text-[13px] hover:bg-text-secondary transition-colors duration-500 disabled:opacity-50"
+          className="relative bg-brand-dark text-white px-6 py-4 font-bold text-[13px] hover:bg-text-secondary transition-colors duration-500 disabled:opacity-50 overflow-hidden"
         >
-          SUBSCRIBE
+          <span className={`inline-flex items-center transition-all duration-500 ${showCheck ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}>
+            SUBSCRIBE
+          </span>
+          {showCheck && (
+            <span className="absolute inset-0 flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-brand-yellow animate-checkmark"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 13l4 4L19 7" className="checkmark-path" />
+              </svg>
+            </span>
+          )}
         </button>
       </form>
       {(status === 'success' || status === 'already' || status === 'error') && (

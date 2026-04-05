@@ -77,7 +77,7 @@ export default async function NewsPostPage({ params }: Props) {
   })
 
   return (
-    <PageLayout>
+    <PageLayout showCheckmark>
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -102,40 +102,43 @@ export default async function NewsPostPage({ params }: Props) {
 
       {/* Title area */}
       <section className="max-w-content mx-auto px-6 md:px-20 pt-10 pb-6">
-        <p className="text-body-sm text-text-secondary mb-2">{date}</p>
-        <h1 className="font-display text-display-lg uppercase tracking-wide">{post.title}</h1>
+        <p className="text-body-md text-text-secondary mb-2">{date}</p>
+        <h1 className="font-display text-display-lg uppercase tracking-wide font-bold">{post.title}</h1>
       </section>
 
       {/* Post content */}
-      <article className="prose mx-auto max-w-content px-6 md:px-20 pb-12">
+      <article className="prose mx-auto max-w-content px-6 md:px-20">
         <RichText data={post.content as SerializedEditorState} />
       </article>
 
-      {/* CTA banner */}
-      <section className="bg-brand-yellow px-6 md:px-20 py-12">
-        <div className="max-w-content mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      {/* CTA banner — contained box per Figma */}
+      <section className="max-w-content mx-auto px-6 md:px-20 py-12">
+        <div className="bg-brand-yellow rounded-button px-8 py-7 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="font-display text-display-sm uppercase tracking-wide text-brand-dark">
+            <h2 className="font-display text-display-md md:text-display-lg uppercase tracking-wide text-brand-dark font-black">
               READY TO JOIN THE MARKET?
             </h2>
             <p className="font-body text-body-md text-text-primary mt-1">
               Apply for a booth today and join hundreds of thriving merchants.
             </p>
           </div>
-          <Link href="/become-a-vendor" className="btn-dark whitespace-nowrap">
+          <Link
+            href="/become-a-vendor"
+            className="bg-brand-dark text-white px-6 py-4 font-bold text-[13px] rounded-button whitespace-nowrap hover:bg-text-secondary transition-colors duration-500"
+          >
             BECOME A MERCHANT
           </Link>
         </div>
       </section>
 
       {/* Related posts */}
-      {relatedPosts.length > 0 && (
-        <section className="max-w-content mx-auto px-6 md:px-20 py-12">
-          <h2 className="font-display text-display-sm uppercase tracking-wide mb-6">
-            MORE FROM THE MARKET
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedPosts.map((related) => {
+      <section className="max-w-content mx-auto px-6 md:px-20 pb-16">
+        <h2 className="font-display text-display-md uppercase tracking-wide font-semibold mb-6">
+          MORE FROM THE MARKET
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {relatedPosts.length > 0 ? (
+            relatedPosts.map((related) => {
               const img = related.featuredImage as { url?: string; alt?: string } | undefined
               return (
                 <NewsCard
@@ -147,10 +150,26 @@ export default async function NewsPostPage({ params }: Props) {
                   publishDate={related.publishDate}
                 />
               )
-            })}
-          </div>
-        </section>
-      )}
+            })
+          ) : (
+            <>
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="rounded-button border border-surface-light overflow-hidden">
+                  <div className="w-full aspect-[16/9] bg-surface-light flex items-center justify-center text-text-subtle text-body-sm">
+                    Coming soon
+                  </div>
+                  <div className="p-4">
+                    <div className="h-3 w-20 bg-surface-light rounded mb-2" />
+                    <div className="h-4 w-full bg-surface-light rounded mb-2" />
+                    <div className="h-4 w-3/4 bg-surface-light rounded mb-3" />
+                    <div className="h-3 w-24 bg-surface-light rounded" />
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </section>
     </PageLayout>
   )
 }

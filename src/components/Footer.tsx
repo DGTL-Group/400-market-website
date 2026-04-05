@@ -31,7 +31,7 @@ const navColumns = [
   },
 ]
 
-export default function Footer({ showTagline = true, headingClass = 'footer-heading', socialLayout = 'horizontal' as 'horizontal' | 'vertical' }: { showTagline?: boolean; headingClass?: string; socialLayout?: 'horizontal' | 'vertical' }) {
+export default function Footer({ showTagline = true, headingClass = 'footer-heading', socialLayout = 'horizontal' as 'horizontal' | 'vertical', showCheckmark = false }: { showTagline?: boolean; headingClass?: string; socialLayout?: 'horizontal' | 'vertical'; showCheckmark?: boolean }) {
   return (
     <footer>
       {/* Yellow newsletter banner — "Stay in the Loop" */}
@@ -45,7 +45,7 @@ export default function Footer({ showTagline = true, headingClass = 'footer-head
               Market news, merchant spotlights, and event updates to your inbox.
             </p>
           </div>
-          <NewsletterForm />
+          <NewsletterForm showCheckmark={showCheckmark} />
         </div>
       </div>
 
