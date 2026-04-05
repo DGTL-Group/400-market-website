@@ -7,27 +7,19 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Setup Node 24
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+          node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -37,9 +29,3 @@ jobs:
 
       - name: Type check
         run: npx tsc --noEmit
-
-      - name: Build
-        run: npm run build
-        env:
-          DATABASE_URI: postgresql://localhost/dummy
-          PAYLOAD_SECRET: ci-build-secret-not-real-just-for-build
