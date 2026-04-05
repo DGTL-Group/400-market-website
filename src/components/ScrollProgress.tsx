@@ -4,11 +4,18 @@ import { useRef, useEffect } from 'react'
 
 export default function ScrollProgress() {
   const clipRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let raf: number
     let current = 0
     let target = 0
+
+    // Measure actual header height
+    function getHeaderHeight() {
+      const header = document.querySelector('header')
+      return header ? header.offsetHeight : 133
+    }
 
     function onScroll() {
       const scrollTop = window.scrollY
@@ -18,13 +25,11 @@ export default function ScrollProgress() {
 
     function animate() {
       const diff = target - current
-      // Max speed: 0.25% per frame (~15% per second at 60fps)
       const maxStep = 0.25
       const step = Math.sign(diff) * Math.min(Math.abs(diff) * 0.01, maxStep)
 
       current += step
 
-      // Snap when extremely close
       if (Math.abs(diff) < 0.01) {
         current = target
       }
@@ -34,6 +39,11 @@ export default function ScrollProgress() {
       }
 
       raf = requestAnimationFrame(animate)
+    }
+
+    // Set position based on actual header
+    if (containerRef.current) {
+      containerRef.current.style.top = `${getHeaderHeight()}px`
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -46,7 +56,7 @@ export default function ScrollProgress() {
   }, [])
 
   return (
-    <div className="sticky top-[calc(3px+130px)] left-0 right-0 z-[55] h-[4px] pointer-events-none -mt-[4px]">
+    <div ref={containerRef} className="fixed left-0 right-0 z-[55] h-[4px] pointer-events-none">
       <div
         ref={clipRef}
         className="h-full w-full bg-gradient-to-r from-brand-yellow to-brand-orange"
