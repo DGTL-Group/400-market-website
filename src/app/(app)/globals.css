@@ -204,9 +204,9 @@
   animation: checkmark-draw 500ms ease-in-out 200ms forwards;
 }
 
-/* Glint / shimmer sweep for CTA */
-@keyframes glint-sweep {
-  0% {
+/* Glint / shimmer sweep for CTA text */
+@keyframes glint-text-sweep {
+  0%, 70% {
     background-position: 200% center;
   }
   100% {
@@ -214,7 +214,22 @@
   }
 }
 
-.animate-glint {
-  animation: glint-sweep 3s ease-in-out infinite;
+.animate-glint-text {
+  background: linear-gradient(
+    120deg,
+    currentColor 0%,
+    currentColor 30%,
+    #fff 45%,
+    #fffbe6 50%,
+    #fff 55%,
+    currentColor 70%,
+    currentColor 100%
+  );
+  background-size: 200% 100%;
+  background-position: 200% center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glint-text-sweep 5s ease-in-out infinite;
   animation-delay: 2s;
 }

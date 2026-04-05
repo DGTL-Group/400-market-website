@@ -119,12 +119,8 @@ export default function Header({ variant = 'G' }: { variant?: Variant }) {
               {link.label}
             </Link>
           ))}
-          <Link href="/become-a-vendor" className={`${config.ctaClasses} relative overflow-hidden inline-block`}>
-            <span className="relative z-10">BECOME A MERCHANT</span>
-            <span className="absolute inset-0 z-20 pointer-events-none animate-glint" style={{
-              background: 'linear-gradient(120deg, transparent 0%, transparent 30%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 55%, transparent 70%, transparent 100%)',
-              backgroundSize: '200% 100%',
-            }} />
+          <Link href="/become-a-vendor" className={config.ctaClasses}>
+            <span className="animate-glint-text">BECOME A MERCHANT</span>
           </Link>
         </div>
       </nav>
