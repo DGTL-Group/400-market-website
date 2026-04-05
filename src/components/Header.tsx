@@ -108,8 +108,8 @@ export default function Header({ variant = 'G' }: { variant?: Variant }) {
         </div>
 
         {/* Center logo */}
-        <Link href="/" className={`block ${config.logoSize}`}>
-          <Logo id={`header-logo-${variant}`} className="w-full h-full" />
+        <Link href="/" className={`block ${config.logoSize} group`}>
+          <Logo id={`header-logo-${variant}`} className="w-full h-full group-hover:animate-wobble" />
         </Link>
 
         {/* Right links */}
@@ -120,7 +120,7 @@ export default function Header({ variant = 'G' }: { variant?: Variant }) {
             </Link>
           ))}
           <Link href="/become-a-vendor" className={config.ctaClasses}>
-            <span className="animate-glint-text">BECOME A MERCHANT</span>
+            BECOME A MERCHANT
           </Link>
         </div>
       </nav>

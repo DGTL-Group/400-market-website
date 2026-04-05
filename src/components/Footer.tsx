@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Logo from './Logo'
+import LogoInteractive from './LogoInteractive'
 import NewsletterForm from './NewsletterForm'
 import SocialIcons from './SocialIcons'
 
@@ -54,9 +54,7 @@ export default function Footer({ showTagline = true, headingClass = 'footer-head
         <div className="max-w-content mx-auto grid grid-cols-1 md:grid-cols-[280px_1fr_auto] gap-10">
           {/* Brand block — logo + tagline */}
           <div className={`flex flex-col items-center ${showTagline ? '' : 'justify-center'}`}>
-            <div className={`${showTagline ? 'w-28' : 'w-36'}`}>
-              <Logo id={`footer-logo${showTagline ? '-a' : '-b'}`} className="w-full h-auto" />
-            </div>
+            <LogoInteractive id={`footer-logo${showTagline ? '-a' : '-b'}`} className={`${showTagline ? 'w-28' : 'w-36'}`} />
             {showTagline && (
               <p className="font-display text-text-subtle font-bold tracking-wider mt-6 text-center text-[18px]">
                 FOOD, FINDS &amp; FUN.<br />

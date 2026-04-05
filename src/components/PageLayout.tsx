@@ -1,6 +1,7 @@
 import Header from './Header'
 import Footer from './Footer'
 import CookieConsent from './CookieConsent'
+import KonamiConfetti from './KonamiConfetti'
 
 export default function PageLayout({ children, showCheckmark = false }: { children: React.ReactNode; showCheckmark?: boolean }) {
   return (
@@ -9,6 +10,7 @@ export default function PageLayout({ children, showCheckmark = false }: { childr
       <main>{children}</main>
       <Footer socialLayout="vertical" showTagline={false} headingClass="footer-heading-lg" showCheckmark={showCheckmark} />
       <CookieConsent />
+      <KonamiConfetti />
     </>
   )
 }

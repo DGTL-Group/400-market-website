@@ -3,9 +3,9 @@
  * Uses a clipPath to contain the black outlines within the shield shape.
  * Each instance needs a unique `id` prefix to avoid SVG ID collisions.
  */
-export default function Logo({ id = 'logo', className = '' }: { id?: string; className?: string }) {
+export default function Logo({ id = 'logo', className = '', onAnimationEnd }: { id?: string; className?: string; onAnimationEnd?: () => void }) {
   return (
-    <svg viewBox="0 0 540.83 596" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <svg viewBox="0 0 540.83 596" xmlns="http://www.w3.org/2000/svg" className={className} onAnimationEnd={onAnimationEnd}>
       <defs>
         <linearGradient id={`${id}-gradient`} x1="267.32" y1="423.34" x2="266.72" y2="-98.57" gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="#f7941d"/>
