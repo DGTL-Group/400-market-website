@@ -9,6 +9,7 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
 import PageLayout from '@/components/PageLayout'
 import Breadcrumb from '@/components/Breadcrumb'
 import NewsCard from '@/components/NewsCard'
+import ScrollProgress from '@/components/ScrollProgress'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -79,6 +80,7 @@ export default async function NewsPostPage({ params }: Props) {
 
   return (
     <PageLayout showCheckmark>
+      <ScrollProgress />
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
