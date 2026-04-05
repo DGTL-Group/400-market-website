@@ -25,15 +25,15 @@ jobs:
         env:
           HAS_HOST: ${{ secrets.HOSTINGER_SSH_HOST != '' }}
           HAS_USER: ${{ secrets.HOSTINGER_SSH_USER != '' }}
-          HAS_KEY: ${{ secrets.HOSTINGER_SSH_KEY != '' }}
+          HAS_PASS: ${{ secrets.HOSTINGER_SSH_PASS != '' }}
         run: |
-          if [ "$HAS_HOST" = "true" ] && [ "$HAS_USER" = "true" ] && [ "$HAS_KEY" = "true" ]; then
+          if [ "$HAS_HOST" = "true" ] && [ "$HAS_USER" = "true" ] && [ "$HAS_PASS" = "true" ]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
             echo "SSH secrets are configured"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "::notice::SSH secrets not configured — skipping cache purge."
-            echo "To enable, add HOSTINGER_SSH_HOST, HOSTINGER_SSH_USER, and HOSTINGER_SSH_KEY in GitHub > Settings > Secrets."
+            echo "To enable, add HOSTINGER_SSH_HOST, HOSTINGER_SSH_USER, and HOSTINGER_SSH_PASS in GitHub > Settings > Secrets."
           fi
 
       # ── Wait for Hostinger deploy to finish ──
@@ -50,26 +50,21 @@ jobs:
         env:
           SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
           SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
-          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          SSH_PASS: ${{ secrets.HOSTINGER_SSH_PASS }}
           SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
           SITE_PATH: ${{ secrets.HOSTINGER_SITE_PATH }}
         run: |
           set -euo pipefail
 
+          sudo apt-get install -yqq sshpass > /dev/null 2>&1
+
           PORT="${SSH_PORT:-65002}"
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=15 -p ${PORT}"
 
-          # Write SSH key
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/hostinger_key
-          chmod 600 ~/.ssh/hostinger_key
-
-          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/hostinger_key -p ${PORT}"
-
-          # Run purge script with retries
           MAX_RETRIES=3
           for attempt in $(seq 1 $MAX_RETRIES); do
             echo "==> SSH attempt $attempt/$MAX_RETRIES"
-            if ssh $SSH_OPTS "${SSH_USER}@${SSH_HOST}" "bash -s -- ${SITE_PATH:-}" < scripts/purge-cache.sh; then
+            if sshpass -p "$SSH_PASS" ssh $SSH_OPTS "${SSH_USER}@${SSH_HOST}" "bash -s -- ${SITE_PATH:-}" < scripts/purge-cache.sh; then
               echo "==> Cache purge succeeded on attempt $attempt"
               break
             fi
@@ -80,9 +75,6 @@ jobs:
             echo "    Retrying in 10s..."
             sleep 10
           done
-
-          # Clean up
-          rm -f ~/.ssh/hostinger_key
 
       # ── CDN purge reminder ──
       - name: CDN cache purge reminder
