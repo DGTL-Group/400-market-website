@@ -203,3 +203,18 @@
   stroke-dashoffset: 24;
   animation: checkmark-draw 500ms ease-in-out 200ms forwards;
 }
+
+/* Glint / shimmer sweep for CTA */
+@keyframes glint-sweep {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.animate-glint {
+  animation: glint-sweep 3s ease-in-out infinite;
+  animation-delay: 2s;
+}

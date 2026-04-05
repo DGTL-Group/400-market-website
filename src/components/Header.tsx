@@ -94,7 +94,7 @@ export default function Header({ variant = 'G' }: { variant?: Variant }) {
   return (
     <header className="sticky top-0 z-50">
       {/* Gradient accent bar */}
-      <div className="h-[3px]" style={{ background: 'linear-gradient(to right, #F7D117, #F7941D 1280px)' }} />
+      <div className="h-[3px] bg-gradient-to-r from-brand-yellow to-brand-orange" />
 
       {/* Main nav */}
       <nav className={`grid grid-cols-[1fr_auto_1fr] items-center ${config.height} bg-brand-dark ${config.padding}`}>
@@ -119,8 +119,12 @@ export default function Header({ variant = 'G' }: { variant?: Variant }) {
               {link.label}
             </Link>
           ))}
-          <Link href="/become-a-vendor" className={config.ctaClasses}>
-            BECOME A MERCHANT
+          <Link href="/become-a-vendor" className={`${config.ctaClasses} relative overflow-hidden inline-block`}>
+            <span className="relative z-10">BECOME A MERCHANT</span>
+            <span className="absolute inset-0 z-20 pointer-events-none animate-glint" style={{
+              background: 'linear-gradient(120deg, transparent 0%, transparent 30%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 55%, transparent 70%, transparent 100%)',
+              backgroundSize: '200% 100%',
+            }} />
           </Link>
         </div>
       </nav>
