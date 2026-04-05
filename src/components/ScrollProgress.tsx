@@ -18,8 +18,8 @@ export default function ScrollProgress() {
 
     function animate() {
       const diff = target - current
-      // Max speed: 0.05% per frame (~3% per second at 60fps)
-      const maxStep = 0.05
+      // Max speed: 0.25% per frame (~15% per second at 60fps)
+      const maxStep = 0.25
       const step = Math.sign(diff) * Math.min(Math.abs(diff) * 0.01, maxStep)
 
       current += step
