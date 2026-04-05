@@ -18,7 +18,7 @@ export default function ScrollProgress() {
 
     function animate() {
       // Smooth exponential ease — low factor = silky smooth
-      current += (target - current) * 0.0075
+      current += (target - current) * 0.002
 
       // Snap when extremely close to avoid infinite loop
       if (Math.abs(target - current) < 0.01) {
