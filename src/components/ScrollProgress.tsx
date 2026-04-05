@@ -17,11 +17,15 @@ export default function ScrollProgress() {
     }
 
     function animate() {
-      // Smooth exponential ease — low factor = silky smooth
-      current += (target - current) * 0.002
+      const diff = target - current
+      // Max speed: 0.05% per frame (~3% per second at 60fps)
+      const maxStep = 0.05
+      const step = Math.sign(diff) * Math.min(Math.abs(diff) * 0.01, maxStep)
 
-      // Snap when extremely close to avoid infinite loop
-      if (Math.abs(target - current) < 0.01) {
+      current += step
+
+      // Snap when extremely close
+      if (Math.abs(diff) < 0.01) {
         current = target
       }
 
