@@ -46,8 +46,11 @@ export default function NewsCard({ title, slug, excerpt, featuredImage, publishD
         {excerpt && (
           <p className="text-body-sm text-text-secondary line-clamp-2 mb-3">{excerpt}</p>
         )}
-        <span className="text-body-sm font-semibold text-brand-mango group-hover:text-brand-orange transition-colors duration-500 inline-flex items-center gap-1">
-          Read more <span className="inline-block group-hover:translate-x-1.5 transition-transform duration-500">&rarr;</span>
+        <span className="text-body-sm font-semibold text-brand-mango group-hover:text-brand-orange transition-colors duration-500 inline-flex items-center gap-1.5">
+          Read more
+          <svg className="w-5 h-5 inline-block group-hover:translate-x-1.5 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 12h16M13 5l7 7-7 7" />
+          </svg>
         </span>
       </div>
     </Link>

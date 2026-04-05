@@ -92,7 +92,7 @@ export default function Header({ variant = 'G' }: { variant?: Variant }) {
   const linkClasses = `text-[#c8c8c8] ${config.fontSize} font-semibold tracking-wide hover:text-white transition-colors duration-500`
 
   return (
-    <header>
+    <header className="sticky top-0 z-50">
       {/* Gradient accent bar */}
       <div className="h-[5px] bg-gradient-to-r from-brand-yellow to-brand-orange" />
 
