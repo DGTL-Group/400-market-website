@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -89,13 +89,11 @@ export default async function NewsPostPage({ params }: Props) {
 
       {/* Featured image hero */}
       {featuredImage?.url && (
-        <div className="relative w-full h-[400px] md:h-[500px]">
-          <Image
+        <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
+          <img
             src={featuredImage.url}
             alt={featuredImage.alt || post.title}
-            fill
-            className="object-cover"
-            priority
+            className="w-full h-full object-cover"
           />
         </div>
       )}

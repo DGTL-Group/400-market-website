@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 
 type NewsCardProps = {
   title: string
@@ -26,11 +25,11 @@ export default function NewsCard({ title, slug, excerpt, featuredImage, publishD
     >
       <div className="relative w-full aspect-[16/9] bg-surface-light overflow-hidden">
         {featuredImage?.url ? (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={featuredImage.url}
             alt={featuredImage.alt || title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-text-subtle text-body-sm">
