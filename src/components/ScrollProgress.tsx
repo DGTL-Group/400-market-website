@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react'
 
 export default function ScrollProgress() {
-  const barRef = useRef<HTMLDivElement>(null)
+  const clipRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let raf: number
@@ -29,8 +29,8 @@ export default function ScrollProgress() {
         current = target
       }
 
-      if (barRef.current) {
-        barRef.current.style.transform = `scaleX(${current / 100})`
+      if (clipRef.current) {
+        clipRef.current.style.clipPath = `inset(0 ${100 - current}% 0 0)`
       }
 
       raf = requestAnimationFrame(animate)
@@ -46,11 +46,11 @@ export default function ScrollProgress() {
   }, [])
 
   return (
-    <div className="fixed left-0 right-0 z-[55] h-[4px] pointer-events-none" style={{ top: 'var(--header-height, 135px)' }}>
+    <div className="sticky top-[calc(3px+130px)] left-0 right-0 z-[55] h-[4px] pointer-events-none -mt-[4px]">
       <div
-        ref={barRef}
-        className="h-full bg-gradient-to-r from-brand-yellow to-brand-orange origin-left"
-        style={{ transform: 'scaleX(0)', willChange: 'transform' }}
+        ref={clipRef}
+        className="h-full w-full bg-gradient-to-r from-brand-yellow to-brand-orange"
+        style={{ clipPath: 'inset(0 100% 0 0)', willChange: 'clip-path' }}
       />
     </div>
   )
