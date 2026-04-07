@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import WhackAVendor from '@/components/WhackAVendor'
+import { fetchLeaderboardEntries, type LeaderboardEntry } from '@/lib/whackLeaderboard'
 
 // Crossfade duration. Must match the Tailwind transition-opacity duration
 // applied below — if you change one, change the other.
@@ -12,6 +13,31 @@ const FADE_MS = 300
 export default function NotFound() {
   const [phase, setPhase] = useState<'intro' | 'game'>('intro')
   const [fadingOut, setFadingOut] = useState(false)
+
+  // Preload the weekly leaderboard the moment the 404 page mounts. The user
+  // is reading the intro text and (hopefully) clicking START GAME a second or
+  // two later, so this typically lands long before the game phase swaps in.
+  // The pre-fetched entries get handed to <WhackAVendor> as props, which
+  // skips its own mount-time fetch and renders the populated board on frame
+  // one — no loading state, no layout pop-in, no shifted grid on mobile.
+  // `null` here means "still loading"; the child falls back to its own fetch
+  // if it mounts before this resolves.
+  const [initialLeaderboard, setInitialLeaderboard] = useState<LeaderboardEntry[] | null>(null)
+  const [initialLeaderboardError, setInitialLeaderboardError] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchLeaderboardEntries()
+      .then((entries) => {
+        if (!cancelled) setInitialLeaderboard(entries)
+      })
+      .catch(() => {
+        if (!cancelled) setInitialLeaderboardError(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const startGame = () => {
     setFadingOut(true)
@@ -56,7 +82,11 @@ export default function NotFound() {
             </button>
           </>
         ) : (
-          <WhackAVendor autoStart />
+          <WhackAVendor
+            autoStart
+            initialLeaderboard={initialLeaderboard}
+            initialLeaderboardError={initialLeaderboardError}
+          />
         )}
 
         <Link

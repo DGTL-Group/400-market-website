@@ -1,6 +1,11 @@
 'use client'
 
 import { memo, useEffect, useRef, useState } from 'react'
+import {
+  LEADERBOARD_LIMIT,
+  fetchLeaderboardEntries,
+  type LeaderboardEntry,
+} from '@/lib/whackLeaderboard'
 
 const GRID_SIZE = 9
 const GAME_DURATION = 30 // seconds
@@ -17,7 +22,6 @@ const POP_DURATION_MAX = 1100 // ms
 const BOOTH_COOLDOWN_MS = 350
 const VENDORS = ['🧑‍🍳', '👨‍🌾', '👩‍🎨', '🧑‍🔧', '👨‍🍳', '👩‍🌾', '🧑‍🌾', '👩‍🍳']
 
-const LEADERBOARD_LIMIT = 10
 const NAME_MAX_LENGTH = 20
 // localStorage key for the IDs of scores already submitted from this browser,
 // so a player can't double-post the same game-over screen.
@@ -27,29 +31,7 @@ function randBetween(min: number, max: number) {
   return min + Math.random() * (max - min)
 }
 
-/**
- * Returns the start of the current ISO week (Monday 00:00 UTC) as an
- * ISO string. The leaderboard query filters on `createdAt >= weekStart`,
- * so old entries fall off the public board automatically every Monday.
- */
-function getWeekStartISO(): string {
-  const now = new Date()
-  const day = now.getUTCDay() // 0 = Sun, 1 = Mon, ..., 6 = Sat
-  const daysFromMonday = (day + 6) % 7
-  const weekStart = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysFromMonday, 0, 0, 0, 0),
-  )
-  return weekStart.toISOString()
-}
-
 type GameState = 'idle' | 'countdown' | 'playing' | 'gameover'
-
-type LeaderboardEntry = {
-  id: string | number
-  name: string
-  score: number
-  createdAt: string
-}
 
 type WhackAVendorProps = {
   /**
@@ -58,9 +40,26 @@ type WhackAVendorProps = {
    * intro screen's "Start Game" button doesn't make the player click twice.
    */
   autoStart?: boolean
+  /**
+   * Pre-fetched leaderboard entries from the parent (the 404 page fetches
+   * them on mount so they're hot by the time the player clicks START GAME).
+   * When provided, the component skips its own mount-time fetch — this
+   * prevents the leaderboard loading state from pushing the game grid
+   * around on mobile. `null` means "parent hasn't loaded them yet", so the
+   * component falls back to its own fetch.
+   */
+  initialLeaderboard?: LeaderboardEntry[] | null
+  /** Mirror of the parent's preload error state — same null semantics. */
+  initialLeaderboardError?: boolean
 }
 
-export default function WhackAVendor({ autoStart = false }: WhackAVendorProps = {}) {
+export default function WhackAVendor({
+  autoStart = false,
+  initialLeaderboard = null,
+  initialLeaderboardError = false,
+}: WhackAVendorProps = {}) {
+  // If the parent already has data or an error, we can skip the mount fetch.
+  const parentProvidedBoard = initialLeaderboard !== null || initialLeaderboardError
   const [gameState, setGameState] = useState<GameState>('idle')
   const [score, setScore] = useState(0)
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION)
@@ -69,10 +68,14 @@ export default function WhackAVendor({ autoStart = false }: WhackAVendorProps = 
   const [whackedBooths, setWhackedBooths] = useState<Set<number>>(new Set())
   const [countdown, setCountdown] = useState(3)
 
-  // Leaderboard state
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
-  const [leaderboardLoading, setLeaderboardLoading] = useState(true)
-  const [leaderboardError, setLeaderboardError] = useState(false)
+  // Leaderboard state — seeded from the parent's preload when available,
+  // otherwise we fetch on mount. Loading is only true if we actually need
+  // to fetch (parent didn't hand us data and didn't error out).
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(
+    initialLeaderboard ?? [],
+  )
+  const [leaderboardLoading, setLeaderboardLoading] = useState(!parentProvidedBoard)
+  const [leaderboardError, setLeaderboardError] = useState(initialLeaderboardError)
   const [playerName, setPlayerName] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submittedEntryId, setSubmittedEntryId] = useState<string | number | null>(null)
@@ -124,9 +127,14 @@ export default function WhackAVendor({ autoStart = false }: WhackAVendorProps = 
     }
   }, [])
 
-  // Fetch the current week's leaderboard on mount.
+  // Fetch the current week's leaderboard on mount — but only if the parent
+  // hasn't already preloaded it for us. The 404 page kicks off its fetch the
+  // moment the user lands, so by the time the player clicks START GAME the
+  // data is usually already in props and this fetch is skipped.
   useEffect(() => {
-    fetchLeaderboard()
+    if (!parentProvidedBoard) {
+      fetchLeaderboard()
+    }
     // Restore last player name from localStorage so repeat players don't
     // have to retype it on every game over.
     try {
@@ -135,6 +143,7 @@ export default function WhackAVendor({ autoStart = false }: WhackAVendorProps = 
     } catch {
       /* localStorage unavailable — silent fallback */
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Auto-start when the parent asks for it (404 intro flow).
@@ -157,15 +166,7 @@ export default function WhackAVendor({ autoStart = false }: WhackAVendorProps = 
     setLeaderboardLoading(true)
     setLeaderboardError(false)
     try {
-      const weekStart = getWeekStartISO()
-      const url =
-        `/api/whack-scores` +
-        `?where[createdAt][greater_than_equal]=${encodeURIComponent(weekStart)}` +
-        `&sort=-score&limit=${LEADERBOARD_LIMIT}&depth=0`
-      const res = await fetch(url, { cache: 'no-store' })
-      if (!res.ok) throw new Error(`status ${res.status}`)
-      const json = await res.json()
-      const docs: LeaderboardEntry[] = Array.isArray(json?.docs) ? json.docs : []
+      const docs = await fetchLeaderboardEntries()
       setLeaderboard(docs)
     } catch {
       setLeaderboardError(true)
