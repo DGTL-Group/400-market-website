@@ -4,6 +4,7 @@ import config from '@payload-config'
 import { notFound } from 'next/navigation'
 import PageLayout from '@/components/PageLayout'
 import RenderBlocks from '@/components/RenderBlocks'
+import ScrollProgress from '@/components/ScrollProgress'
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayload({ config })
@@ -35,6 +36,7 @@ export default async function PrivacyPolicyPage() {
 
   return (
     <PageLayout>
+      <ScrollProgress />
       <RenderBlocks blocks={page.layout as never[]} />
     </PageLayout>
   )
