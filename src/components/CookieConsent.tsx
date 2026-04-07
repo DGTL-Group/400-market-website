@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false)
@@ -65,9 +66,9 @@ export default function CookieConsent() {
               <p className="text-brand-dark text-body-sm text-center sm:text-left">
                 We use essential cookies for payments and optional cookies for advertising analytics (Meta Pixel).
                 See our{' '}
-                <a href="/privacy-policy" className="text-brand-yellow underline hover:text-brand-orange transition-colors duration-500">
+                <Link href="/privacy-policy" className="text-brand-yellow underline hover:text-brand-orange transition-colors duration-500">
                   Privacy Policy
-                </a>
+                </Link>
                 .
               </p>
               <div className="flex gap-3 shrink-0">

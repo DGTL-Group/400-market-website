@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import type { Where } from 'payload'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import PageLayout from '@/components/PageLayout'
@@ -175,12 +176,12 @@ export default async function EventsPage({ searchParams }: Props) {
               Apply for a booth and join us at our next themed weekend.
             </p>
           </div>
-          <a
+          <Link
             href="/become-a-vendor"
             className="bg-brand-dark text-white px-6 py-4 font-bold text-[13px] rounded-button whitespace-nowrap hover:bg-text-secondary transition-colors duration-500"
           >
             BECOME A MERCHANT
-          </a>
+          </Link>
         </div>
       </section>
     </PageLayout>

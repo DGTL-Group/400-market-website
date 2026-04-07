@@ -60,16 +60,21 @@ export default function WhackAVendor() {
     }
   }, [])
 
-  // Clean up all timers on unmount
+  // Clean up all timers on unmount. Capture the ref Maps locally so the
+  // cleanup function references the same object the effect saw at mount —
+  // satisfies react-hooks/exhaustive-deps without changing behaviour, since
+  // refs persist across renders and we mutate (not reassign) these Maps.
   useEffect(() => {
+    const popHide = popHideTimers.current
+    const whack = whackTimers.current
     return () => {
       if (popTimerRef.current) clearTimeout(popTimerRef.current)
       if (tickIntervalRef.current) clearInterval(tickIntervalRef.current)
       if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current)
-      popHideTimers.current.forEach((t) => clearTimeout(t))
-      whackTimers.current.forEach((t) => clearTimeout(t))
-      popHideTimers.current.clear()
-      whackTimers.current.clear()
+      popHide.forEach((t) => clearTimeout(t))
+      whack.forEach((t) => clearTimeout(t))
+      popHide.clear()
+      whack.clear()
     }
   }, [])
 
