@@ -77,25 +77,10 @@ export const Media: CollectionConfig = {
     // Without creds (local dev fallback), files land in the project's media/ folder.
     disableLocalStorage: CLOUDINARY_ENABLED,
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'],
-    imageSizes: [
-      {
-        name: 'thumbnail',
-        width: 400,
-        height: 300,
-        position: 'centre',
-      },
-      {
-        name: 'card',
-        width: 800,
-        height: 600,
-        position: 'centre',
-      },
-      {
-        name: 'hero',
-        width: 1920,
-        height: undefined, // maintain aspect ratio
-      },
-    ],
+    // No `imageSizes` here on purpose: Cloudinary handles resizing on-the-fly
+    // via URL transformations (e.g. /w_400,h_300,c_fill/) so generating sharp
+    // derivatives and uploading each as a separate Cloudinary asset would just
+    // create duplicates. Use Cloudinary URL params at render time instead.
   },
   fields: [
     {
