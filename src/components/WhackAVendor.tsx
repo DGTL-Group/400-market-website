@@ -137,17 +137,19 @@ export default function WhackAVendor({ autoStart = false }: WhackAVendorProps = 
     }
   }, [])
 
-  // Auto-start when the parent asks for it (404 intro flow). Guarded by a
-  // ref so a re-render with the same prop value doesn't restart the game
-  // mid-play.
-  const autoStartTriggered = useRef(false)
+  // Auto-start when the parent asks for it (404 intro flow).
+  //
+  // No ref guard here on purpose: in React 18 strict mode dev, effects run
+  // setup → cleanup → setup on first mount. The cleanup of the timer-cleanup
+  // effect above wipes the countdown timer we scheduled in the first setup,
+  // so the second setup MUST be free to re-call beginCountdown — otherwise
+  // the countdown freezes at "3" forever in dev. In production strict mode
+  // is off so the effect runs exactly once. beginCountdown() starts with
+  // clearAllTimers(), so calling it twice in a row is idempotent.
   useEffect(() => {
-    if (autoStart && !autoStartTriggered.current) {
-      autoStartTriggered.current = true
+    if (autoStart) {
       beginCountdown()
     }
-    // beginCountdown is a stable closure on the component instance — we
-    // intentionally don't list it as a dep.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart])
 
