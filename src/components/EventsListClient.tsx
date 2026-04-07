@@ -35,30 +35,16 @@ type Props = {
 const FILTERS = [
   { label: 'Upcoming', value: '' },
   { label: 'This Month', value: 'month' },
-  { label: 'All Events', value: 'all' },
   { label: 'Past', value: 'past' },
 ]
 
 const PER_PAGE = 8
 
 /**
- * First instant of the current month in America/Toronto, returned as a
- * UTC Date so direct comparisons against ISO event dates work correctly.
- * Mirrors the helper that previously lived in the server page so the
- * client-side filter produces identical results.
+ * First instant of the month AFTER the given date, in America/Toronto,
+ * returned as a UTC Date so direct comparisons against ISO event dates
+ * work correctly. Used as the exclusive upper bound for "This Month".
  */
-function startOfTorontoMonth(d: Date): Date {
-  const fmt = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Toronto',
-    year: 'numeric',
-    month: '2-digit',
-  })
-  const parts = fmt.formatToParts(d)
-  const year = Number(parts.find((p) => p.type === 'year')?.value)
-  const month = Number(parts.find((p) => p.type === 'month')?.value)
-  return new Date(Date.UTC(year, month - 1, 1, 5, 0, 0))
-}
-
 function endOfTorontoMonth(d: Date): Date {
   const fmt = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Toronto',
@@ -110,6 +96,10 @@ export default function EventsListClient({
   // All filtering happens here in JS — no network round-trip on filter
   // change. The full event list is in memory because the server hands it
   // to us once on initial load.
+  //
+  // Design rule: past events ONLY appear under the "Past" filter. Every
+  // other view hides them, so "Upcoming" and "This Month" never mix old
+  // events into the list.
   const filtered = useMemo<ClientEvent[]>(() => {
     if (view === 'past') {
       return [...events]
@@ -117,21 +107,17 @@ export default function EventsListClient({
         .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
     }
     if (view === 'month') {
-      const start = startOfTorontoMonth(now)
+      // Future events whose start falls before the first instant of next
+      // month — i.e. the rest of this month, starting from right now.
       const end = endOfTorontoMonth(now)
       return events
         .filter((e) => {
           const d = new Date(e.startDate)
-          return d >= start && d < end
+          return d >= now && d < end
         })
         .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
     }
-    if (view === 'all') {
-      return [...events].sort(
-        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
-      )
-    }
-    // Default: upcoming
+    // Default: upcoming (everything from now onwards, ascending)
     return events
       .filter((e) => new Date(e.startDate) >= now)
       .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
