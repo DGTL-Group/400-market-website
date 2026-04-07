@@ -20,16 +20,13 @@ export default buildConfig({
   collections: [Users, Media, Vendors, Events, News, Products, FAQs, Pages],
   db: postgresAdapter({
     // Pool sizing: `next build` spawns multiple worker processes for static
-    // generation, and each worker creates its own pool. Hostinger's Postgres
-    // caps total connections, so a per-pool max of 20 quickly exhausts it.
-    // Keep this small (3 during build, 8 at runtime) and release idle
-    // connections fast so we never hold more than we need.
+    // generation, each with its own pool. Hostinger's Postgres caps total
+    // connections, so during build we shrink the pool aggressively.
+    // At runtime we use defaults (no connectionTimeout, no min) so the pool
+    // doesn't churn or fail under cold-start network latency.
     pool: {
       connectionString: process.env.DATABASE_URI || '',
-      max: process.env.NEXT_PHASE === 'phase-production-build' ? 3 : 8,
-      min: 0,
-      idleTimeoutMillis: 10000,
-      connectionTimeoutMillis: 5000,
+      max: process.env.NEXT_PHASE === 'phase-production-build' ? 3 : 10,
     },
   }),
   editor: lexicalEditor(),
