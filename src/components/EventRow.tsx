@@ -93,8 +93,8 @@ export default function EventRow({
     >
       {/* Date box */}
       <div className="bg-brand-yellow w-20 h-20 md:w-[88px] md:h-[88px] flex flex-col items-center justify-center flex-shrink-0">
-        <span className="font-display text-[11px] font-bold tracking-wider text-brand-dark">{month}</span>
-        <span className="font-display text-[28px] md:text-[32px] font-bold leading-none text-brand-dark">{day}</span>
+        <span className="font-body text-[14px] font-bold tracking-wide text-brand-dark">{month}</span>
+        <span className="font-body text-[30px] md:text-[34px] font-bold leading-none text-brand-dark">{day}</span>
       </div>
 
       {/* Content */}
@@ -114,19 +114,46 @@ export default function EventRow({
         <div className="flex flex-wrap items-center gap-4">
           <Link
             href={`/events/${slug}`}
-            className="inline-flex items-center gap-1.5 bg-brand-yellow text-brand-dark font-bold text-[13px] uppercase tracking-wide px-5 py-2.5 rounded-button hover:bg-brand-orange transition-colors duration-500"
+            className="group inline-flex items-center gap-1.5 bg-brand-yellow text-brand-dark font-bold text-[13px] uppercase tracking-wide px-5 py-2.5 rounded-button hover:bg-brand-orange transition-colors duration-500"
           >
             Event Details
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 12h16M13 5l7 7-7 7" />
             </svg>
           </Link>
           <a
             href={`/api/events/${slug}/ics`}
             download={`${slug}.ics`}
-            className="text-brand-mango text-body-sm font-semibold hover:text-brand-orange transition-colors duration-500"
+            className="group relative text-brand-mango text-body-sm font-semibold hover:text-brand-orange transition-colors duration-500"
           >
             + Add to Calendar
+            <span className="absolute left-full top-1/2 -translate-y-1/2 ml-1.5 inline-flex items-center gap-1 whitespace-nowrap pointer-events-none">
+              <svg
+                className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 delay-200 group-hover:delay-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+              <svg
+                className="w-[22px] h-[22px] opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 group-hover:delay-200"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Calendar body */}
+                <rect x="3" y="5" width="18" height="16" rx="2" fill="white" stroke="currentColor" strokeWidth="2" />
+                {/* Header strip with only top corners rounded — uses currentColor to match arrow */}
+                <path d="M3 9 V 7 A 2 2 0 0 1 5 5 H 19 A 2 2 0 0 1 21 7 V 9 Z" fill="currentColor" />
+                {/* Binder hooks at top */}
+                <line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </span>
           </a>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { cloudinaryStorage } from 'payload-storage-cloudinary'
+import sharp from 'sharp'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -25,6 +27,27 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
+  sharp,
+  plugins: [
+    // Cloudinary storage — only enabled when all 3 env vars are present.
+    // Local fallback applies otherwise (useful during dev before creds are added).
+    ...(process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+      ? [
+          cloudinaryStorage({
+            cloudConfig: {
+              cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+              api_key: process.env.CLOUDINARY_API_KEY,
+              api_secret: process.env.CLOUDINARY_API_SECRET,
+            },
+            collections: {
+              media: true,
+            },
+          }),
+        ]
+      : []),
+  ],
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
