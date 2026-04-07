@@ -1,47 +1,18 @@
 import type { Metadata } from 'next'
-import type { Where } from 'payload'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import PageLayout from '@/components/PageLayout'
-import EventRow from '@/components/EventRow'
-import EventsFilter from '@/components/EventsFilter'
+import EventsListClient, { type ClientEvent } from '@/components/EventsListClient'
 
 export const metadata: Metadata = {
   title: 'Events',
-  description: 'Special market days, themed weekends, and seasonal events at The 400 Market in Innisfil, Ontario.',
+  description:
+    'Special market days, themed weekends, and seasonal events at The 400 Market in Innisfil, Ontario.',
 }
 
 type Props = {
   searchParams: Promise<{ view?: string; page?: string }>
-}
-
-function startOfTorontoMonth(d: Date): Date {
-  // Compute the first day of the month in America/Toronto, returned as UTC instant.
-  const fmt = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Toronto',
-    year: 'numeric',
-    month: '2-digit',
-  })
-  const parts = fmt.formatToParts(d)
-  const year = Number(parts.find((p) => p.type === 'year')?.value)
-  const month = Number(parts.find((p) => p.type === 'month')?.value)
-  // First day of that month at 00:00 in Toronto. Use a generous UTC offset (UTC noon)
-  // — month boundary tolerance for filtering doesn't need millisecond precision.
-  return new Date(Date.UTC(year, month - 1, 1, 5, 0, 0))
-}
-
-function endOfTorontoMonth(d: Date): Date {
-  const fmt = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Toronto',
-    year: 'numeric',
-    month: '2-digit',
-  })
-  const parts = fmt.formatToParts(d)
-  const year = Number(parts.find((p) => p.type === 'year')?.value)
-  const month = Number(parts.find((p) => p.type === 'month')?.value)
-  // First day of NEXT month, then we'll filter `< nextMonth`.
-  return new Date(Date.UTC(year, month, 1, 5, 0, 0))
 }
 
 function extractDescription(rich: unknown): string {
@@ -67,41 +38,43 @@ function extractDescription(rich: unknown): string {
 
 export default async function EventsPage({ searchParams }: Props) {
   const { view, page } = await searchParams
-  const currentPage = Number(page) || 1
-  const perPage = 8
+  const initialView = view ?? ''
+  const initialPage = Number(page) || 1
 
+  // Fetch ALL events in one go and hand them to the client. Filtering and
+  // pagination then happen entirely in the browser, so swapping filters or
+  // flipping pages is instant — no server round-trip, no grid snap. The
+  // dataset is small (a market does maybe a few dozen events a year), so
+  // shipping it all to the client is cheap. The 1000-doc cap is just a
+  // safety net.
   const payload = await getPayload({ config })
-  const now = new Date()
-
-  const where: Where = {}
-  let sort = 'startDate'
-
-  if (view === 'past') {
-    where.startDate = { less_than: now.toISOString() }
-    sort = '-startDate'
-  } else if (view === 'month') {
-    const start = startOfTorontoMonth(now)
-    const end = endOfTorontoMonth(now)
-    where.and = [
-      { startDate: { greater_than_equal: start.toISOString() } },
-      { startDate: { less_than: end.toISOString() } },
-    ]
-  } else if (view === 'all') {
-    // No date filter
-  } else {
-    // Default: upcoming
-    where.startDate = { greater_than_equal: now.toISOString() }
-  }
-
-  const { docs: events, totalPages } = await payload.find({
+  const { docs: events } = await payload.find({
     collection: 'events',
-    where,
-    sort,
-    limit: perPage,
-    page: currentPage,
+    sort: 'startDate',
+    limit: 1000,
   })
 
-  const queryString = view ? `view=${view}&` : ''
+  // Server captures "now" once and passes it to the client so SSR and the
+  // first hydration agree on which events count as upcoming/past.
+  const serverNow = new Date().toISOString()
+
+  const clientEvents: ClientEvent[] = events.map((event) => {
+    const image = event.featuredImage as
+      | { url?: string | null; alt?: string | null }
+      | null
+    return {
+      id: event.id,
+      name: event.name,
+      slug: event.slug,
+      startDate: event.startDate,
+      endDate: event.endDate ?? null,
+      description: extractDescription(event.description),
+      location: event.location ?? null,
+      featuredImage: image
+        ? { url: image.url ?? null, alt: image.alt ?? null }
+        : null,
+    }
+  })
 
   return (
     <PageLayout showCheckmark>
@@ -117,53 +90,14 @@ export default async function EventsPage({ searchParams }: Props) {
         </div>
       </section>
 
-      {/* Filter tab bar */}
-      <EventsFilter />
-
-      {/* Event rows */}
-      <section className="max-w-content mx-auto">
-        {events.length === 0 ? (
-          <p className="text-text-secondary text-body-md py-20 text-center">
-            No events found for this view.
-          </p>
-        ) : (
-          events.map((event, i) => {
-            const image = event.featuredImage as { url?: string | null; alt?: string | null } | null
-            return (
-              <EventRow
-                key={event.id}
-                name={event.name}
-                slug={event.slug}
-                startDate={event.startDate}
-                endDate={event.endDate}
-                description={extractDescription(event.description)}
-                location={event.location}
-                featuredImage={image}
-                featured={view !== 'past' && i === 0 && currentPage === 1}
-                highlight={i % 2 === 1}
-              />
-            )
-          })
-        )}
-
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 py-12">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <a
-                key={p}
-                href={`/events?${queryString}page=${p}`}
-                className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
-                  p === currentPage
-                    ? 'bg-brand-yellow text-brand-dark'
-                    : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
-                }`}
-              >
-                {p}
-              </a>
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Filter bar + paginated rows — all client-driven so filter clicks
+          don't trigger a server round trip. */}
+      <EventsListClient
+        events={clientEvents}
+        initialView={initialView}
+        initialPage={initialPage}
+        serverNow={serverNow}
+      />
 
       {/* CTA banner */}
       <section className="max-w-content mx-auto px-6 md:px-20 py-12">
