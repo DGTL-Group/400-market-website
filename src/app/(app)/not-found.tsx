@@ -24,11 +24,17 @@ export default function NotFound() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-brand-dark text-white px-4 py-8 sm:py-12">
+    // Outer container is a top-anchored flex column. We intentionally do NOT
+    // use `justify-center` here because the game phase renders a leaderboard
+    // below the grid that loads async — if the parent were vertically centered,
+    // the grid would jump upward the moment the leaderboard's rows arrive.
+    // Instead, the intro phase opts back into vertical centering via `flex-1`
+    // on the inner wrapper (no layout shift there because the intro is static).
+    <div className="min-h-screen flex flex-col items-center bg-brand-dark text-white px-4 py-8 sm:py-12">
       <div
         className={`flex flex-col items-center w-full transition-opacity duration-300 ${
           fadingOut ? 'opacity-0' : 'opacity-100'
-        }`}
+        } ${phase === 'intro' ? 'flex-1 justify-center' : ''}`}
       >
         {phase === 'intro' ? (
           <>
