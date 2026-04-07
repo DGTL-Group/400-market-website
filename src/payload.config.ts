@@ -6,7 +6,7 @@ import sharp from 'sharp'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { Users, Media, Vendors, Events, News, Products, FAQs, Pages } from '@/collections'
+import { Users, Media, Vendors, Events, News, Products, FAQs, Pages, WhackScores } from '@/collections'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -17,7 +17,7 @@ export default buildConfig({
     suppressHydrationWarning: true, // TODO: remove before production — workaround for browser extension hydration mismatch
     theme: 'dark',
   },
-  collections: [Users, Media, Vendors, Events, News, Products, FAQs, Pages],
+  collections: [Users, Media, Vendors, Events, News, Products, FAQs, Pages, WhackScores],
   db: postgresAdapter({
     // Pool sizing: `next build` spawns multiple worker processes for static
     // generation, each with its own pool. Hostinger's Postgres caps total

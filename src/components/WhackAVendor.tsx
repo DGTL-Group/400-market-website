@@ -17,11 +17,39 @@ const POP_DURATION_MAX = 1100 // ms
 const BOOTH_COOLDOWN_MS = 350
 const VENDORS = ['🧑‍🍳', '👨‍🌾', '👩‍🎨', '🧑‍🔧', '👨‍🍳', '👩‍🌾', '🧑‍🌾', '👩‍🍳']
 
+const LEADERBOARD_LIMIT = 10
+const NAME_MAX_LENGTH = 20
+// localStorage key for the IDs of scores already submitted from this browser,
+// so a player can't double-post the same game-over screen.
+const SUBMITTED_KEY = 'whack-a-vendor-submitted'
+
 function randBetween(min: number, max: number) {
   return min + Math.random() * (max - min)
 }
 
+/**
+ * Returns the start of the current ISO week (Monday 00:00 UTC) as an
+ * ISO string. The leaderboard query filters on `createdAt >= weekStart`,
+ * so old entries fall off the public board automatically every Monday.
+ */
+function getWeekStartISO(): string {
+  const now = new Date()
+  const day = now.getUTCDay() // 0 = Sun, 1 = Mon, ..., 6 = Sat
+  const daysFromMonday = (day + 6) % 7
+  const weekStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysFromMonday, 0, 0, 0, 0),
+  )
+  return weekStart.toISOString()
+}
+
 type GameState = 'idle' | 'countdown' | 'playing' | 'gameover'
+
+type LeaderboardEntry = {
+  id: string | number
+  name: string
+  score: number
+  createdAt: string
+}
 
 export default function WhackAVendor() {
   const [gameState, setGameState] = useState<GameState>('idle')
@@ -31,6 +59,15 @@ export default function WhackAVendor() {
   const [activeBooths, setActiveBooths] = useState<Map<number, string>>(new Map())
   const [whackedBooths, setWhackedBooths] = useState<Set<number>>(new Set())
   const [countdown, setCountdown] = useState(3)
+
+  // Leaderboard state
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true)
+  const [leaderboardError, setLeaderboardError] = useState(false)
+  const [playerName, setPlayerName] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submittedEntryId, setSubmittedEntryId] = useState<string | number | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Refs to avoid stale closures inside intervals
   const scoreRef = useRef(0)
@@ -78,6 +115,84 @@ export default function WhackAVendor() {
     }
   }, [])
 
+  // Fetch the current week's leaderboard on mount.
+  useEffect(() => {
+    fetchLeaderboard()
+    // Restore last player name from localStorage so repeat players don't
+    // have to retype it on every game over.
+    try {
+      const stored = localStorage.getItem('whack-a-vendor-name')
+      if (stored) setPlayerName(stored.slice(0, NAME_MAX_LENGTH))
+    } catch {
+      /* localStorage unavailable — silent fallback */
+    }
+  }, [])
+
+  async function fetchLeaderboard() {
+    setLeaderboardLoading(true)
+    setLeaderboardError(false)
+    try {
+      const weekStart = getWeekStartISO()
+      const url =
+        `/api/whack-scores` +
+        `?where[createdAt][greater_than_equal]=${encodeURIComponent(weekStart)}` +
+        `&sort=-score&limit=${LEADERBOARD_LIMIT}&depth=0`
+      const res = await fetch(url, { cache: 'no-store' })
+      if (!res.ok) throw new Error(`status ${res.status}`)
+      const json = await res.json()
+      const docs: LeaderboardEntry[] = Array.isArray(json?.docs) ? json.docs : []
+      setLeaderboard(docs)
+    } catch {
+      setLeaderboardError(true)
+    } finally {
+      setLeaderboardLoading(false)
+    }
+  }
+
+  async function submitScore() {
+    const trimmed = playerName.trim().slice(0, NAME_MAX_LENGTH)
+    if (!trimmed) {
+      setSubmitError('Enter a name first')
+      return
+    }
+    if (submitting || submittedEntryId !== null) return
+
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const res = await fetch('/api/whack-scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed, score: scoreRef.current }),
+      })
+      if (!res.ok) throw new Error(`status ${res.status}`)
+      const json = await res.json()
+      // Payload returns the created doc under `doc`.
+      const created: LeaderboardEntry | undefined = json?.doc
+      if (created?.id !== undefined) {
+        setSubmittedEntryId(created.id)
+        // Persist this submission so a refresh / page reload doesn't let
+        // the same player re-submit the same score.
+        try {
+          const raw = localStorage.getItem(SUBMITTED_KEY)
+          const list: (string | number)[] = raw ? JSON.parse(raw) : []
+          list.push(created.id)
+          // Keep the list bounded — we never need more than the last few.
+          localStorage.setItem(SUBMITTED_KEY, JSON.stringify(list.slice(-20)))
+          localStorage.setItem('whack-a-vendor-name', trimmed)
+        } catch {
+          /* silent */
+        }
+      }
+      // Refresh the board so the new entry shows up in the right rank.
+      await fetchLeaderboard()
+    } catch {
+      setSubmitError('Could not submit — try again')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   function clearAllTimers() {
     if (popTimerRef.current) {
       clearTimeout(popTimerRef.current)
@@ -107,6 +222,9 @@ export default function WhackAVendor() {
     setActiveBooths(new Map())
     setWhackedBooths(new Set())
     setCountdown(3)
+    // Reset submission state for the new run
+    setSubmittedEntryId(null)
+    setSubmitError(null)
     setGameState('countdown')
 
     // Tick down 3 → 2 → 1, then start the game
@@ -339,21 +457,145 @@ export default function WhackAVendor() {
 
           {gameState === 'gameover' && (
             <>
-              <div className="font-display text-display-sm sm:text-display-md uppercase tracking-wide text-brand-yellow mb-2 sm:mb-3 text-center px-2">
+              <div className="font-display text-display-sm sm:text-display-md uppercase tracking-wide text-brand-yellow mb-1 sm:mb-2 text-center px-2">
                 {getGameOverMessage()}
               </div>
-              <p className="font-body font-bold text-[13px] uppercase tracking-wider text-text-subtle text-center mb-1">
+              <p className="font-body font-bold text-[13px] uppercase tracking-wider text-text-subtle text-center mb-3">
                 Score: <span className="text-white">{scoreRef.current}</span>
+                <span className="mx-2 opacity-50">·</span>
+                Best: <span className="text-brand-orange">{bestScore}</span>
               </p>
-              <p className="font-body font-bold text-[11px] uppercase tracking-wider text-text-subtle text-center mb-4 sm:mb-5">
-                Best: {bestScore}
-              </p>
-              <button type="button" onClick={beginCountdown} className="btn-primary">
-                PLAY AGAIN
-              </button>
+
+              {submittedEntryId === null ? (
+                <>
+                  <p className="font-body text-body-sm text-text-subtle text-center mb-2 px-2">
+                    Add your name to the weekly leaderboard:
+                  </p>
+                  <div className="flex flex-col items-stretch gap-2 w-full max-w-[260px]">
+                    <input
+                      type="text"
+                      value={playerName}
+                      onChange={(e) => setPlayerName(e.target.value.slice(0, NAME_MAX_LENGTH))}
+                      maxLength={NAME_MAX_LENGTH}
+                      placeholder="Your name"
+                      className="rounded-button bg-[#1a1a1a] border border-[#3a3a3a] px-4 py-3 font-body text-body-md text-white placeholder:text-text-subtle text-center focus:outline-none focus:border-brand-yellow"
+                      disabled={submitting}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitScore()
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={submitScore}
+                      disabled={submitting || playerName.trim().length === 0}
+                      className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {submitting ? 'SUBMITTING…' : 'SUBMIT SCORE'}
+                    </button>
+                    {submitError && (
+                      <p className="font-body text-[11px] text-brand-orange text-center">{submitError}</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={beginCountdown}
+                      className="font-body font-bold text-[11px] uppercase tracking-wider text-text-subtle hover:text-brand-yellow transition-colors"
+                    >
+                      Skip & play again
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="font-body font-bold text-[11px] uppercase tracking-wider text-brand-yellow text-center mb-3">
+                    {(() => {
+                      const rank = leaderboard.findIndex((e) => e.id === submittedEntryId)
+                      if (rank === -1) return 'SCORE SAVED — KEEP GRINDING!'
+                      return `YOU\u2019RE #${rank + 1} THIS WEEK`
+                    })()}
+                  </p>
+                  <button type="button" onClick={beginCountdown} className="btn-primary">
+                    PLAY AGAIN
+                  </button>
+                </>
+              )}
             </>
           )}
         </div>
+      </div>
+
+      {/* Weekly leaderboard */}
+      <div className="mt-4 sm:mt-5 rounded-button bg-[#1a1a1a] border-2 border-[#3a3a3a] p-3 sm:p-4">
+        <div className="flex items-baseline justify-between mb-3 px-1">
+          <div className="font-display text-display-sm uppercase tracking-wide text-brand-yellow">
+            This Week
+          </div>
+          <div className="font-body font-bold text-[10px] uppercase tracking-widest text-text-subtle">
+            Top {LEADERBOARD_LIMIT}
+          </div>
+        </div>
+
+        {leaderboardLoading ? (
+          <div className="font-body text-body-sm text-text-subtle text-center py-6">
+            Loading leaderboard…
+          </div>
+        ) : leaderboardError ? (
+          <div className="font-body text-body-sm text-text-subtle text-center py-6">
+            Couldn&apos;t load leaderboard.{' '}
+            <button
+              type="button"
+              onClick={fetchLeaderboard}
+              className="text-brand-yellow hover:text-brand-orange underline"
+            >
+              Retry
+            </button>
+          </div>
+        ) : leaderboard.length === 0 ? (
+          <div className="font-body text-body-sm text-text-subtle text-center py-6">
+            No scores yet this week. Be the first!
+          </div>
+        ) : (
+          <ol className="space-y-1">
+            {leaderboard.map((entry, idx) => {
+              const isMe = entry.id === submittedEntryId
+              const rank = idx + 1
+              return (
+                <li
+                  key={entry.id}
+                  className={`flex items-center justify-between gap-2 px-2 py-1.5 rounded-sm ${
+                    isMe ? 'bg-brand-yellow/15 border border-brand-yellow/40' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span
+                      className={`font-body font-bold text-[13px] tabular-nums w-6 text-right ${
+                        rank === 1
+                          ? 'text-brand-yellow'
+                          : rank === 2
+                            ? 'text-white'
+                            : rank === 3
+                              ? 'text-brand-orange'
+                              : 'text-text-subtle'
+                      }`}
+                    >
+                      {rank}
+                    </span>
+                    <span className="font-body text-body-sm text-white truncate">
+                      {entry.name}
+                      {isMe && (
+                        <span className="ml-2 font-bold text-[10px] uppercase tracking-widest text-brand-yellow">
+                          You
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <span className="font-body font-bold text-body-sm text-brand-yellow tabular-nums">
+                    {entry.score}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+        )}
       </div>
     </div>
   )
