@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import EventRow from '@/components/EventRow'
 import { withViewTransition } from '@/lib/viewTransition'
 
@@ -80,10 +80,32 @@ export default function EventsListClient({
   const [view, setView] = useState(initialView)
   const [page, setPage] = useState(initialPage)
   const listTopRef = useRef<HTMLDivElement>(null)
+  // Skip the animation on first paint — we only want it firing on user
+  // interaction, not on initial mount. Otherwise the list would fade in
+  // on every page load, which would compete with the hero reveal.
+  const isFirstRender = useRef(true)
 
   // `now` must be stable across renders to avoid hydration mismatches and
   // to keep the filter results deterministic during a single session.
   const now = useMemo(() => new Date(serverNow), [serverNow])
+
+  // Re-trigger the swap animation every time the filter or page changes.
+  // The remove + force reflow + add trick is the standard way to replay a
+  // CSS animation — without the reflow, re-adding the same class is a no-op.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    const el = listTopRef.current
+    if (!el) return
+    el.classList.remove('animate-list-swap')
+    // Force reflow. The `void` discards the read, but the browser still
+    // has to flush style/layout for the offsetWidth access, which resets
+    // the animation so the next classList.add actually replays it.
+    void el.offsetWidth
+    el.classList.add('animate-list-swap')
+  }, [view, page])
 
   // All filtering happens here in JS — no network round-trip on filter
   // change. The full event list is in memory because the server hands it

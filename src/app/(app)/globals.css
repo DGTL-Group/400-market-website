@@ -271,88 +271,54 @@
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   View Transitions API — list filter / pagination crossfades
+   List swap animation — filter / pagination crossfade
    ──────────────────────────────────────────────────────────────────────────
 
-   The Events and News list pages wrap their filter / page state changes in
-   `document.startViewTransition()`. The browser captures the old DOM,
-   applies the React update, captures the new DOM, then runs these
-   keyframes to move from one to the other.
+   Used on the Events and News list pages. When the user clicks a filter or
+   page button, the list wrapper gets `.animate-list-swap` applied via a
+   `useEffect` hook that also force-reflows the element so the animation
+   re-triggers every time (not just once on first mount).
 
-   What's animated:
-   - Cards that PERSIST across the change (same element with the same
-     `view-transition-name`) are morphed in place — the browser interpolates
-     position and size, so a card moving up the list slides smoothly.
-   - Cards that LEAVE (in old, not in new) fade + slide down slightly.
-   - Cards that ARRIVE (in new, not in old) fade + slide up slightly.
+   We use a plain CSS keyframe instead of relying solely on the View
+   Transitions API because support is still patchy (Firefox and older
+   Safari don't animate VT pseudos reliably). This runs in every modern
+   browser. The `withViewTransition` helper is still wrapping our state
+   updates as a bonus — Chromium browsers get the morph-in-place for free,
+   and everyone else gets this fade.
 
-   Why we kill the root group animation:
-   - By default, every unnamed element on the page is grouped under `root`
-     and crossfades together. That looks great for full-page transitions,
-     but on a filter change the static parts (hero, filter bar, CTA) flicker
-     ever so slightly. Disabling the root animation makes those parts snap
-     instantly (which is invisible since their pixels don't change), so the
-     only thing the user sees animating is the cards themselves.
-
-   Reduced motion: respects the user's OS-level "reduce motion" preference
-   by disabling all view-transition animations entirely.
+   Reduced motion: if the user prefers reduced motion, the animation is
+   disabled entirely so the swap is instant.
 */
 
+@keyframes list-swap-in {
+  0% {
+    opacity: 0.35;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-list-swap {
+  animation: list-swap-in 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  /* Don't animate the root group — only the named elements (cards) move. */
+  /* Don't animate the root group when a View Transition runs — otherwise
+     the browser crossfades the entire page (including the static hero and
+     filter bar) which looks janky on filter clicks. Named elements still
+     animate normally. */
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none;
     mix-blend-mode: normal;
   }
-
-  /* Tighten the timing on every named transition group. The default is
-     250ms which is fine; 320ms gives the eye a touch more time to track
-     a moving card without feeling sluggish. */
-  ::view-transition-group(*) {
-    animation-duration: 320ms;
-    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-
-  @keyframes vt-fade-slide-in {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes vt-fade-slide-out {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-  }
-
-  /* Cards leaving the list (old DOM only) drop and fade. */
-  ::view-transition-old(*) {
-    animation: vt-fade-slide-out 220ms ease-in forwards;
-  }
-
-  /* Cards arriving in the list (new DOM only) rise and fade in. */
-  ::view-transition-new(*) {
-    animation: vt-fade-slide-in 320ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-  }
 }
 
-/* If the user has reduced motion enabled, kill ALL view-transition animation
-   so the swap is instantaneous. Same end result as today, just no crossfade. */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
+  .animate-list-swap {
+    animation: none;
   }
 }

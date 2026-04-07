@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import NewsCard from '@/components/NewsCard'
 import { withViewTransition } from '@/lib/viewTransition'
 
@@ -39,6 +39,9 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
   const [tag, setTag] = useState(initialTag)
   const [page, setPage] = useState(initialPage)
   const listTopRef = useRef<HTMLDivElement>(null)
+  // Skip the animation on first paint — we only want it firing on user
+  // interaction, not on initial mount.
+  const isFirstRender = useRef(true)
 
   // Tag filtering happens entirely client-side. The server hands us every
   // post in one go on initial load, so swapping tags is instant — no
@@ -47,6 +50,21 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
     if (!tag) return posts
     return posts.filter((p) => p.tags.includes(tag))
   }, [posts, tag])
+
+  // Re-trigger the swap animation every time the filter or page changes.
+  // The remove + force reflow + add trick is the standard way to replay a
+  // CSS animation — without the reflow, re-adding the same class is a no-op.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    const el = listTopRef.current
+    if (!el) return
+    el.classList.remove('animate-list-swap')
+    void el.offsetWidth
+    el.classList.add('animate-list-swap')
+  }, [tag, page])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   // Clamp the requested page so a stale URL like ?page=99 still renders
