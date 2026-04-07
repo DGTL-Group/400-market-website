@@ -42,31 +42,35 @@
 }
 
 @layer components {
+  /* Button font: matches header/newsletter buttons across the site —
+     DM Sans bold 13px uppercase with wide tracking, NOT the METAFORA display font.
+     Touching any .btn-* class updates every CTA — keep in sync across all variants. */
+
   /* Primary CTA — yellow background */
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-button bg-brand-yellow px-6 py-3
-           font-display text-body-md uppercase tracking-wide text-brand-dark
+    @apply inline-flex items-center justify-center rounded-button bg-brand-yellow px-6 py-4
+           font-body font-bold text-[13px] uppercase tracking-wide text-brand-dark
            hover:bg-brand-orange transition-colors duration-500;
   }
 
   /* Secondary CTA — orange background */
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-button bg-brand-orange px-6 py-3
-           font-display text-body-md uppercase tracking-wide text-white
+    @apply inline-flex items-center justify-center rounded-button bg-brand-orange px-6 py-4
+           font-body font-bold text-[13px] uppercase tracking-wide text-white
            hover:bg-brand-mango transition-colors duration-500;
   }
 
   /* Dark CTA — dark background */
   .btn-dark {
-    @apply inline-flex items-center justify-center rounded-button bg-brand-dark px-6 py-3
-           font-display text-body-md uppercase tracking-wide text-white
+    @apply inline-flex items-center justify-center rounded-button bg-brand-dark px-6 py-4
+           font-body font-bold text-[13px] uppercase tracking-wide text-white
            hover:bg-text-secondary transition-colors duration-500;
   }
 
   /* Outlined variant */
   .btn-outline {
-    @apply inline-flex items-center justify-center rounded-button border-2 border-brand-dark px-6 py-3
-           font-display text-body-md uppercase tracking-wide text-brand-dark
+    @apply inline-flex items-center justify-center rounded-button border-2 border-brand-dark px-6 py-4
+           font-body font-bold text-[13px] uppercase tracking-wide text-brand-dark
            hover:bg-brand-dark hover:text-white transition-colors duration-500;
   }
 
@@ -252,4 +256,16 @@
 
 .animate-est-fade-out {
   animation: est-fade-out 300ms ease-in forwards;
+}
+
+/* Whack-a-Vendor 3-2-1 countdown pop */
+@keyframes countdown-pop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  25%  { opacity: 1; transform: scale(1.15); }
+  60%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.85); }
+}
+
+.animate-countdown-pop {
+  animation: countdown-pop 800ms ease-out forwards;
 }
