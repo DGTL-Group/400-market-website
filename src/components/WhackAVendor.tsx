@@ -51,7 +51,16 @@ type LeaderboardEntry = {
   createdAt: string
 }
 
-export default function WhackAVendor() {
+type WhackAVendorProps = {
+  /**
+   * When true, the game skips its own idle overlay and goes straight to
+   * the 3-2-1 countdown as soon as it mounts. Used by the 404 page so the
+   * intro screen's "Start Game" button doesn't make the player click twice.
+   */
+  autoStart?: boolean
+}
+
+export default function WhackAVendor({ autoStart = false }: WhackAVendorProps = {}) {
   const [gameState, setGameState] = useState<GameState>('idle')
   const [score, setScore] = useState(0)
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION)
@@ -127,6 +136,20 @@ export default function WhackAVendor() {
       /* localStorage unavailable — silent fallback */
     }
   }, [])
+
+  // Auto-start when the parent asks for it (404 intro flow). Guarded by a
+  // ref so a re-render with the same prop value doesn't restart the game
+  // mid-play.
+  const autoStartTriggered = useRef(false)
+  useEffect(() => {
+    if (autoStart && !autoStartTriggered.current) {
+      autoStartTriggered.current = true
+      beginCountdown()
+    }
+    // beginCountdown is a stable closure on the component instance — we
+    // intentionally don't list it as a dep.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart])
 
   async function fetchLeaderboard() {
     setLeaderboardLoading(true)
