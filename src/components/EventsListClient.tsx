@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import EventRow from '@/components/EventRow'
 
 /**
@@ -64,33 +64,11 @@ export default function EventsListClient({
 }: Props) {
   const [view, setView] = useState(initialView)
   const [page, setPage] = useState(initialPage)
-  const listTopRef = useRef<HTMLDivElement>(null)
-  // Skip the animation on first paint — we only want it firing on user
-  // interaction, not on initial mount. Otherwise the list would fade in
-  // on every page load, which would compete with the hero reveal.
-  const isFirstRender = useRef(true)
+  const listTopRef = useRef<HTMLElement>(null)
 
   // `now` must be stable across renders to avoid hydration mismatches and
   // to keep the filter results deterministic during a single session.
   const now = useMemo(() => new Date(serverNow), [serverNow])
-
-  // Re-trigger the swap animation every time the filter or page changes.
-  // The remove + force reflow + add trick is the standard way to replay a
-  // CSS animation — without the reflow, re-adding the same class is a no-op.
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
-    }
-    const el = listTopRef.current
-    if (!el) return
-    el.classList.remove('animate-list-swap')
-    // Force reflow. The `void` discards the read, but the browser still
-    // has to flush style/layout for the offsetWidth access, which resets
-    // the animation so the next classList.add actually replays it.
-    void el.offsetWidth
-    el.classList.add('animate-list-swap')
-  }, [view, page])
 
   // All filtering happens here in JS — no network round-trip on filter
   // change. The full event list is in memory because the server hands it
@@ -183,23 +161,22 @@ export default function EventsListClient({
         </div>
       </div>
 
-      {/* Event rows */}
+      {/* Event rows.
+          - The OUTER <section> stays mounted for stable scrollIntoView().
+          - The INNER div is keyed by view+page so React unmounts it and
+            mounts a fresh node on every filter / page change. Because the
+            new node enters the DOM with `animate-list-swap` already on it,
+            the keyframe runs from frame 1 — no useEffect timing games. */}
       <section ref={listTopRef} className="max-w-content mx-auto">
-        {pageItems.length === 0 ? (
-          <p
-            className="text-text-secondary text-body-md py-20 text-center"
-            style={{ viewTransitionName: 'events-empty-state' }}
-          >
-            No events found for this view.
-          </p>
-        ) : (
-          pageItems.map((event, i) => (
-            // The wrapper div carries the view-transition-name so the
-            // browser can track the same card across filter / page changes
-            // and animate it in place. Each name must be unique on the
-            // page at any moment, so we key it by event id.
-            <div key={event.id} style={{ viewTransitionName: `event-${event.id}` }}>
+        <div key={`${view}-${safePage}`} className="animate-list-swap">
+          {pageItems.length === 0 ? (
+            <p className="text-text-secondary text-body-md py-20 text-center">
+              No events found for this view.
+            </p>
+          ) : (
+            pageItems.map((event, i) => (
               <EventRow
+                key={event.id}
                 name={event.name}
                 slug={event.slug}
                 startDate={event.startDate}
@@ -210,28 +187,28 @@ export default function EventsListClient({
                 featured={view !== 'past' && i === 0 && safePage === 1}
                 highlight={i % 2 === 1}
               />
-            </div>
-          ))
-        )}
+            ))
+          )}
 
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 py-12">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => handlePageClick(p)}
-                className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
-                  p === safePage
-                    ? 'bg-brand-yellow text-brand-dark'
-                    : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        )}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 py-12">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => handlePageClick(p)}
+                  className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
+                    p === safePage
+                      ? 'bg-brand-yellow text-brand-dark'
+                      : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
     </>
   )

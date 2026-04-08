@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import NewsCard from '@/components/NewsCard'
 
 /**
@@ -38,9 +38,6 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
   const [tag, setTag] = useState(initialTag)
   const [page, setPage] = useState(initialPage)
   const listTopRef = useRef<HTMLDivElement>(null)
-  // Skip the animation on first paint — we only want it firing on user
-  // interaction, not on initial mount.
-  const isFirstRender = useRef(true)
 
   // Tag filtering happens entirely client-side. The server hands us every
   // post in one go on initial load, so swapping tags is instant — no
@@ -49,21 +46,6 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
     if (!tag) return posts
     return posts.filter((p) => p.tags.includes(tag))
   }, [posts, tag])
-
-  // Re-trigger the swap animation every time the filter or page changes.
-  // The remove + force reflow + add trick is the standard way to replay a
-  // CSS animation — without the reflow, re-adding the same class is a no-op.
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
-    }
-    const el = listTopRef.current
-    if (!el) return
-    el.classList.remove('animate-list-swap')
-    void el.offsetWidth
-    el.classList.add('animate-list-swap')
-  }, [tag, page])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   // Clamp the requested page so a stale URL like ?page=99 still renders
@@ -119,22 +101,21 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
         ))}
       </div>
 
+      {/* Outer ref div stays mounted for stable scrollIntoView. The inner
+          keyed div remounts on every tag/page change so React applies
+          `animate-list-swap` to a fresh DOM node — the keyframe runs from
+          frame 1, no useEffect timing games required. */}
       <div ref={listTopRef}>
-        {pageItems.length === 0 ? (
-          <p
-            className="text-text-secondary text-body-md py-12 text-center"
-            style={{ viewTransitionName: 'news-empty-state' }}
-          >
-            No posts found.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pageItems.map((post) => (
-              // Wrapper div carries the view-transition-name so the browser
-              // can morph the same card across tag / page changes. Each
-              // name must be unique on the page at any moment.
-              <div key={post.id} style={{ viewTransitionName: `news-${post.id}` }}>
+        <div key={`${tag}-${safePage}`} className="animate-list-swap">
+          {pageItems.length === 0 ? (
+            <p className="text-text-secondary text-body-md py-12 text-center">
+              No posts found.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pageItems.map((post) => (
                 <NewsCard
+                  key={post.id}
                   title={post.title}
                   slug={post.slug}
                   excerpt={post.excerpt ?? undefined}
@@ -148,29 +129,29 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
                   }
                   publishDate={post.publishDate}
                 />
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-12">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => handlePageClick(p)}
-                className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
-                  p === safePage
-                    ? 'bg-brand-yellow text-brand-dark'
-                    : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        )}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-12">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => handlePageClick(p)}
+                  className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
+                    p === safePage
+                      ? 'bg-brand-yellow text-brand-dark'
+                      : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </>
   )
