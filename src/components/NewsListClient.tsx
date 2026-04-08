@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import NewsCard from '@/components/NewsCard'
-import { withViewTransition } from '@/lib/viewTransition'
 
 /**
  * Serialized news post shape sent from the server. Kept narrow on purpose
@@ -88,18 +87,14 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
 
   function handleTagClick(nextTag: string) {
     if (nextTag === tag) return
-    withViewTransition(() => {
-      setTag(nextTag)
-      setPage(1)
-    })
+    setTag(nextTag)
+    setPage(1)
     syncURL(nextTag, 1)
   }
 
   function handlePageClick(nextPage: number) {
     if (nextPage === safePage) return
-    withViewTransition(() => {
-      setPage(nextPage)
-    })
+    setPage(nextPage)
     syncURL(tag, nextPage)
     listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }

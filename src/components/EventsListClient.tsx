@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import EventRow from '@/components/EventRow'
-import { withViewTransition } from '@/lib/viewTransition'
 
 /**
  * Serialized shape the server hands us. We deliberately keep this narrow
@@ -147,18 +146,14 @@ export default function EventsListClient({
 
   function handleFilterClick(nextView: string) {
     if (nextView === view) return
-    withViewTransition(() => {
-      setView(nextView)
-      setPage(1)
-    })
+    setView(nextView)
+    setPage(1)
     syncURL(nextView, 1)
   }
 
   function handlePageClick(nextPage: number) {
     if (nextPage === safePage) return
-    withViewTransition(() => {
-      setPage(nextPage)
-    })
+    setPage(nextPage)
     syncURL(view, nextPage)
     // Scroll back up to the first row so the player doesn't have to hunt
     // for the new content. `start` aligns the top of the list with the

@@ -278,38 +278,28 @@
 
    1. `.animate-page-swap` — fires every time the route pathname changes,
       applied by <PageTransition> in the (app) layout. Fades the new page
-      content in from a slight downward offset.
+      content in from a downward offset.
 
    2. `.animate-list-swap` — fires every time the events/news filter or
-      page button is clicked. Same idea, slightly snappier timing, scoped
-      to the list wrapper instead of the whole page.
+      page button is clicked. Same idea, scoped to the list wrapper.
 
    In both cases the React side uses the remove + force-reflow + add-class
    pattern so the animation REPLAYS on every change (not just on mount).
 
-   We use plain CSS keyframes instead of relying on the View Transitions
-   API alone, because VT support is still patchy in Firefox and older
-   Safari. As a bonus, Chromium browsers get a native View Transition
-   crossfade for navigations via the `@view-transition` rule below — that
-   layers under the JS fade for an extra-smooth feel, with no harm if
-   it's not supported.
+   IMPORTANT: We do NOT layer this on top of the View Transitions API.
+   When `startViewTransition()` is in flight, the browser hides the real
+   DOM behind a snapshot pseudo-element for ~250ms, which masks any CSS
+   animation we run on the actual element. The JS fade is the only
+   animation source — pure, predictable, works everywhere.
 
    Reduced motion: respects the user's OS-level "reduce motion" preference
    by disabling the animations entirely so the swap is instant.
 */
 
-/* Opt every same-document Next.js navigation into the browser's native
-   View Transitions API. Chromium will capture before/after snapshots and
-   crossfade them for free. Browsers that don't support this rule simply
-   ignore it and fall back to the JS fade below. */
-@view-transition {
-  navigation: auto;
-}
-
 @keyframes page-swap-in {
   0% {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(14px);
   }
   100% {
     opacity: 1;
@@ -318,13 +308,13 @@
 }
 
 .animate-page-swap {
-  animation: page-swap-in 380ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: page-swap-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 @keyframes list-swap-in {
   0% {
-    opacity: 0.35;
-    transform: translateY(6px);
+    opacity: 0;
+    transform: translateY(10px);
   }
   100% {
     opacity: 1;
@@ -333,7 +323,7 @@
 }
 
 .animate-list-swap {
-  animation: list-swap-in 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: list-swap-in 340ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
