@@ -23,11 +23,8 @@ type Props = {
   events: ClientEvent[]
   initialView: string
   initialPage: number
-  /**
-   * ISO timestamp captured by the server at request time. We use this for
-   * "now" instead of `new Date()` so the SSR pass and the first client
-   * render produce identical filtered output (no hydration mismatch).
-   */
+  // ISO string. The server captures `now` once and passes it down so SSR
+  // and the first client render agree on which events count as upcoming.
   serverNow: string
 }
 

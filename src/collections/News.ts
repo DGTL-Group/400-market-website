@@ -1,6 +1,10 @@
 import type { CollectionConfig } from 'payload'
 import { isAuthenticated } from './access'
 import { formatSlug } from './hooks/formatSlug'
+import {
+  revalidateContentAfterChange,
+  revalidateContentAfterDelete,
+} from './hooks/revalidateContent'
 
 export const News: CollectionConfig = {
   slug: 'news',
@@ -17,6 +21,13 @@ export const News: CollectionConfig = {
   },
   versions: {
     drafts: true,
+  },
+  // Bust the ISR cache instantly on every admin edit / create / delete so
+  // the listing and detail pages reflect changes without waiting for the
+  // 1-hour revalidate window. See ./hooks/revalidateContent.ts.
+  hooks: {
+    afterChange: [revalidateContentAfterChange({ basePath: 'news' })],
+    afterDelete: [revalidateContentAfterDelete({ basePath: 'news' })],
   },
   fields: [
     {

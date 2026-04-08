@@ -11,6 +11,13 @@ export const metadata: Metadata = {
     'Special market days, themed weekends, and seasonal events at The 400 Market in Innisfil, Ontario.',
 }
 
+// ISR: serve a cached static render and refresh in the background at most
+// once per hour. The Events collection's afterChange/afterDelete hooks
+// also call revalidatePath('/events') for instant updates on edits, so
+// this hour-long window is just the safety net for scheduled publishes
+// and any out-of-band data changes (direct DB writes, migrations, etc).
+export const revalidate = 3600
+
 type Props = {
   searchParams: Promise<{ view?: string; page?: string }>
 }

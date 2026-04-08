@@ -15,6 +15,12 @@ type Props = {
   params: Promise<{ slug: string }>
 }
 
+// ISR: each post is prerendered at build time via generateStaticParams
+// below, then refreshed at most once per hour. The News collection's
+// afterChange hook also calls revalidatePath() for the specific slug, so
+// admin edits show up instantly without waiting.
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const payload = await getPayload({ config })
   const { docs } = await payload.find({

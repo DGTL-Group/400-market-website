@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     'The latest news, updates, and stories from The 400 Market in Innisfil, Ontario.',
 }
 
+// ISR: serve a cached static render and refresh in the background at most
+// once per hour. The News collection's afterChange/afterDelete hooks also
+// call revalidatePath('/news') for instant updates on edits, so this
+// hour-long window is just the safety net.
+export const revalidate = 3600
+
 type Props = {
   searchParams: Promise<{ tag?: string; page?: string }>
 }
