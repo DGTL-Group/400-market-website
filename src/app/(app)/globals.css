@@ -292,8 +292,12 @@
    animation we run on the actual element. The JS fade is the only
    animation source — pure, predictable, works everywhere.
 
-   Reduced motion: respects the user's OS-level "reduce motion" preference
-   by disabling the animations entirely so the swap is instant.
+   Reduced motion: deliberately NOT respected. The fade is gentle (~340ms,
+   small translate, no spinning or scaling) and the client wants every
+   visitor to see the brand polish, including those whose OS has
+   "reduce animations" toggled on. If we ever ship a more aggressive
+   motion (parallax, large slide, bounce), revisit this and add a
+   `@media (prefers-reduced-motion: reduce)` override back in.
 */
 
 @keyframes page-swap-in {
@@ -324,11 +328,4 @@
 
 .animate-list-swap {
   animation: list-swap-in 340ms cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-list-swap,
-  .animate-page-swap {
-    animation: none;
-  }
 }

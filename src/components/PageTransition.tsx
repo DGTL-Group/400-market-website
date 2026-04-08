@@ -5,23 +5,29 @@ import { usePathname } from 'next/navigation'
 /**
  * Page-level fade transition wrapper.
  *
- * Implementation: keyed remount. When the pathname changes, React unmounts
- * the wrapper div and mounts a fresh one with the `animate-page-swap`
- * class baked into the JSX. The animation runs from frame 1 on the new
- * DOM node — no useEffect, no reflow tricks, no possibility of running
- * "after" the new content has already painted in its final state.
+ * Implementation: keyed remount inside an outer host div. When the
+ * pathname changes, the inner keyed div is unmounted and a fresh one is
+ * mounted with `animate-page-swap` baked into the JSX. The keyframe runs
+ * from frame 1 on the new DOM node — no useEffect timing games.
  *
- * Why we abandoned the useEffect approach: useEffect fires AFTER the
- * browser paints. So the user would see the new page snap into its final
- * state, then the animation would start from a blank state and play out.
- * Net effect: zero visible animation. Keyed remount sidesteps this
- * because the new node enters the DOM with the class already applied.
+ * Why the OUTER host div: in React, putting `key` on the root element
+ * returned by a component doesn't always force a remount, because the
+ * single-child reconciliation path can reuse the DOM node if types match.
+ * Wrapping it in a stable host div puts the keyed div into a children
+ * slot of host, where React's reconciler reliably honors the key change.
+ *
+ * Why we abandoned the useEffect approach earlier: useEffect fires AFTER
+ * the browser paints. By then the new page is already on screen in its
+ * final state, so any class added in the effect runs against an
+ * invisible-to-the-user target.
  */
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   return (
-    <div key={pathname} className="animate-page-swap">
-      {children}
+    <div>
+      <div key={pathname} className="animate-page-swap">
+        {children}
+      </div>
     </div>
   )
 }
