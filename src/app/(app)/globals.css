@@ -274,36 +274,51 @@
    Page + list swap animations
    ──────────────────────────────────────────────────────────────────────────
 
-   Two related animations:
+   Two related sequenced fade systems, each with paired OUT → IN keyframes:
 
-   1. `.animate-page-swap` — fires every time the route pathname changes,
-      applied by <PageTransition> in the (app) layout. Fades the new page
-      content in from a downward offset.
+   1. `.animate-page-swap` / `.animate-page-swap-out` — fires every time
+      the route pathname changes, driven by <PageTransition> in the (app)
+      layout. The OUT keyframe runs FIRST on the outgoing page. When it
+      finishes, the OLD DOM unmounts and the IN keyframe runs on the new
+      page. One thing visible at a time, no overlap.
 
-   2. `.animate-list-swap` — fires every time the events/news filter or
-      page button is clicked. Same idea, scoped to the list wrapper.
+   2. `.animate-list-swap` / `.animate-list-swap-out` — same OUT → IN
+      sequence, scoped to the list wrapper inside EventsListClient /
+      NewsListClient and fired on every filter / page change.
 
-   In both cases the React side uses the remove + force-reflow + add-class
-   pattern so the animation REPLAYS on every change (not just on mount).
+   Why sequence (not crossfade): running OUT and IN simultaneously makes
+   the outgoing and incoming frames overlap at partial opacity, which
+   reads as a washed-out double-exposure — especially when both frames
+   have similar layout (same headers, same grid). Sequencing them — old
+   fades OUT fully, then new fades IN fully — means the eye only sees
+   one frame at a time. Total duration is longer, but the motion is
+   unambiguously clean.
 
-   IMPORTANT: We do NOT layer this on top of the View Transitions API.
-   When `startViewTransition()` is in flight, the browser hides the real
-   DOM behind a snapshot pseudo-element for ~250ms, which masks any CSS
-   animation we run on the actual element. The JS fade is the only
-   animation source — pure, predictable, works everywhere.
+   Why the Y position jumps at the swap boundary and doesn't look wrong:
+   the OUT ends at translateY(-20px) opacity 0; the IN starts at
+   translateY(+28px) opacity 0. Both endpoints have opacity 0, so the
+   48px Y jump happens while the element is invisible. The user sees:
+   page slides up and fades away → (nothing visible) → page slides up
+   from below and fades in. Continuous visual narrative.
 
-   Reduced motion: deliberately NOT respected. The fade is gentle (~340ms,
-   small translate, no spinning or scaling) and the client wants every
-   visitor to see the brand polish, including those whose OS has
-   "reduce animations" toggled on. If we ever ship a more aggressive
-   motion (parallax, large slide, bounce), revisit this and add a
+   Reduced motion: deliberately NOT respected. The fade is gentle (small
+   translate, no spinning or scaling) and the client wants every visitor
+   to see the brand polish, including those whose OS has "reduce
+   animations" toggled on. If we ever ship a more aggressive motion
+   (parallax, large slide, bounce), revisit this and add a
    `@media (prefers-reduced-motion: reduce)` override back in.
+
+   Duration tuning: sequence totals (OUT + IN) are deliberately long so
+   any compile / data fetch tail after the animation feels like part of
+   the transition rather than a dead pause. Page transitions total
+   ~1150ms; list swaps total ~850ms. OUT is always shorter than IN so
+   the "clearing" feels crisp and the "arriving" feels substantial.
 */
 
 @keyframes page-swap-in {
   0% {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(28px);
   }
   100% {
     opacity: 1;
@@ -312,13 +327,43 @@
 }
 
 .animate-page-swap {
-  animation: page-swap-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: page-swap-in 750ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes page-swap-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+.animate-page-swap-out {
+  animation: page-swap-out 400ms cubic-bezier(0.42, 0, 0.78, 0.39);
+  animation-fill-mode: forwards;
+}
+
+/* The exit layer's content is a snapshotted HTML string re-parsed into
+   fresh DOM nodes via `dangerouslySetInnerHTML`. Any element inside
+   that carried a mount-time CSS animation (e.g. `.animate-list-swap`
+   on the EventsListClient grid) would REPLAY that animation from
+   frame 0 on the new nodes, because the browser sees them as
+   just-inserted. Visually that looks like the content bouncing or
+   "doubling" while the wrapper is also animating out. Kill all child
+   animations inside the exit layer so ONLY the outer page-swap-out
+   keyframe plays — the wrapper itself is unaffected because this
+   selector only targets descendants. */
+.animate-page-swap-out * {
+  animation: none !important;
 }
 
 @keyframes list-swap-in {
   0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   100% {
     opacity: 1;
@@ -327,5 +372,21 @@
 }
 
 .animate-list-swap {
-  animation: list-swap-in 340ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: list-swap-in 550ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes list-swap-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+.animate-list-swap-out {
+  animation: list-swap-out 300ms cubic-bezier(0.42, 0, 0.78, 0.39);
+  animation-fill-mode: forwards;
 }

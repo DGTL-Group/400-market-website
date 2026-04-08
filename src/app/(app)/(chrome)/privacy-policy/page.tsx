@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { notFound } from 'next/navigation'
-import PageLayout from '@/components/PageLayout'
 import RenderBlocks from '@/components/RenderBlocks'
 import ScrollProgress from '@/components/ScrollProgress'
 
@@ -35,9 +34,9 @@ export default async function PrivacyPolicyPage() {
   if (!page) notFound()
 
   return (
-    <PageLayout>
+    <>
       <ScrollProgress />
       <RenderBlocks blocks={page.layout as never[]} />
-    </PageLayout>
+    </>
   )
 }

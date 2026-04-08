@@ -23,6 +23,19 @@ type Props = {
   initialPage: number
 }
 
+/**
+ * Frozen snapshot of everything the grid+pagination renderer needs. We
+ * keep two of these in state — one for the currently shown grid and one
+ * for the grid that's currently fading out — so the OUT and IN keyframes
+ * can run simultaneously on different DOM trees.
+ */
+type GridSnapshot = {
+  key: string
+  items: ClientNewsPost[]
+  safePage: number
+  totalPages: number
+}
+
 const TAGS = [
   { label: 'All', value: '' },
   { label: 'Filter 1', value: 'filter1' },
@@ -33,6 +46,63 @@ const TAGS = [
 ]
 
 const PER_PAGE = 9
+
+/**
+ * Pure projection from a snapshot to the grid + pagination JSX. Lives
+ * outside the component so we can render the same shape twice — once for
+ * the current frame and once for the exiting overlay — without
+ * duplicating any markup.
+ */
+function renderNewsGrid(snapshot: GridSnapshot, handlePageClick: (p: number) => void) {
+  return (
+    <>
+      {snapshot.items.length === 0 ? (
+        <p className="text-text-secondary text-body-md py-12 text-center">
+          No posts found.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {snapshot.items.map((post) => (
+            <NewsCard
+              key={post.id}
+              title={post.title}
+              slug={post.slug}
+              excerpt={post.excerpt ?? undefined}
+              featuredImage={
+                post.featuredImage
+                  ? {
+                      url: post.featuredImage.url ?? undefined,
+                      alt: post.featuredImage.alt ?? undefined,
+                    }
+                  : undefined
+              }
+              publishDate={post.publishDate}
+            />
+          ))}
+        </div>
+      )}
+
+      {snapshot.totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-12">
+          {Array.from({ length: snapshot.totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => handlePageClick(p)}
+              className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
+                p === snapshot.safePage
+                  ? 'bg-brand-yellow text-brand-dark'
+                  : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  )
+}
 
 export default function NewsListClient({ posts, initialTag, initialPage }: Props) {
   const [tag, setTag] = useState(initialTag)
@@ -52,6 +122,27 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
   // something sensible after a tag change shrinks the list.
   const safePage = Math.min(Math.max(1, page), totalPages)
   const pageItems = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
+
+  // Sequenced transition state. `shown` is the snapshot mounted while
+  // the IN keyframe plays; `exiting` is the snapshot mounted while the
+  // OUT keyframe plays. The render logic renders only ONE at a time
+  // (ternary, not both siblings) so the old grid fades out completely
+  // before the new grid starts fading in — no visual overlap. The
+  // derived-state `if` block captures the previous frame the moment the
+  // user changes tags or pages.
+  const currentKey = `${tag}-${safePage}`
+  const [shown, setShown] = useState<GridSnapshot>({
+    key: currentKey,
+    items: pageItems,
+    safePage,
+    totalPages,
+  })
+  const [exiting, setExiting] = useState<GridSnapshot | null>(null)
+
+  if (shown.key !== currentKey) {
+    setExiting(shown)
+    setShown({ key: currentKey, items: pageItems, safePage, totalPages })
+  }
 
   /**
    * Update the URL in-place (without triggering a Next.js navigation) so
@@ -83,7 +174,9 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
 
   return (
     <>
-      {/* Tag filter bar */}
+      {/* Tag filter bar — buttons track the LIVE tag so the active
+          highlight flips immediately on click, even while the grid
+          below is still mid-transition. */}
       <div className="mb-8 flex flex-wrap gap-2">
         {TAGS.map((t) => (
           <button
@@ -101,57 +194,34 @@ export default function NewsListClient({ posts, initialTag, initialPage }: Props
         ))}
       </div>
 
-      {/* Outer ref div stays mounted for stable scrollIntoView. The inner
-          keyed div remounts on every tag/page change so React applies
-          `animate-list-swap` to a fresh DOM node — the keyframe runs from
-          frame 1, no useEffect timing games required. */}
+      {/* Outer ref div stays mounted for stable scrollIntoView. The
+          ternary sequences the transition: while `exiting` is set we
+          render ONLY the outgoing snapshot running the OUT keyframe;
+          when `onAnimationEnd` clears it we render ONLY the new snapshot
+          with the IN keyframe. One frame at a time, no overlap. */}
       <div ref={listTopRef}>
-        <div key={`${tag}-${safePage}`} className="animate-list-swap">
-          {pageItems.length === 0 ? (
-            <p className="text-text-secondary text-body-md py-12 text-center">
-              No posts found.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pageItems.map((post) => (
-                <NewsCard
-                  key={post.id}
-                  title={post.title}
-                  slug={post.slug}
-                  excerpt={post.excerpt ?? undefined}
-                  featuredImage={
-                    post.featuredImage
-                      ? {
-                          url: post.featuredImage.url ?? undefined,
-                          alt: post.featuredImage.alt ?? undefined,
-                        }
-                      : undefined
-                  }
-                  publishDate={post.publishDate}
-                />
-              ))}
-            </div>
-          )}
-
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-12">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => handlePageClick(p)}
-                  className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
-                    p === safePage
-                      ? 'bg-brand-yellow text-brand-dark'
-                      : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {exiting ? (
+          <div
+            key={`exit-${exiting.key}`}
+            className="animate-list-swap-out"
+            onAnimationEnd={(e) => {
+              // animationend bubbles. Any child card with its own CSS
+              // animation (e.g. image fade-in on mount) would otherwise
+              // fire animationend on frame 0 and prematurely clear
+              // `exiting`, skipping the grid OUT animation entirely.
+              // Only react to this wrapper's own animation.
+              if (e.target !== e.currentTarget) return
+              if (e.animationName !== 'list-swap-out') return
+              setExiting(null)
+            }}
+          >
+            {renderNewsGrid(exiting, handlePageClick)}
+          </div>
+        ) : (
+          <div key={`enter-${shown.key}`} className="animate-list-swap">
+            {renderNewsGrid(shown, handlePageClick)}
+          </div>
+        )}
       </div>
     </>
   )

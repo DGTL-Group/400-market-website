@@ -28,6 +28,20 @@ type Props = {
   serverNow: string
 }
 
+/**
+ * Frozen snapshot of everything the row+pagination renderer needs. We
+ * keep two of these in state — one for what's currently shown, one for
+ * what's currently fading out — so the OUT and IN keyframes can run
+ * simultaneously on different DOM trees.
+ */
+type ListSnapshot = {
+  key: string
+  items: ClientEvent[]
+  view: string
+  safePage: number
+  totalPages: number
+}
+
 const FILTERS = [
   { label: 'Upcoming', value: '' },
   { label: 'This Month', value: 'month' },
@@ -51,6 +65,60 @@ function endOfTorontoMonth(d: Date): Date {
   const year = Number(parts.find((p) => p.type === 'year')?.value)
   const month = Number(parts.find((p) => p.type === 'month')?.value)
   return new Date(Date.UTC(year, month, 1, 5, 0, 0))
+}
+
+/**
+ * Pure projection from a snapshot to the rows + pagination JSX. Lives
+ * outside the component so we can render the same shape twice — once for
+ * the current frame and once for the exiting overlay — without
+ * duplicating any markup. Each call closes over the snapshot's frozen
+ * data, so the exiting overlay keeps showing the OLD list while the new
+ * one fades in underneath.
+ */
+function renderEventRows(snapshot: ListSnapshot, handlePageClick: (p: number) => void) {
+  return (
+    <>
+      {snapshot.items.length === 0 ? (
+        <p className="text-text-secondary text-body-md py-20 text-center">
+          No events found for this view.
+        </p>
+      ) : (
+        snapshot.items.map((event, i) => (
+          <EventRow
+            key={event.id}
+            name={event.name}
+            slug={event.slug}
+            startDate={event.startDate}
+            endDate={event.endDate}
+            description={event.description}
+            location={event.location}
+            featuredImage={event.featuredImage}
+            featured={snapshot.view !== 'past' && i === 0 && snapshot.safePage === 1}
+            highlight={i % 2 === 1}
+          />
+        ))
+      )}
+
+      {snapshot.totalPages > 1 && (
+        <div className="flex justify-center gap-2 py-12">
+          {Array.from({ length: snapshot.totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => handlePageClick(p)}
+              className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
+                p === snapshot.safePage
+                  ? 'bg-brand-yellow text-brand-dark'
+                  : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  )
 }
 
 export default function EventsListClient({
@@ -103,6 +171,30 @@ export default function EventsListClient({
   const safePage = Math.min(Math.max(1, page), totalPages)
   const pageItems = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
 
+  // Sequenced transition state. `shown` is the snapshot mounted while
+  // the IN keyframe plays; `exiting` is the snapshot mounted while the
+  // OUT keyframe plays. The render logic renders only ONE at a time
+  // (ternary, not both siblings) so the old list fades out completely
+  // before the new list starts fading in — no visual overlap. When the
+  // live view/page combination produces a new key, we capture the
+  // current `shown` into `exiting` and replace `shown` with a fresh
+  // snapshot of the new state via the standard React derived-state
+  // pattern (the `if` guard prevents looping).
+  const currentKey = `${view}-${safePage}`
+  const [shown, setShown] = useState<ListSnapshot>({
+    key: currentKey,
+    items: pageItems,
+    view,
+    safePage,
+    totalPages,
+  })
+  const [exiting, setExiting] = useState<ListSnapshot | null>(null)
+
+  if (shown.key !== currentKey) {
+    setExiting(shown)
+    setShown({ key: currentKey, items: pageItems, view, safePage, totalPages })
+  }
+
   /**
    * Update the URL in-place (without triggering a Next.js navigation) so
    * the page is shareable / refreshable but the server doesn't re-render.
@@ -138,7 +230,9 @@ export default function EventsListClient({
 
   return (
     <>
-      {/* Filter tab bar */}
+      {/* Filter tab bar — buttons reflect the LIVE `view` so the active
+          highlight flips immediately on click, even while the row area
+          is still mid-transition. */}
       <div className="bg-surface-light/60">
         <div className="max-w-content mx-auto px-6 md:px-20 py-4 flex flex-wrap items-center gap-3">
           {FILTERS.map((f) => (
@@ -160,52 +254,34 @@ export default function EventsListClient({
 
       {/* Event rows.
           - The OUTER <section> stays mounted for stable scrollIntoView().
-          - The INNER div is keyed by view+page so React unmounts it and
-            mounts a fresh node on every filter / page change. Because the
-            new node enters the DOM with `animate-list-swap` already on it,
-            the keyframe runs from frame 1 — no useEffect timing games. */}
+          - The ternary sequences the transition: while `exiting` is set
+            we render ONLY the outgoing snapshot running the OUT keyframe;
+            when `onAnimationEnd` clears it we render ONLY the new
+            snapshot with the IN keyframe. One frame at a time, no
+            overlap, no double-exposure ghosting. */}
       <section ref={listTopRef} className="max-w-content mx-auto">
-        <div key={`${view}-${safePage}`} className="animate-list-swap">
-          {pageItems.length === 0 ? (
-            <p className="text-text-secondary text-body-md py-20 text-center">
-              No events found for this view.
-            </p>
-          ) : (
-            pageItems.map((event, i) => (
-              <EventRow
-                key={event.id}
-                name={event.name}
-                slug={event.slug}
-                startDate={event.startDate}
-                endDate={event.endDate}
-                description={event.description}
-                location={event.location}
-                featuredImage={event.featuredImage}
-                featured={view !== 'past' && i === 0 && safePage === 1}
-                highlight={i % 2 === 1}
-              />
-            ))
-          )}
-
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 py-12">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => handlePageClick(p)}
-                  className={`px-4 py-2 rounded-button text-body-sm font-semibold transition-colors duration-500 ${
-                    p === safePage
-                      ? 'bg-brand-yellow text-brand-dark'
-                      : 'bg-surface-light text-text-secondary hover:bg-brand-yellow/20'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {exiting ? (
+          <div
+            key={`exit-${exiting.key}`}
+            className="animate-list-swap-out"
+            onAnimationEnd={(e) => {
+              // animationend bubbles. Any child row with its own CSS
+              // animation (e.g. image fade-in on mount) would otherwise
+              // fire animationend on frame 0 and prematurely clear
+              // `exiting`, skipping the list OUT animation entirely.
+              // Only react to this wrapper's own animation.
+              if (e.target !== e.currentTarget) return
+              if (e.animationName !== 'list-swap-out') return
+              setExiting(null)
+            }}
+          >
+            {renderEventRows(exiting, handlePageClick)}
+          </div>
+        ) : (
+          <div key={`enter-${shown.key}`} className="animate-list-swap">
+            {renderEventRows(shown, handlePageClick)}
+          </div>
+        )}
       </section>
     </>
   )

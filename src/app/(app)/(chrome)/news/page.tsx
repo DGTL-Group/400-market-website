@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import PageLayout from '@/components/PageLayout'
 import NewsListClient, { type ClientNewsPost } from '@/components/NewsListClient'
 
 export const metadata: Metadata = {
@@ -53,16 +52,14 @@ export default async function NewsPage({ searchParams }: Props) {
   })
 
   return (
-    <PageLayout showCheckmark>
-      <section className="max-w-content mx-auto px-6 md:px-20 py-12">
-        <h1 className="font-display text-display-lg uppercase tracking-wide mb-8">NEWS</h1>
+    <section className="max-w-content mx-auto px-6 md:px-20 py-12">
+      <h1 className="font-display text-display-lg uppercase tracking-wide mb-8">NEWS</h1>
 
-        <NewsListClient
-          posts={clientPosts}
-          initialTag={initialTag}
-          initialPage={initialPage}
-        />
-      </section>
-    </PageLayout>
+      <NewsListClient
+        posts={clientPosts}
+        initialTag={initialTag}
+        initialPage={initialPage}
+      />
+    </section>
   )
 }

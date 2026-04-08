@@ -6,7 +6,6 @@ import config from '@payload-config'
 import { notFound } from 'next/navigation'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
-import PageLayout from '@/components/PageLayout'
 import Breadcrumb from '@/components/Breadcrumb'
 import NewsCard from '@/components/NewsCard'
 import ScrollProgress from '@/components/ScrollProgress'
@@ -85,7 +84,7 @@ export default async function NewsPostPage({ params }: Props) {
   })
 
   return (
-    <PageLayout showCheckmark>
+    <>
       <ScrollProgress />
       {/* Breadcrumb */}
       <Breadcrumb
@@ -177,6 +176,6 @@ export default async function NewsPostPage({ params }: Props) {
           )}
         </div>
       </section>
-    </PageLayout>
+    </>
   )
 }

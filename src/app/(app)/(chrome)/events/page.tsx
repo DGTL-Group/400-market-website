@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import PageLayout from '@/components/PageLayout'
 import EventsListClient, { type ClientEvent } from '@/components/EventsListClient'
 
 export const metadata: Metadata = {
@@ -84,7 +83,7 @@ export default async function EventsPage({ searchParams }: Props) {
   })
 
   return (
-    <PageLayout showCheckmark>
+    <>
       {/* Yellow hero band */}
       <section className="bg-brand-yellow px-6 md:px-20 py-12 md:py-16">
         <div className="max-w-content mx-auto">
@@ -125,6 +124,6 @@ export default async function EventsPage({ searchParams }: Props) {
           </Link>
         </div>
       </section>
-    </PageLayout>
+    </>
   )
 }
