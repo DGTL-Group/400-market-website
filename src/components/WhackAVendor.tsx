@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useEffect, useRef, useState } from 'react'
+import Logo from '@/components/Logo'
 import {
   LEADERBOARD_LIMIT,
   fetchLeaderboardEntries,
@@ -411,6 +412,21 @@ export default function WhackAVendor({
 
   return (
     <div className="w-full max-w-md mx-auto">
+      {/* Brand bar — keeps the 400 Market logo visible while playing, so the
+          game reads as an official market arcade cabinet rather than a
+          generic whack-a-mole clone. Uses the display font (METAFORA) at a
+          size a step below the "Stay in the Loop" newsletter headline so the
+          two feel like siblings. */}
+      <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4">
+        <Logo
+          id="whack-brand-logo"
+          className="w-10 h-10 sm:w-11 sm:h-11 flex-shrink-0"
+        />
+        <div className="font-display text-display-sm uppercase text-white font-black leading-none">
+          400 Market Arcade
+        </div>
+      </div>
+
       {/* HUD */}
       <div className="flex items-center justify-between mb-3 sm:mb-4 px-2">
         <div className="text-left">

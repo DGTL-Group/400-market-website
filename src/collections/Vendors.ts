@@ -69,6 +69,7 @@ export const Vendors: CollectionConfig = {
         { label: 'Health & Beauty', value: 'health-beauty' },
         { label: 'Sports & Outdoors', value: 'sports' },
         { label: 'Toys & Games', value: 'toys' },
+        { label: 'Retail / General Merchandise', value: 'retail' },
         { label: 'Services', value: 'services' },
         { label: 'Other', value: 'other' },
       ],
