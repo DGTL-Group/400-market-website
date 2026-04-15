@@ -10,7 +10,7 @@ const leftLinks = [
 const rightLinks = [
   { label: 'NEWS', href: '/news' },
   { label: 'ABOUT', href: '/about-us' },
-  { label: 'CONTACT', href: '/contact-us' },
+  { label: 'CONTACT US', href: '/contact-us' },
 ]
 
 type Variant = 'C' | 'D' | 'E' | 'F' | 'G' | 'H'

@@ -88,20 +88,18 @@ export default function ContactPage() {
       </section>
 
       {/* Google Maps embed */}
-      <section className="px-6 md:px-20 pb-12 md:pb-16">
-        <div className="max-w-content mx-auto">
-          <iframe
-            title="The 400 Market location on Google Maps"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2852.0!2d-79.5815!3d44.3185!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882aa3b3c4f2a3a1%3A0x1234567890abcdef!2s2207%20Industrial%20Park%20Rd%2C%20Innisfil%2C%20ON%20L9S%203V9!5e0!3m2!1sen!2sca!4v1700000000000"
-            width="100%"
-            height="340"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="rounded-button"
-          />
-        </div>
+      <section className="max-w-content mx-auto px-6 md:px-20 pb-12 md:pb-16">
+        <iframe
+          title="The 400 Market location on Google Maps"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6000.0!2d-79.5815!3d44.3185!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882aa3b3c4f2a3a1%3A0x1234567890abcdef!2s2207%20Industrial%20Park%20Rd%2C%20Innisfil%2C%20ON%20L9S%203V9!5e0!3m2!1sen!2sca!4v1700000000000"
+          width="100%"
+          height="425"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="rounded-button"
+        />
       </section>
     </>
   )
