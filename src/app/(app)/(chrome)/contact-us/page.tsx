@@ -11,12 +11,12 @@ export default function ContactPage() {
   return (
     <>
       {/* Yellow hero band */}
-      <section className="bg-brand-yellow px-6 md:px-20 py-12 md:py-16">
+      <section className="bg-brand-yellow px-6 md:px-20 py-6 md:py-8">
         <div className="max-w-content mx-auto">
-          <h1 className="font-display text-display-xl uppercase tracking-wide text-brand-dark font-black mb-3">
+          <h1 className="font-display text-display-lg md:text-display-xl uppercase tracking-wide text-brand-dark font-black mb-2">
             CONTACT US
           </h1>
-          <p className="font-body text-body-lg text-brand-dark/80 max-w-2xl">
+          <p className="font-body text-body-md text-brand-dark/80 max-w-2xl">
             We&apos;d love to hear from you. Questions, merchant inquiries, or just saying hello.
           </p>
         </div>
@@ -44,11 +44,16 @@ export default function ContactPage() {
                 <h3 className="font-body text-body-sm font-bold text-text-primary uppercase tracking-wide mb-1">
                   Address
                 </h3>
-                <p className="font-body text-body-md text-text-secondary leading-relaxed">
+                <a
+                  href="https://share.google/qGvHeXlwOD08Oodyb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-body text-body-md text-text-secondary leading-relaxed hover:text-brand-mango transition-colors duration-200"
+                >
                   The 400 Market<br />
                   2207 Industrial Park Road<br />
                   Innisfil, Ontario, L9S 3V9
-                </p>
+                </a>
               </div>
 
               <div>

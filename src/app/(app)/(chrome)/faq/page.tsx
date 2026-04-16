@@ -60,12 +60,12 @@ export default async function FAQPage() {
   return (
     <>
       {/* ─── HERO ─── */}
-      <section className="relative bg-brand-dark overflow-hidden">
-        <div className="max-w-content mx-auto px-6 md:px-20 py-16 md:py-20 min-h-[280px] flex flex-col justify-center">
-          <h1 className="font-display text-[40px] md:text-[56px] leading-[1.05] tracking-wide text-brand-yellow font-black max-w-[700px]">
+      <section className="bg-brand-yellow px-6 md:px-20 py-6 md:py-8">
+        <div className="max-w-content mx-auto">
+          <h1 className="font-display text-display-lg md:text-display-xl uppercase tracking-wide text-brand-dark font-black mb-2">
             FREQUENTLY ASKED QUESTIONS
           </h1>
-          <p className="font-body text-body-md text-text-subtle mt-5 max-w-[560px] leading-relaxed">
+          <p className="font-body text-body-md text-brand-dark/80 max-w-2xl">
             Everything you need to know about visiting and selling at 400 Market.
           </p>
         </div>

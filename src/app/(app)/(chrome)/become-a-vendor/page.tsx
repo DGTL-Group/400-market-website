@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import MerchantApplicationForm from '@/components/MerchantApplicationForm'
+import { getYearsInBusiness } from '@/lib/marketFacts'
+
+const yearsInBusiness = getYearsInBusiness()
 
 export const metadata: Metadata = {
   title: 'Become a Merchant',
@@ -45,13 +48,13 @@ export default function BecomeAVendorPage() {
   return (
     <>
       {/* ─── HERO ─── */}
-      <section className="relative bg-brand-dark overflow-hidden">
-        <div className="max-w-content mx-auto px-6 md:px-20 py-16 md:py-20 min-h-[320px] flex flex-col justify-center">
-          <h1 className="font-display text-[40px] md:text-[56px] leading-[1.05] tracking-wide text-brand-yellow font-black max-w-[580px]">
+      <section className="bg-brand-yellow px-6 md:px-20 py-6 md:py-8">
+        <div className="max-w-content mx-auto">
+          <h1 className="font-display text-display-lg md:text-display-xl uppercase tracking-wide text-brand-dark font-black mb-2">
             BECOME A MERCHANT
           </h1>
-          <p className="font-body text-body-md text-text-subtle mt-5 max-w-[560px] leading-relaxed">
-            For over 35 years, the 400 Market has been the heart of Simcoe County&apos;s
+          <p className="font-body text-body-md text-brand-dark/80 max-w-2xl">
+            For over {yearsInBusiness} years, the 400 Market has been the heart of Simcoe County&apos;s
             local economy, uniting entrepreneurs, small businesses, and food artisans
             in one thriving community.
           </p>

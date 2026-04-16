@@ -2,6 +2,7 @@ import Link from 'next/link'
 import LogoInteractive from './LogoInteractive'
 import NewsletterForm from './NewsletterForm'
 import SocialIcons from './SocialIcons'
+import OpenClosedBadge from './OpenClosedBadge'
 
 const navColumns = [
   {
@@ -103,6 +104,20 @@ export default function Footer({ showTagline = true, headingClass = 'footer-head
                 <a href="tel:7054361010" className="footer-text">
                   705-436-1010
                 </a>
+              </div>
+            </div>
+
+            {/* Hours column */}
+            <div>
+              <h5 className={headingClass}>
+                HOURS
+              </h5>
+              <div className="flex flex-col gap-2">
+                <p className="footer-text leading-relaxed">
+                  Saturday &amp; Sunday<br />
+                  9:00 AM &ndash; 5:00 PM
+                </p>
+                <OpenClosedBadge variant="inline" />
               </div>
             </div>
           </div>

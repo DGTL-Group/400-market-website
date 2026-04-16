@@ -85,12 +85,12 @@ export default async function EventsPage({ searchParams }: Props) {
   return (
     <>
       {/* Yellow hero band */}
-      <section className="bg-brand-yellow px-6 md:px-20 py-12 md:py-16">
+      <section className="bg-brand-yellow px-6 md:px-20 py-6 md:py-8">
         <div className="max-w-content mx-auto">
-          <h1 className="font-display text-display-xl uppercase tracking-wide text-brand-dark font-black mb-3">
+          <h1 className="font-display text-display-lg md:text-display-xl uppercase tracking-wide text-brand-dark font-black mb-2">
             EVENTS
           </h1>
-          <p className="font-body text-body-lg text-brand-dark/80 max-w-2xl">
+          <p className="font-body text-body-md text-brand-dark/80 max-w-2xl">
             Special market days, themed weekends, and seasonal events at The 400 Market.
           </p>
         </div>
