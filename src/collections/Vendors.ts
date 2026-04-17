@@ -47,7 +47,19 @@ export const Vendors: CollectionConfig = {
       index: true,
       label: 'Booth Number',
       admin: {
-        description: 'Booth or stall identifier (e.g. "A12", "B3").',
+        description:
+          'Primary booth identifier (e.g. "1804"). Kept for search and back-compat. For vendors with multiple booths, see the Booths join below for the full list.',
+      },
+    },
+    {
+      name: 'booths',
+      type: 'join',
+      collection: 'booths',
+      on: 'vendor',
+      label: 'All Booths Occupied by This Vendor',
+      admin: {
+        description:
+          'Auto-populated read-only list. Shows every Booth record whose vendor relation points here. To add/remove, edit the Booth record directly (or update via the CRM).',
       },
     },
     {

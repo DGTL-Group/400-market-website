@@ -390,3 +390,29 @@
   animation: list-swap-out 300ms cubic-bezier(0.42, 0, 0.78, 0.39);
   animation-fill-mode: forwards;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Floor plan — available booth attention pulse
+   ──────────────────────────────────────────────────────────────────────────
+
+   Applied to available booths ONLY on /become-a-vendor, where we want to
+   steer the eye toward open spots. Homepage and /vendors leave available
+   booths static so rented booths (the visit-planning target) read first.
+
+   The pulse modulates fill-opacity rather than scale/translate so booths
+   stay rock-solid against the floor plan grid — no visual jitter on
+   neighbouring booths. Duration is long (2.4s) so the effect is ambient
+   background animation, not an attention-seeking blink.
+
+   Stagger: each booth gets a deterministic animation-delay based on its
+   booth number via `style={{ animationDelay: ... }}` on the rect so the
+   pulses ripple rather than all flashing in lockstep.
+*/
+@keyframes booth-available-pulse {
+  0%, 100% { fill-opacity: 1; }
+  50%      { fill-opacity: 0.65; }
+}
+
+.animate-booth-available {
+  animation: booth-available-pulse 2.4s ease-in-out infinite;
+}

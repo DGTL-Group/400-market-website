@@ -1,12 +1,33 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import Link from 'next/link'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
 export default function MerchantApplicationForm() {
   const [status, setStatus] = useState<Status>('idle')
+  // Pre-fillable booth number. Two sources, both optional:
+  //   1. `?booth=N` query param (set by FloorPlanSVG via replaceState on click)
+  //   2. `floorPlan:boothSelected` window event (same source, immediate update)
+  // Visitors who land on the page without interacting with the map just
+  // see an empty "Preferred Booth" field they can fill in manually.
+  const [booth, setBooth] = useState('')
+
+  useEffect(() => {
+    // Hydrate from URL on mount.
+    const params = new URLSearchParams(window.location.search)
+    const fromUrl = params.get('booth')
+    if (fromUrl) setBooth(fromUrl)
+
+    // Listen for booth clicks from the floor plan.
+    const onBoothSelected = (e: Event) => {
+      const detail = (e as CustomEvent<{ number?: string }>).detail
+      if (detail?.number) setBooth(detail.number)
+    }
+    window.addEventListener('floorPlan:boothSelected', onBoothSelected)
+    return () => window.removeEventListener('floorPlan:boothSelected', onBoothSelected)
+  }, [])
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -25,6 +46,7 @@ export default function MerchantApplicationForm() {
           businessName: data.get('businessName'),
           email: data.get('email'),
           phone: data.get('phone'),
+          booth: data.get('booth') || undefined,
           description: data.get('description'),
         }),
       })
@@ -32,6 +54,7 @@ export default function MerchantApplicationForm() {
       if (!res.ok) throw new Error('Failed to send')
       setStatus('sent')
       form.reset()
+      setBooth('')
     } catch {
       setStatus('error')
     }
@@ -100,6 +123,21 @@ export default function MerchantApplicationForm() {
         </div>
 
         <div>
+          <label htmlFor="app-booth" className="block font-body text-body-sm font-semibold text-text-primary mb-1.5">
+            Preferred Booth <span className="font-normal text-text-subtle">(optional)</span>
+          </label>
+          <input
+            id="app-booth"
+            name="booth"
+            type="text"
+            value={booth}
+            onChange={(e) => setBooth(e.target.value)}
+            placeholder="e.g. 1804"
+            className={inputClasses}
+          />
+        </div>
+
+        <div className="md:col-span-2">
           <label htmlFor="app-description" className="block font-body text-body-sm font-semibold text-text-primary mb-1.5">
             Business Description
           </label>

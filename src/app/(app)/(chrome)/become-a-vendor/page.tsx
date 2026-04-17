@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import MerchantApplicationForm from '@/components/MerchantApplicationForm'
 import { getYearsInBusiness } from '@/lib/marketFacts'
+import { FloorPlan } from '@/components/FloorPlan/FloorPlan'
 
 const yearsInBusiness = getYearsInBusiness()
 
@@ -165,14 +166,10 @@ export default function BecomeAVendorPage() {
             </p>
           </div>
 
-          <div className="mx-auto max-w-[85%] bg-white rounded-button overflow-hidden border border-surface-light">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/home/market-floor-plan.webp"
-              alt="The 400 Market floor plan showing booth numbers and sections"
-              className="w-full h-auto block"
-            />
-          </div>
+          {/* Interactive floor plan — available booths pulse in yellow.
+              Clicking one scrolls to the application form below and
+              pre-fills the booth number via URL + custom event. */}
+          <FloorPlan mode="become-a-vendor" />
 
           <div className="text-center mt-8">
             <Link href="/contact-us" className="btn-dark">
@@ -183,7 +180,13 @@ export default function BecomeAVendorPage() {
       </section>
 
       {/* ─── APPLICATION FORM ─── */}
-      <section className="max-w-content mx-auto px-6 md:px-20 py-16 md:py-20">
+      {/* `id` is the scroll target used by FloorPlanSVG when a visitor
+          clicks an available booth — don't rename without updating
+          src/components/FloorPlan/FloorPlanSVG.tsx. */}
+      <section
+        id="merchant-application-form"
+        className="max-w-content mx-auto px-6 md:px-20 py-16 md:py-20"
+      >
         <h2 className="font-display text-display-lg md:text-display-xl uppercase tracking-wide text-brand-dark font-black mb-3">
           APPLY FOR A BOOTH
         </h2>

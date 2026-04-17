@@ -46,3 +46,13 @@ next-env.d.ts
 # ── Misc ──
 .vercel
 .turbo
+
+# ── Claude Code session state ──
+.claude/
+.claude-*
+
+# ── Scratch / staging files ──
+figma-code.txt
+fp-b64.txt
+floor-plan-b64*.txt
+floor-plan.jpg

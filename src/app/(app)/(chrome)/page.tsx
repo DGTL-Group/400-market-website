@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { FloorPlan } from '@/components/FloorPlan/FloorPlan'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -267,12 +268,12 @@ export default async function HomePage() {
       </section>
 
       {/* ─── MARKET MAP TEASER ─── */}
-      {/* Single horizontal rectangle showing the market floor plan. For
-          now we're using the legacy scanned map as a placeholder — the
-          client is producing a brand new interactive SVG that will drop
-          straight into this slot without touching anything around it.
-          The "Browse the full directory" CTA is a standalone button
-          underneath the map, matching the other page CTAs. */}
+      {/* Interactive floor plan — CRM-driven. Rented booths show vendor
+          info on hover and link to the vendor detail page; available and
+          reserved booths are visible but not interactive in this mode
+          (the homepage's goal is to direct plan-a-visit intent toward
+          occupied vendors). The "Browse the full directory" CTA below
+          remains the escape hatch for anyone who'd rather scan a list. */}
       <section className="bg-surface-light py-16 md:py-20">
         <div className="max-w-content mx-auto px-6 md:px-20">
           <div className="text-center mb-10 md:mb-12">
@@ -280,18 +281,11 @@ export default async function HomePage() {
               EXPLORE THE MARKET
             </h2>
             <p className="font-body text-body-lg text-text-secondary mt-3">
-              Interactive floor plan &mdash; tap a section to explore.
+              Interactive floor plan &mdash; hover a booth to see the vendor.
             </p>
           </div>
 
-          <div className="mx-auto max-w-[85%] bg-white rounded-button overflow-hidden border border-surface-light">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/home/market-floor-plan.webp"
-              alt="The 400 Market floor plan showing booth numbers and sections"
-              className="w-full h-auto block"
-            />
-          </div>
+          <FloorPlan mode="homepage" />
 
           <div className="text-center mt-10">
             <Link href="/vendors" className="btn-dark">
