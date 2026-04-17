@@ -123,6 +123,35 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
       dot.setAttribute('data-fp-dot', '1')
       dotLayer.appendChild(dot)
     })
+
+    // Dev-only: stamp each booth's number over its rect so the real
+    // market layout is easy to eyeball against the CRM. Inlined as a
+    // sibling <text> so it inherits the rect's parent transform matrix
+    // (some booths live inside <g transform="matrix(…)"> wrappers).
+    if (process.env.NODE_ENV === 'development') {
+      svg.querySelectorAll('[data-fp-label]').forEach((el) => el.remove())
+      rects.forEach((rect) => {
+        const number = rect.getAttribute('data-booth') ?? ''
+        if (!number) return
+        const x = parseFloat(rect.getAttribute('x') ?? '0')
+        const y = parseFloat(rect.getAttribute('y') ?? '0')
+        const w = parseFloat(rect.getAttribute('width') ?? '0')
+        const h = parseFloat(rect.getAttribute('height') ?? '0')
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+        text.setAttribute('x', String(x + w / 2))
+        text.setAttribute('y', String(y + h / 2))
+        text.setAttribute('text-anchor', 'middle')
+        text.setAttribute('dominant-baseline', 'central')
+        text.setAttribute('font-size', '9')
+        text.setAttribute('font-family', 'DM Sans, sans-serif')
+        text.setAttribute('font-weight', '600')
+        text.setAttribute('fill', '#2C2C2C')
+        text.setAttribute('pointer-events', 'none')
+        text.setAttribute('data-fp-label', '1')
+        text.textContent = number
+        rect.parentNode?.insertBefore(text, rect.nextSibling)
+      })
+    }
   }, [boothMap, booths, mode, vendorBoothMap])
 
   /**
