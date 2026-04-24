@@ -100,6 +100,14 @@
       vector-effect: non-scaling-stroke;
     }
 
+    /* ATM machines — money-green squares with a dark border. */
+    .fp-atm {
+      fill: #1F6B3B;
+      stroke: #0C3B1E;
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
     /* Door openings */
     .fp-door {
       fill: none;
@@ -1086,5 +1094,9 @@
                 <path d="M542.386,50.718L542.386,16.853"/>
             </g>
         </g>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Concession" x="1137" y="514" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-1" x="148.732" y="675.879" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-2" x="162.732" y="675.879" width="14" height="14"/>
+    
     </g>
 </svg>

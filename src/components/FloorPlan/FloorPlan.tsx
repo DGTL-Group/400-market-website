@@ -12,14 +12,14 @@ type Props = {
 }
 
 /**
- * Read the branded floor-plan SVG off disk exactly once per process.
- * `public/images/floor-plan.svg` is a pure build artefact (produced by
- * `scripts/brand-floor-plan.mjs`) so this is just an optimisation — no
- * invalidation concerns.
+ * Read the branded floor-plan SVG off disk. Cached per-process in
+ * production (the file only changes when we redeploy), but re-read
+ * every request in development so `node scripts/brand-floor-plan.mjs`
+ * + refresh lands immediately without a dev-server bounce.
  */
 let cachedSvg: string | null = null
 function loadFloorPlanSvg(): string {
-  if (cachedSvg) return cachedSvg
+  if (cachedSvg && process.env.NODE_ENV === 'production') return cachedSvg
   const path = join(process.cwd(), 'public', 'images', 'floor-plan.svg')
   cachedSvg = readFileSync(path, 'utf8')
   return cachedSvg

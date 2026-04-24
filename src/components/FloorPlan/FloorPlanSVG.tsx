@@ -170,7 +170,7 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
         text.setAttribute('dominant-baseline', 'central')
         text.setAttribute('font-size', '9')
         text.setAttribute('font-family', 'DM Sans, sans-serif')
-        text.setAttribute('font-weight', '600')
+        text.setAttribute('font-weight', '700')
         text.setAttribute('fill', '#2C2C2C')
         text.setAttribute('pointer-events', 'none')
         text.setAttribute('data-fp-label', '1')

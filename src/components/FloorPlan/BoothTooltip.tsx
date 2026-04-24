@@ -176,6 +176,7 @@ export type AmenityKind =
   | 'womens-restroom'
   | 'info-desk'
   | 'concession'
+  | 'atm'
 
 export function describeAmenity(kind: AmenityKind): TooltipDescriptor {
   switch (kind) {
@@ -194,6 +195,12 @@ export function describeAmenity(kind: AmenityKind): TooltipDescriptor {
         eyebrow: 'Amenity',
         title: 'Concession',
         subtitle: 'Grab-and-go market snacks.',
+      }
+    case 'atm':
+      return {
+        eyebrow: 'Amenity',
+        title: 'ATM',
+        subtitle: 'Cash machine.',
       }
   }
 }

@@ -58,6 +58,22 @@ tag('Women-Restroom', 'fp-restroom', 'womens-restroom')
 tag('Women-Restroom1', 'fp-restroom', 'womens-restroom')
 tag('Blocked', 'fp-blocked')
 
+// 3b. Inject ATM markers — three small money-green squares the source
+//    SVG doesn't have. Positions (in the local pre-3.125 coord space):
+//      - just ABOVE the Concession area's top-right corner, sitting
+//        outside the concession rect and flush with its top + right edges
+//      - two side-by-side HUGGING the east (front) wall of the left-side
+//        men's restroom (Men-s-Restroom1 ends at x=148.732), vertically
+//        centred on the restroom (y centre = 682.879)
+//    Each gets data-amenity="atm" so the tooltip describes it.
+const ATM_MARKUP = `
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Concession" x="1137" y="514" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-1" x="148.732" y="675.879" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-2" x="162.732" y="675.879" width="14" height="14"/>
+    `
+// Insert right before the closing </g> of the outer scaled group.
+svg = svg.replace(/(\s*)<\/g>\s*<\/svg>/, `${ATM_MARKUP}$1</g>\n</svg>`)
+
 // 4. Tag food-court child rects — still rentable (food-court booths), so
 //    they ALSO need a data-booth later. Just gives them the pale-orange
 //    resting fill so they feel part of the food zone.
@@ -211,6 +227,14 @@ const styleBlock = `  <style>
     .fp-blocked {
       fill: #CFCFCF;
       stroke: #9A9A9A;
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
+    /* ATM machines — money-green squares with a dark border. */
+    .fp-atm {
+      fill: #1F6B3B;
+      stroke: #0C3B1E;
       stroke-width: 1;
       vector-effect: non-scaling-stroke;
     }
