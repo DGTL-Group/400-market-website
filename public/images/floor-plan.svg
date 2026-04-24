@@ -11,8 +11,11 @@
     }
 
     /* Default: every unclassed rect is a rentable booth (available). */
+    /* Available = white, rented = brand yellow, reserved = orange,
+       blocked = gray. Flipped from the old scheme so the "taken"
+       booths catch the eye rather than the empty ones. */
     rect {
-      fill: #F7D117;
+      fill: #FFFFFF;
       stroke: #2C2C2C;
       stroke-width: 1;
       vector-effect: non-scaling-stroke;
@@ -21,7 +24,7 @@
 
     /* Interactive states driven by data-status on the rect. */
     rect[data-booth] { cursor: default; }
-    rect[data-booth][data-status="rented"]   { fill: #FFFBEA; stroke: #2C2C2C; }
+    rect[data-booth][data-status="rented"]   { fill: #F7D117; stroke: #2C2C2C; }
     rect[data-booth][data-status="reserved"] { fill: #F7941D; }
     rect[data-booth][data-status="blocked"]  { fill: #CFCFCF; stroke: #9A9A9A; }
 
@@ -44,19 +47,59 @@
       outline: none;
     }
 
+    /* Search + legend filter states. React stamps data-filter="match"
+       on hits and data-filter="dim" on everything else. Matches grow
+       a mango stroke and gently pulse; dimmed elements fade to 25% so
+       the map reads as a dimmed backdrop behind the spotlighted
+       results. */
+    [data-filter="dim"] {
+      opacity: 0.22;
+      transition: opacity 200ms ease;
+    }
+    [data-filter="match"] {
+      opacity: 1;
+      transition: opacity 200ms ease, stroke-width 200ms ease;
+    }
+    rect[data-filter="match"],
+    path[data-filter="match"] {
+      stroke: #E57200;
+      stroke-width: 3;
+      animation: fp-filter-pulse 1.8s infinite ease-in-out;
+    }
+    @keyframes fp-filter-pulse {
+      0%, 100% { stroke-width: 3; }
+      50%      { stroke-width: 5; }
+    }
+    /* When a filter is active, dim the outer wall + dev labels so the
+       contrast between match and miss really pops. */
+    [data-fp-label][data-filter="dim"] { opacity: 0.12; }
+
     /* Amenities (restrooms, info, concession) — hoverable but not
        clickable, so we flag them with a help cursor. */
     [data-amenity] { cursor: help; }
 
-    /* Food court booths share the status system but keep their pale base. */
+    /* Food-court booths — same status palette as regular booths plus a
+       mango stroke so the whole zone reads as one block. */
     .fp-food-court-booth {
-      fill: #FDE2BF;
+      fill: #FFFFFF;
       stroke: #E57200;
       stroke-width: 0.8;
       vector-effect: non-scaling-stroke;
     }
-    .fp-food-court-booth[data-status="rented"] { fill: #FFFBEA; }
+    .fp-food-court-booth[data-status="rented"]   { fill: #F7D117; }
     .fp-food-court-booth[data-status="reserved"] { fill: #F7941D; }
+
+    /* FOOD COURT label — dropped in at step 4 below, positioned over
+       the Food-Court1 zone rect. */
+    .fp-food-court-label {
+      fill: #E57200;
+      font-family: 'METAFORA', 'DM Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
 
     /* Service/food zones */
     .fp-concession {
@@ -1005,7 +1048,8 @@
             <rect class="fp-food-court-booth" id="_1702" serif:id="1702" data-booth="1702" x="293.395" y="421.239" width="38.619" height="35.361"/>
             <rect class="fp-food-court-booth" id="_1705" serif:id="1705" data-booth="1705" x="402.88" y="421.239" width="73.099" height="35.361"/>
             <rect class="fp-food-court-booth" id="_1704" serif:id="1704" data-booth="1704" x="367.622" y="421.239" width="35.258" height="35.361"/>
-        </g>
+        
+        <text class="fp-food-court-label" x="584.813" y="414" font-size="14">FOOD COURT</text></g>
         <g id="_2100" serif:id="2100">
             <rect id="_2101" serif:id="2101" data-booth="2101" x="549.577" y="159.392" width="33.763" height="37.674"/>
             <rect id="_2102" serif:id="2102" data-booth="2102" x="549.577" y="197.066" width="33.763" height="37.014"/>

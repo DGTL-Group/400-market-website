@@ -88,8 +88,10 @@ const ATM_MARKUP = `
 svg = svg.replace(/(\s*)<\/g>\s*<\/svg>/, `${ATM_MARKUP}$1</g>\n</svg>`)
 
 // 4. Tag food-court child rects — still rentable (food-court booths), so
-//    they ALSO need a data-booth later. Just gives them the pale-orange
-//    resting fill so they feel part of the food zone.
+//    they ALSO need a data-booth later. Also drop a FOOD COURT text
+//    label in the middle of the zone so the area is obvious at a glance.
+//    The Food-Court1 container rect is 755.658 × 124.767 starting at
+//    (206.984, 372.408), so the centre sits at (584.813, 434.791).
 svg = svg.replace(
   /<g id="Food-Court"[^>]*>([\s\S]*?)<\/g>/,
   (_m, inner) => {
@@ -97,7 +99,9 @@ svg = svg.replace(
       /<rect id="(_17\d{2})"/g,
       '<rect class="fp-food-court-booth" id="$1"',
     )
-    return `<g id="Food-Court">${tagged}</g>`
+    const label = `
+        <text class="fp-food-court-label" x="584.813" y="414" font-size="14">FOOD COURT</text>`
+    return `<g id="Food-Court">${tagged}${label}</g>`
   },
 )
 
@@ -161,8 +165,11 @@ const styleBlock = `  <style>
     }
 
     /* Default: every unclassed rect is a rentable booth (available). */
+    /* Available = white, rented = brand yellow, reserved = orange,
+       blocked = gray. Flipped from the old scheme so the "taken"
+       booths catch the eye rather than the empty ones. */
     rect {
-      fill: #F7D117;
+      fill: #FFFFFF;
       stroke: #2C2C2C;
       stroke-width: 1;
       vector-effect: non-scaling-stroke;
@@ -171,7 +178,7 @@ const styleBlock = `  <style>
 
     /* Interactive states driven by data-status on the rect. */
     rect[data-booth] { cursor: default; }
-    rect[data-booth][data-status="rented"]   { fill: #FFFBEA; stroke: #2C2C2C; }
+    rect[data-booth][data-status="rented"]   { fill: #F7D117; stroke: #2C2C2C; }
     rect[data-booth][data-status="reserved"] { fill: #F7941D; }
     rect[data-booth][data-status="blocked"]  { fill: #CFCFCF; stroke: #9A9A9A; }
 
@@ -194,19 +201,59 @@ const styleBlock = `  <style>
       outline: none;
     }
 
+    /* Search + legend filter states. React stamps data-filter="match"
+       on hits and data-filter="dim" on everything else. Matches grow
+       a mango stroke and gently pulse; dimmed elements fade to 25% so
+       the map reads as a dimmed backdrop behind the spotlighted
+       results. */
+    [data-filter="dim"] {
+      opacity: 0.22;
+      transition: opacity 200ms ease;
+    }
+    [data-filter="match"] {
+      opacity: 1;
+      transition: opacity 200ms ease, stroke-width 200ms ease;
+    }
+    rect[data-filter="match"],
+    path[data-filter="match"] {
+      stroke: #E57200;
+      stroke-width: 3;
+      animation: fp-filter-pulse 1.8s infinite ease-in-out;
+    }
+    @keyframes fp-filter-pulse {
+      0%, 100% { stroke-width: 3; }
+      50%      { stroke-width: 5; }
+    }
+    /* When a filter is active, dim the outer wall + dev labels so the
+       contrast between match and miss really pops. */
+    [data-fp-label][data-filter="dim"] { opacity: 0.12; }
+
     /* Amenities (restrooms, info, concession) — hoverable but not
        clickable, so we flag them with a help cursor. */
     [data-amenity] { cursor: help; }
 
-    /* Food court booths share the status system but keep their pale base. */
+    /* Food-court booths — same status palette as regular booths plus a
+       mango stroke so the whole zone reads as one block. */
     .fp-food-court-booth {
-      fill: #FDE2BF;
+      fill: #FFFFFF;
       stroke: #E57200;
       stroke-width: 0.8;
       vector-effect: non-scaling-stroke;
     }
-    .fp-food-court-booth[data-status="rented"] { fill: #FFFBEA; }
+    .fp-food-court-booth[data-status="rented"]   { fill: #F7D117; }
     .fp-food-court-booth[data-status="reserved"] { fill: #F7941D; }
+
+    /* FOOD COURT label — dropped in at step 4 below, positioned over
+       the Food-Court1 zone rect. */
+    .fp-food-court-label {
+      fill: #E57200;
+      font-family: 'METAFORA', 'DM Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
 
     /* Service/food zones */
     .fp-concession {

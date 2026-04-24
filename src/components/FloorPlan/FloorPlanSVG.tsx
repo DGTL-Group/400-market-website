@@ -17,6 +17,8 @@ import {
   type AmenityKind,
   type TooltipDescriptor,
 } from './BoothTooltip'
+import { FloorPlanSearch } from './FloorPlanSearch'
+import { FloorPlanLegend, type LegendKey } from './FloorPlanLegend'
 
 type Props = {
   mode: FloorPlanMode
@@ -72,6 +74,18 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
   const [svgBounds, setSvgBounds] = useState<{ w: number; h: number }>({ w: 0, h: 0 })
 
+  // ── Filter state ─────────────────────────────────────────────────
+  // The search bar and the legend both drive the same "dim everything
+  // except the match set" highlight. They're mutually exclusive:
+  // typing into the search clears the legend selection, clicking a
+  // legend chip clears the search. `filter.kind === 'none'` means no
+  // highlight is active and every booth renders at full opacity.
+  const [filter, setFilter] = useState<
+    | { kind: 'none' }
+    | { kind: 'search'; query: string }
+    | { kind: 'legend'; legend: LegendKey }
+  >({ kind: 'none' })
+
   /** booth number → view */
   const boothMap = useMemo(() => {
     const m = new Map<string, BoothView>()
@@ -91,6 +105,79 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     }
     return m
   }, [booths])
+
+  /**
+   * Filter outcome — which BOOTH rects to highlight, and whether the
+   * filter also wants to highlight amenities. `null` = no active filter.
+   */
+  const filterMatch = useMemo<
+    | null
+    | { boothNumbers: Set<string>; amenities: Set<AmenityKind>; foodCourt: boolean }
+  >(() => {
+    if (filter.kind === 'none') return null
+
+    const boothNumbers = new Set<string>()
+    const amenities = new Set<AmenityKind>()
+    let foodCourt = false
+
+    if (filter.kind === 'search') {
+      const q = filter.query.toLowerCase()
+      if (!q) return null
+      for (const b of booths) {
+        if (b.number.toLowerCase().includes(q)) {
+          boothNumbers.add(b.number)
+          continue
+        }
+        const name = b.vendor?.name.toLowerCase() ?? ''
+        if (name.includes(q)) {
+          boothNumbers.add(b.number)
+          continue
+        }
+        const cats = b.vendor?.category ?? []
+        if (cats.some((c) => c.toLowerCase().includes(q))) {
+          boothNumbers.add(b.number)
+        }
+      }
+    } else if (filter.kind === 'legend') {
+      switch (filter.legend) {
+        case 'rented':
+          booths.forEach((b) => b.status === 'rented' && boothNumbers.add(b.number))
+          break
+        case 'available':
+          booths.forEach((b) => b.status === 'available' && boothNumbers.add(b.number))
+          break
+        case 'reserved':
+          booths.forEach((b) => b.status === 'reserved' && boothNumbers.add(b.number))
+          break
+        case 'atm':
+          amenities.add('atm')
+          break
+        case 'mens-restroom':
+          amenities.add('mens-restroom')
+          break
+        case 'womens-restroom':
+          amenities.add('womens-restroom')
+          break
+        case 'info-desk':
+          amenities.add('info-desk')
+          break
+        case 'food-court':
+          foodCourt = true
+          booths.forEach(
+            (b) =>
+              /^17\d{2}$/.test(b.number) && boothNumbers.add(b.number),
+          )
+          break
+      }
+    }
+    return { boothNumbers, amenities, foodCourt }
+  }, [filter, booths])
+
+  /** Reported back to the search bar for its "N matches" live region. */
+  const searchMatchCount =
+    filter.kind === 'search' && filterMatch
+      ? filterMatch.boothNumbers.size
+      : null
 
   /**
    * Sync per-rect attributes + dev labels + overlay + dots when state
@@ -119,30 +206,40 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
       rect.setAttribute('role', clickable ? 'button' : 'img')
     })
 
-    // Multi-booth vendor dots (vendor id → dot on second+ booth).
+    // Multi-booth vendor dots (vendor id → dot on second+ booth). We
+    // need the same matrix projection the dev labels use — otherwise a
+    // booth inside a nested <g transform="…"> gets its dot plotted in
+    // the wrong coord space and ends up floating above the wall.
     svg.querySelectorAll('[data-fp-dot]').forEach((d) => d.remove())
-    const dotLayer = ensureDotLayer(svg)
+    const outerG = findOuterScaledGroup(svg)
+    const outerCTM = outerG?.getCTM()
 
-    booths.forEach((b) => {
-      if (!b.vendor || b.status !== 'rented') return
-      const sibCount = vendorBoothMap.get(b.vendor.id)?.length ?? 0
-      if (sibCount < 2) return
-      const rect = svg.querySelector<SVGRectElement>(`rect[data-booth="${b.number}"]`)
-      if (!rect) return
-      const bbox = rect.getBBox()
-      const cx = bbox.x + bbox.width - 4
-      const cy = bbox.y + 4
-      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-      dot.setAttribute('cx', String(cx))
-      dot.setAttribute('cy', String(cy))
-      dot.setAttribute('r', '3.5')
-      dot.setAttribute('fill', `hsl(${vendorHue(b.vendor.id)} 60% 45%)`)
-      dot.setAttribute('stroke', 'white')
-      dot.setAttribute('stroke-width', '0.8')
-      dot.setAttribute('pointer-events', 'none')
-      dot.setAttribute('data-fp-dot', '1')
-      dotLayer.appendChild(dot)
-    })
+    if (outerG && outerCTM) {
+      booths.forEach((b) => {
+        if (!b.vendor || b.status !== 'rented') return
+        const sibCount = vendorBoothMap.get(b.vendor.id)?.length ?? 0
+        if (sibCount < 2) return
+        const rect = svg.querySelector<SVGRectElement>(`rect[data-booth="${b.number}"]`)
+        if (!rect) return
+        const rectCTM = rect.getCTM()
+        if (!rectCTM) return
+        const bbox = rect.getBBox() // local coords
+        const pt = svg.createSVGPoint()
+        pt.x = bbox.x + bbox.width - 4
+        pt.y = bbox.y + 4
+        const projected = pt.matrixTransform(outerCTM.inverse().multiply(rectCTM))
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+        dot.setAttribute('cx', String(projected.x))
+        dot.setAttribute('cy', String(projected.y))
+        dot.setAttribute('r', '3.5')
+        dot.setAttribute('fill', `hsl(${vendorHue(b.vendor.id)} 60% 45%)`)
+        dot.setAttribute('stroke', 'white')
+        dot.setAttribute('stroke-width', '0.8')
+        dot.setAttribute('pointer-events', 'none')
+        dot.setAttribute('data-fp-dot', '1')
+        outerG.appendChild(dot)
+      })
+    }
 
     // Hover highlight overlay — one rect sits at the END of the SVG so
     // it paints on top of every other element. We move it around on
@@ -160,9 +257,7 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     // size.
     if (process.env.NODE_ENV === 'development') {
       svg.querySelectorAll('[data-fp-label]').forEach((el) => el.remove())
-      const outerG = findOuterScaledGroup(svg)
-      if (outerG) {
-        const outerCTM = outerG.getCTM()
+      if (outerG && outerCTM) {
         rects.forEach((rect) => {
           const number = rect.getAttribute('data-booth') ?? ''
           if (!number) return
@@ -236,6 +331,46 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     },
     [boothMap],
   )
+
+  /**
+   * Apply the filter as a pair of `data-filter` attributes on every
+   * selectable rect / amenity. CSS in the SVG paints them accordingly
+   * (`match` = highlighted + pulse, `dim` = 25% opacity). Runs in an
+   * effect so it doesn't tear the DOM on every keystroke — we just
+   * flip attributes.
+   */
+  useEffect(() => {
+    const svg = containerRef.current?.querySelector('svg')
+    if (!svg) return
+
+    const rects = svg.querySelectorAll<SVGRectElement>('rect[data-booth]')
+    const amenityEls = svg.querySelectorAll<SVGGraphicsElement>('[data-amenity]')
+    const foodCourtGroup = svg.querySelector<SVGGElement>('g[id="Food-Court"]')
+
+    if (!filterMatch) {
+      rects.forEach((r) => r.removeAttribute('data-filter'))
+      amenityEls.forEach((el) => el.removeAttribute('data-filter'))
+      foodCourtGroup?.removeAttribute('data-filter')
+      return
+    }
+
+    const { boothNumbers, amenities, foodCourt } = filterMatch
+
+    rects.forEach((r) => {
+      const num = r.getAttribute('data-booth') ?? ''
+      r.setAttribute('data-filter', boothNumbers.has(num) ? 'match' : 'dim')
+    })
+    amenityEls.forEach((el) => {
+      const kind = el.getAttribute('data-amenity') as AmenityKind | null
+      el.setAttribute(
+        'data-filter',
+        kind && amenities.has(kind) ? 'match' : 'dim',
+      )
+    })
+    if (foodCourtGroup) {
+      foodCourtGroup.setAttribute('data-filter', foodCourt ? 'match' : 'dim')
+    }
+  }, [filterMatch])
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -318,6 +453,22 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
 
   return (
     <div className="relative">
+      {/* Search bar on top — typing clears any pinned legend row. */}
+      <FloorPlanSearch
+        matchCount={searchMatchCount}
+        onQueryChange={(q) =>
+          setFilter(q ? { kind: 'search', query: q } : { kind: 'none' })
+        }
+      />
+
+      {/* Legend — clicking a chip clears any active search. */}
+      <FloorPlanLegend
+        active={filter.kind === 'legend' ? filter.legend : null}
+        onToggle={(key) =>
+          setFilter(key ? { kind: 'legend', legend: key } : { kind: 'none' })
+        }
+      />
+
       <div className="overflow-hidden rounded-button">
         <div
           ref={containerRef}
@@ -369,16 +520,6 @@ function ariaLabelFor(
   if (status === 'reserved') return `Booth ${number}: reserved`
   if (status === 'blocked') return `Booth ${number}: unavailable`
   return `Booth ${number}`
-}
-
-function ensureDotLayer(svg: SVGSVGElement): SVGGElement {
-  let layer = svg.querySelector<SVGGElement>('g[data-fp-dot-layer="1"]')
-  if (layer) return layer
-  layer = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-  layer.setAttribute('data-fp-dot-layer', '1')
-  layer.setAttribute('pointer-events', 'none')
-  svg.appendChild(layer)
-  return layer
 }
 
 /**
