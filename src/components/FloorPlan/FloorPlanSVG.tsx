@@ -206,39 +206,117 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
       rect.setAttribute('role', clickable ? 'button' : 'img')
     })
 
-    // Multi-booth vendor dots (vendor id → dot on second+ booth). We
-    // need the same matrix projection the dev labels use — otherwise a
-    // booth inside a nested <g transform="…"> gets its dot plotted in
-    // the wrong coord space and ends up floating above the wall.
+    // (No more multi-booth vendor dots. They used to mark booths owned
+    // by the same vendor, but the colour hashing over sequential
+    // vendor ids clumped everything into a near-identical green and it
+    // just added noise. Adjacent-booth merging replaces the signal.)
     svg.querySelectorAll('[data-fp-dot]').forEach((d) => d.remove())
     const outerG = findOuterScaledGroup(svg)
     const outerCTM = outerG?.getCTM()
 
+    // Clear any previous merged-cluster artefacts before rebuilding.
+    svg.querySelectorAll('[data-fp-merged]').forEach((el) => el.remove())
+    svg.querySelectorAll<SVGRectElement>('rect[data-booth]').forEach((r) => {
+      r.style.visibility = ''
+      r.removeAttribute('data-hidden-by-merge')
+    })
+    // Restore any dev-only labels that were hidden by a previous merge
+    // pass — they may or may not get re-hidden depending on the new
+    // cluster set.
+    svg
+      .querySelectorAll<SVGTextElement>('text[data-fp-label]')
+      .forEach((lbl) => {
+        lbl.style.visibility = ''
+      })
+
+    // Adjacency-based merge: booths with the same vendor, rented, and
+    // spatially adjacent (within 2 outer-g units on either axis) get
+    // rendered as ONE big rect with the vendor name in the middle and
+    // the booth-number range tucked into the top-left. The individual
+    // booth rects go visibility:hidden so they stop intercepting
+    // pointer events — hits route to the merged rect instead.
     if (outerG && outerCTM) {
+      const candidates: Array<{
+        number: string
+        booth: BoothView
+        rect: SVGRectElement
+        bbox: { x: number; y: number; w: number; h: number; right: number; bottom: number }
+      }> = []
+
       booths.forEach((b) => {
-        if (!b.vendor || b.status !== 'rented') return
-        const sibCount = vendorBoothMap.get(b.vendor.id)?.length ?? 0
-        if (sibCount < 2) return
-        const rect = svg.querySelector<SVGRectElement>(`rect[data-booth="${b.number}"]`)
+        if (b.status !== 'rented' || !b.vendor) return
+        const rect = svg.querySelector<SVGRectElement>(
+          `rect[data-booth="${cssEscape(b.number)}"]`,
+        )
         if (!rect) return
         const rectCTM = rect.getCTM()
         if (!rectCTM) return
-        const bbox = rect.getBBox() // local coords
-        const pt = svg.createSVGPoint()
-        pt.x = bbox.x + bbox.width - 4
-        pt.y = bbox.y + 4
-        const projected = pt.matrixTransform(outerCTM.inverse().multiply(rectCTM))
-        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-        dot.setAttribute('cx', String(projected.x))
-        dot.setAttribute('cy', String(projected.y))
-        dot.setAttribute('r', '3.5')
-        dot.setAttribute('fill', `hsl(${vendorHue(b.vendor.id)} 60% 45%)`)
-        dot.setAttribute('stroke', 'white')
-        dot.setAttribute('stroke-width', '0.8')
-        dot.setAttribute('pointer-events', 'none')
-        dot.setAttribute('data-fp-dot', '1')
-        outerG.appendChild(dot)
+        const x = parseFloat(rect.getAttribute('x') ?? '0')
+        const y = parseFloat(rect.getAttribute('y') ?? '0')
+        const w = parseFloat(rect.getAttribute('width') ?? '0')
+        const h = parseFloat(rect.getAttribute('height') ?? '0')
+        const transform = outerCTM.inverse().multiply(rectCTM)
+        const tl = svg.createSVGPoint()
+        tl.x = x
+        tl.y = y
+        const br = svg.createSVGPoint()
+        br.x = x + w
+        br.y = y + h
+        const pTL = tl.matrixTransform(transform)
+        const pBR = br.matrixTransform(transform)
+        candidates.push({
+          number: b.number,
+          booth: b,
+          rect,
+          bbox: {
+            x: pTL.x,
+            y: pTL.y,
+            w: pBR.x - pTL.x,
+            h: pBR.y - pTL.y,
+            right: pBR.x,
+            bottom: pBR.y,
+          },
+        })
       })
+
+      // Group by vendor id, then inside each group find connected
+      // components by spatial adjacency.
+      const byVendor = new Map<string | number, typeof candidates>()
+      for (const c of candidates) {
+        const list = byVendor.get(c.booth.vendor!.id) ?? []
+        list.push(c)
+        byVendor.set(c.booth.vendor!.id, list)
+      }
+
+      const TOL = 2
+      const clusters: Array<(typeof candidates)[number][]> = []
+      for (const group of byVendor.values()) {
+        if (group.length < 2) continue
+        const n = group.length
+        const visited = Array(n).fill(false)
+        for (let i = 0; i < n; i++) {
+          if (visited[i]) continue
+          const queue = [i]
+          visited[i] = true
+          const component: typeof group = []
+          while (queue.length) {
+            const k = queue.shift()!
+            component.push(group[k])
+            for (let j = 0; j < n; j++) {
+              if (visited[j]) continue
+              if (areAdjacent(group[k].bbox, group[j].bbox, TOL)) {
+                visited[j] = true
+                queue.push(j)
+              }
+            }
+          }
+          if (component.length >= 2) clusters.push(component)
+        }
+      }
+
+      for (const cluster of clusters) {
+        renderMergedCluster({ svg, outerG, cluster })
+      }
     }
 
     // Hover highlight overlay — one rect sits at the END of the SVG so
@@ -452,44 +530,56 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
   )
 
   return (
-    <div className="relative">
-      {/* Search bar on top — typing clears any pinned legend row. */}
-      <FloorPlanSearch
-        matchCount={searchMatchCount}
-        onQueryChange={(q) =>
-          setFilter(q ? { kind: 'search', query: q } : { kind: 'none' })
-        }
-      />
-
-      {/* Legend — clicking a chip clears any active search. */}
-      <FloorPlanLegend
-        active={filter.kind === 'legend' ? filter.legend : null}
-        onToggle={(key) =>
-          setFilter(key ? { kind: 'legend', legend: key } : { kind: 'none' })
-        }
-      />
-
-      <div className="overflow-hidden rounded-button">
-        <div
-          ref={containerRef}
-          onPointerMove={handlePointerMove}
-          onPointerLeave={handlePointerLeave}
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}
-        >
-          <StaticSvg svgMarkup={svgMarkup} />
-        </div>
+    <div>
+      {/* Breathing room above the search input — the map used to slam
+          up against whatever was above it. */}
+      <div className="pt-6 md:pt-8">
+        {/* Search bar — typing clears any pinned legend row. */}
+        <FloorPlanSearch
+          matchCount={searchMatchCount}
+          onQueryChange={(q) =>
+            setFilter(q ? { kind: 'search', query: q } : { kind: 'none' })
+          }
+        />
       </div>
 
-      {hoveredDescriptor && tooltipPos && (
-        <FloorPlanTooltip
-          descriptor={hoveredDescriptor}
-          x={tooltipPos.x}
-          y={tooltipPos.y}
-          containerWidth={svgBounds.w}
-          containerHeight={svgBounds.h}
+      {/* The map itself. The wrapper is `relative` so the hover tooltip
+          can position against IT (not the whole component), keeping the
+          tooltip glued to the cursor. overflow-hidden lives on an inner
+          box so the tooltip can still escape the rounded corners. */}
+      <div className="relative">
+        <div className="overflow-hidden rounded-button">
+          <div
+            ref={containerRef}
+            onPointerMove={handlePointerMove}
+            onPointerLeave={handlePointerLeave}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+          >
+            <StaticSvg svgMarkup={svgMarkup} />
+          </div>
+        </div>
+
+        {hoveredDescriptor && tooltipPos && (
+          <FloorPlanTooltip
+            descriptor={hoveredDescriptor}
+            x={tooltipPos.x}
+            y={tooltipPos.y}
+            containerWidth={svgBounds.w}
+            containerHeight={svgBounds.h}
+          />
+        )}
+      </div>
+
+      {/* Legend below the map — clicking a chip clears any active search. */}
+      <div className="pt-4">
+        <FloorPlanLegend
+          active={filter.kind === 'legend' ? filter.legend : null}
+          onToggle={(key) =>
+            setFilter(key ? { kind: 'legend', legend: key } : { kind: 'none' })
+          }
         />
-      )}
+      </div>
     </div>
   )
 }
@@ -599,9 +689,195 @@ function findOuterScaledGroup(svg: SVGSVGElement): SVGGElement | null {
   return svg.querySelector<SVGGElement>(':scope > g')
 }
 
-function vendorHue(vendorId: string | number): number {
-  const str = String(vendorId)
-  let h = 0
-  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0
-  return Math.abs(h) % 360
+/** querySelector values inside selectors need CSS-escaping for safe use. */
+function cssEscape(s: string): string {
+  if (typeof CSS !== 'undefined' && CSS.escape) return CSS.escape(s)
+  return s.replace(/[^\w-]/g, '\\$&')
 }
+
+type MergedBBox = {
+  x: number
+  y: number
+  w: number
+  h: number
+  right: number
+  bottom: number
+}
+
+/**
+ * Two rectangles are adjacent if one of their edges touches the other's
+ * (within `tol` outer-g units) AND the perpendicular ranges overlap —
+ * i.e. they share an actual side, not just a corner.
+ */
+function areAdjacent(a: MergedBBox, b: MergedBBox, tol: number): boolean {
+  const yOverlap = Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > tol
+  const xOverlap = Math.min(a.right, b.right) - Math.max(a.x, b.x) > tol
+  const xClose =
+    Math.abs(a.right - b.x) < tol || Math.abs(b.right - a.x) < tol
+  const yClose =
+    Math.abs(a.bottom - b.y) < tol || Math.abs(b.bottom - a.y) < tol
+  return (xClose && yOverlap) || (yClose && xOverlap)
+}
+
+/** Compact an unsorted booth-number list into hyphenated runs. */
+function formatBoothRange(numbers: string[]): string {
+  const withParsed = numbers.map((n) => ({ n, num: parseInt(n, 10) }))
+  withParsed.sort((a, b) => a.num - b.num)
+  const sorted = withParsed.map((x) => x.n)
+  const runs: string[] = []
+  let runStart = sorted[0]
+  let prev = sorted[0]
+  for (let i = 1; i < sorted.length; i++) {
+    const cur = sorted[i]
+    const prevNum = parseInt(prev, 10)
+    const curNum = parseInt(cur, 10)
+    if (curNum !== prevNum + 1 || cur.length !== prev.length) {
+      runs.push(runStart === prev ? runStart : `${runStart}\u2013${prev}`)
+      runStart = cur
+    }
+    prev = cur
+  }
+  runs.push(runStart === prev ? runStart : `${runStart}\u2013${prev}`)
+  return runs.join(', ')
+}
+
+/**
+ * Shrink a text element's font-size until its bounding box fits
+ * `maxWidth` OR hits `minSize`. If still overflowing at minSize,
+ * truncate with a trailing ellipsis.
+ */
+function fitTextWidth(
+  text: SVGTextElement,
+  maxWidth: number,
+  maxSize: number,
+  minSize: number,
+) {
+  let size = maxSize
+  text.setAttribute('font-size', String(size))
+  while (size > minSize && text.getBBox().width > maxWidth) {
+    size -= 1
+    text.setAttribute('font-size', String(size))
+  }
+  if (text.getBBox().width > maxWidth) {
+    const original = text.textContent ?? ''
+    let trimmed = original
+    while (trimmed.length > 3 && text.getBBox().width > maxWidth) {
+      trimmed = trimmed.slice(0, -1)
+      text.textContent = trimmed.replace(/\s+$/, '') + '\u2026'
+    }
+  }
+}
+
+/**
+ * For a cluster of rented booths owned by one vendor, build a single
+ * merged rectangle spanning their bounding box, hide the individual
+ * booth rects, and label the merged rect with the vendor name +
+ * booth-number range (Option E layout per the merge design brief).
+ */
+function renderMergedCluster({
+  svg,
+  outerG,
+  cluster,
+}: {
+  svg: SVGSVGElement
+  outerG: SVGGElement
+  cluster: Array<{
+    number: string
+    booth: BoothView
+    rect: SVGRectElement
+    bbox: MergedBBox
+  }>
+}) {
+  const minX = Math.min(...cluster.map((c) => c.bbox.x))
+  const minY = Math.min(...cluster.map((c) => c.bbox.y))
+  const maxX = Math.max(...cluster.map((c) => c.bbox.right))
+  const maxY = Math.max(...cluster.map((c) => c.bbox.bottom))
+  const w = maxX - minX
+  const h = maxY - minY
+
+  // Hide the individual booths so pointer events reach the merged rect
+  // (visibility:hidden blocks pointers; display:none would remove the
+  // tooltip target we need for backup hovers).
+  cluster.forEach((c) => {
+    c.rect.style.visibility = 'hidden'
+    c.rect.setAttribute('data-hidden-by-merge', '1')
+  })
+
+  // Hide any dev-only booth labels inside this cluster — the vendor
+  // name + range replaces them.
+  cluster.forEach((c) => {
+    const labels = svg.querySelectorAll<SVGTextElement>(
+      `text[data-fp-label]`,
+    )
+    labels.forEach((lbl) => {
+      if (lbl.textContent === c.number) lbl.style.visibility = 'hidden'
+    })
+  })
+
+  const primary = cluster[0]
+  const booth = primary.booth
+
+  // Merged rect (rented fill via data-status; data-booth so existing
+  // hit-test + hover-overlay + filter systems treat it like any booth).
+  const merged = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'rect',
+  ) as SVGRectElement
+  merged.setAttribute('data-fp-merged', '1')
+  merged.setAttribute('data-booth', primary.number)
+  merged.setAttribute('data-status', 'rented')
+  merged.setAttribute('x', String(minX))
+  merged.setAttribute('y', String(minY))
+  merged.setAttribute('width', String(w))
+  merged.setAttribute('height', String(h))
+  merged.setAttribute(
+    'aria-label',
+    `${booth.vendor?.name ?? 'Vendor'} — booths ${formatBoothRange(
+      cluster.map((c) => c.number),
+    )}`,
+  )
+  merged.setAttribute('role', 'button')
+  merged.setAttribute('tabindex', '0')
+  outerG.appendChild(merged)
+
+  // Booth-number range — tiny text in the top-left corner.
+  const range = formatBoothRange(cluster.map((c) => c.number))
+  const rangeText = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text',
+  ) as SVGTextElement
+  rangeText.setAttribute('data-fp-merged', '1')
+  rangeText.setAttribute('data-merged-label', 'range')
+  rangeText.setAttribute('x', String(minX + 2))
+  rangeText.setAttribute('y', String(minY + 2))
+  rangeText.setAttribute('dominant-baseline', 'hanging')
+  rangeText.setAttribute('font-family', 'DM Sans, sans-serif')
+  rangeText.setAttribute('font-weight', '600')
+  rangeText.setAttribute('font-size', '6')
+  rangeText.setAttribute('fill', '#2C2C2C')
+  rangeText.setAttribute('pointer-events', 'none')
+  rangeText.textContent = range
+  outerG.appendChild(rangeText)
+  // Clamp range text width to the merged rect.
+  fitTextWidth(rangeText, w - 4, 6, 3.5)
+
+  // Vendor name — big and centred.
+  const nameText = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text',
+  ) as SVGTextElement
+  nameText.setAttribute('data-fp-merged', '1')
+  nameText.setAttribute('data-merged-label', 'name')
+  nameText.setAttribute('x', String(minX + w / 2))
+  nameText.setAttribute('y', String(minY + h / 2))
+  nameText.setAttribute('text-anchor', 'middle')
+  nameText.setAttribute('dominant-baseline', 'central')
+  nameText.setAttribute('font-family', 'DM Sans, sans-serif')
+  nameText.setAttribute('font-weight', '700')
+  nameText.setAttribute('fill', '#2C2C2C')
+  nameText.setAttribute('pointer-events', 'none')
+  nameText.textContent = (booth.vendor?.name ?? '').trim()
+  outerG.appendChild(nameText)
+  fitTextWidth(nameText, w - 6, Math.min(14, h * 0.45), 5)
+}
+

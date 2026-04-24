@@ -47,6 +47,20 @@
       outline: none;
     }
 
+    /* Merged adjacent-booth rect — a single big rectangle drawn over
+       a cluster of same-vendor booths. Slightly thicker stroke so it
+       reads as one unit, not four stacked rects. */
+    rect[data-fp-merged] {
+      fill: #F7D117;
+      stroke: #2C2C2C;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+      cursor: pointer;
+    }
+    text[data-fp-merged] {
+      user-select: none;
+    }
+
     /* Search + legend filter states. React stamps data-filter="match"
        on hits and data-filter="dim" on everything else. Matches grow
        a mango stroke and gently pulse; dimmed elements fade to 25% so
@@ -1049,7 +1063,7 @@
             <rect class="fp-food-court-booth" id="_1705" serif:id="1705" data-booth="1705" x="402.88" y="421.239" width="73.099" height="35.361"/>
             <rect class="fp-food-court-booth" id="_1704" serif:id="1704" data-booth="1704" x="367.622" y="421.239" width="35.258" height="35.361"/>
         
-        <text class="fp-food-court-label" x="584.813" y="414" font-size="14">FOOD COURT</text></g>
+        <text class="fp-food-court-label" x="584.066" y="477" font-size="12">FOOD COURT</text></g>
         <g id="_2100" serif:id="2100">
             <rect id="_2101" serif:id="2101" data-booth="2101" x="549.577" y="159.392" width="33.763" height="37.674"/>
             <rect id="_2102" serif:id="2102" data-booth="2102" x="549.577" y="197.066" width="33.763" height="37.014"/>

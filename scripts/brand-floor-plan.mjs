@@ -89,9 +89,10 @@ svg = svg.replace(/(\s*)<\/g>\s*<\/svg>/, `${ATM_MARKUP}$1</g>\n</svg>`)
 
 // 4. Tag food-court child rects — still rentable (food-court booths), so
 //    they ALSO need a data-booth later. Also drop a FOOD COURT text
-//    label in the middle of the zone so the area is obvious at a glance.
-//    The Food-Court1 container rect is 755.658 × 124.767 starting at
-//    (206.984, 372.408), so the centre sits at (584.813, 434.791).
+//    label *between* booth 1706's bottom edge (y=456.6) and the
+//    Food-Court1 dashed perimeter (bottom at y=497.175), horizontally
+//    centred on 1706 (x-centre = 584.066). That's the airspace under
+//    the last food-court row and above the zone's dotted line.
 svg = svg.replace(
   /<g id="Food-Court"[^>]*>([\s\S]*?)<\/g>/,
   (_m, inner) => {
@@ -100,7 +101,7 @@ svg = svg.replace(
       '<rect class="fp-food-court-booth" id="$1"',
     )
     const label = `
-        <text class="fp-food-court-label" x="584.813" y="414" font-size="14">FOOD COURT</text>`
+        <text class="fp-food-court-label" x="584.066" y="477" font-size="12">FOOD COURT</text>`
     return `<g id="Food-Court">${tagged}${label}</g>`
   },
 )
@@ -199,6 +200,20 @@ const styleBlock = `  <style>
     rect[data-booth]:focus-visible,
     [data-amenity]:focus-visible {
       outline: none;
+    }
+
+    /* Merged adjacent-booth rect — a single big rectangle drawn over
+       a cluster of same-vendor booths. Slightly thicker stroke so it
+       reads as one unit, not four stacked rects. */
+    rect[data-fp-merged] {
+      fill: #F7D117;
+      stroke: #2C2C2C;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+      cursor: pointer;
+    }
+    text[data-fp-merged] {
+      user-select: none;
     }
 
     /* Search + legend filter states. React stamps data-filter="match"
