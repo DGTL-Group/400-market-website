@@ -151,32 +151,51 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     ensureHoverOverlay(svg)
 
     // Dev-only: stamp each booth's number over its rect so the layout is
-    // easy to eyeball against the CRM. Added as a sibling <text> so it
-    // inherits the rect's parent transform (some booths live inside
-    // nested <g transform="matrix(…)"> wrappers).
+    // easy to eyeball against the CRM. We append each label to the
+    // outermost scaled `<g>` rather than as a sibling of its rect,
+    // because some booths live inside nested `<g transform="matrix(1, 0,
+    // 0, 0.75, …)">` wrappers that scale the y axis non-uniformly. A
+    // sibling would inherit that squish and the digits render smooshed;
+    // placing them at the outer g keeps every label at the same visual
+    // size.
     if (process.env.NODE_ENV === 'development') {
       svg.querySelectorAll('[data-fp-label]').forEach((el) => el.remove())
-      rects.forEach((rect) => {
-        const number = rect.getAttribute('data-booth') ?? ''
-        if (!number) return
-        const x = parseFloat(rect.getAttribute('x') ?? '0')
-        const y = parseFloat(rect.getAttribute('y') ?? '0')
-        const w = parseFloat(rect.getAttribute('width') ?? '0')
-        const h = parseFloat(rect.getAttribute('height') ?? '0')
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-        text.setAttribute('x', String(x + w / 2))
-        text.setAttribute('y', String(y + h / 2))
-        text.setAttribute('text-anchor', 'middle')
-        text.setAttribute('dominant-baseline', 'central')
-        text.setAttribute('font-size', '9')
-        text.setAttribute('font-family', 'DM Sans, sans-serif')
-        text.setAttribute('font-weight', '700')
-        text.setAttribute('fill', '#2C2C2C')
-        text.setAttribute('pointer-events', 'none')
-        text.setAttribute('data-fp-label', '1')
-        text.textContent = number
-        rect.parentNode?.insertBefore(text, rect.nextSibling)
-      })
+      const outerG = findOuterScaledGroup(svg)
+      if (outerG) {
+        const outerCTM = outerG.getCTM()
+        rects.forEach((rect) => {
+          const number = rect.getAttribute('data-booth') ?? ''
+          if (!number) return
+          const x = parseFloat(rect.getAttribute('x') ?? '0')
+          const y = parseFloat(rect.getAttribute('y') ?? '0')
+          const w = parseFloat(rect.getAttribute('width') ?? '0')
+          const h = parseFloat(rect.getAttribute('height') ?? '0')
+          // Project the rect's centre out of its local coord space
+          // (including any nested transforms) into the outer g's coord
+          // space, so the label sits at the right visual spot without
+          // inheriting any of the non-uniform scales.
+          const rectCTM = rect.getCTM()
+          if (!rectCTM || !outerCTM) return
+          const pt = svg.createSVGPoint()
+          pt.x = x + w / 2
+          pt.y = y + h / 2
+          const projected = pt.matrixTransform(outerCTM.inverse().multiply(rectCTM))
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+          text.setAttribute('x', String(projected.x))
+          text.setAttribute('y', String(projected.y))
+          text.setAttribute('text-anchor', 'middle')
+          text.setAttribute('dominant-baseline', 'central')
+          text.setAttribute('font-size', '9')
+          text.setAttribute('font-family', 'DM Sans, sans-serif')
+          text.setAttribute('font-weight', '700')
+          text.setAttribute('fill', '#2C2C2C')
+          text.setAttribute('pointer-events', 'none')
+          text.setAttribute('data-fp-label', '1')
+          text.textContent = number
+          outerG.appendChild(text)
+        })
+      }
     }
   }, [boothMap, booths, mode, vendorBoothMap])
 
@@ -425,6 +444,18 @@ function updateHoverOverlay(svg: SVGSVGElement, hit: SVGGraphicsElement) {
   overlay.setAttribute('width', String(botRight.x - topLeft.x))
   overlay.setAttribute('height', String(botRight.y - topLeft.y))
   overlay.style.display = 'block'
+}
+
+/**
+ * The source SVG wraps every booth inside a single `<g transform="matrix(
+ * 3.125, 0, 0, 3.125, 0, 0)">` scaled group. We use it as the insertion
+ * target for dev-only booth-number labels so they land above everything
+ * inside but outside any nested booth-specific transforms. (The root
+ * SVG's first element is actually `<style>` — the scaled group is the
+ * first `<g>` child.)
+ */
+function findOuterScaledGroup(svg: SVGSVGElement): SVGGElement | null {
+  return svg.querySelector<SVGGElement>(':scope > g')
 }
 
 function vendorHue(vendorId: string | number): number {

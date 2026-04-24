@@ -336,8 +336,8 @@
             <g id="_404" serif:id="404" transform="matrix(1,0,0,0.750714,0,157.893)">
                 <rect x="222.319" y="159.392" width="34.95" height="41.23" data-booth="404"/>
             </g>
-            <g id="_3051" serif:id="305" transform="matrix(1,0,0,0.750714,0,157.893)">
-                <rect x="257.269" y="159.392" width="36.126" height="41.23" data-booth="305"/>
+            <g id="_405" serif:id="405" transform="matrix(1,0,0,0.750714,0,157.893)">
+                <rect x="257.269" y="159.392" width="36.126" height="41.23" data-booth="405"/>
             </g>
         </g>
         <g id="_500" serif:id="500" transform="matrix(1,0,0,1,219.172,602.394)">
@@ -560,7 +560,7 @@
                 <rect x="257.269" y="159.392" width="36.126" height="41.23" data-booth="3005"/>
             </g>
         </g>
-        <rect class="fp-concession" data-amenity="concession" id="Concession-Area" serif:id="Concession Area" x="1082.12" y="529.634" width="68.977" height="150.866"/>
+        <rect class="fp-food-storage" data-booth="3000" id="Concession-Area" serif:id="Concession Area" x="1082.12" y="529.634" width="68.977" height="150.866"/>
         <rect class="fp-food-storage" id="Food" x="976.624" y="609.329" width="75.711" height="103.465"/>
         <g id="_2900" serif:id="2900">
             <rect id="_2904" serif:id="2904" data-booth="2904" x="1010.17" y="806.441" width="36.441" height="51.187"/>
@@ -818,8 +818,8 @@
         </g>
         <g id="_3400" serif:id="3400">
             <rect id="_3401" serif:id="3401" data-booth="3401" x="1291.08" y="385.595" width="34.002" height="35.645"/>
-            <rect id="_3403" serif:id="3403" data-booth="3403" x="1325.08" y="385.595" width="35.989" height="35.645"/>
-            <rect id="_34031" serif:id="3403" data-booth="3403" x="1325.08" y="421.239" width="35.989" height="35.361"/>
+            <rect id="_3404" serif:id="3404" data-booth="3404" x="1325.08" y="385.595" width="35.989" height="35.645"/>
+            <rect id="_3403" serif:id="3403" data-booth="3403" x="1325.08" y="421.239" width="35.989" height="35.361"/>
             <rect id="_3402" serif:id="3402" data-booth="3402" x="1291.08" y="421.239" width="34.002" height="35.361"/>
         </g>
         <g id="North-Wall" serif:id="North Wall">
@@ -976,8 +976,8 @@
             <rect class="fp-restroom" data-amenity="womens-restroom" id="Women-Restroom1" serif:id="Women Restroom" x="107.143" y="756.195" width="41.589" height="96.791"/>
             <rect class="fp-restroom" data-amenity="mens-restroom" id="Men-s-Restroom1" serif:id="Men&apos;s Restroom" x="107.143" y="633.644" width="41.589" height="98.469"/>
         </g>
-        <rect class="fp-food-storage" id="Food1" serif:id="Food" x="107.143" y="539.591" width="41.589" height="94.053"/>
-        <rect class="fp-food-storage" id="Food2" serif:id="Food" x="107.143" y="372.408" width="41.589" height="84.192"/>
+        <rect class="fp-food-storage" data-booth="1000" id="Food1" serif:id="Food" x="107.143" y="539.591" width="41.589" height="94.053"/>
+        <rect class="fp-food-storage" data-booth="1700" id="Food2" serif:id="Food" x="107.143" y="372.408" width="41.589" height="84.192"/>
         <g id="Food-Court">
             <rect class="fp-food-court-booth" id="_1719" serif:id="1719" data-booth="1719" x="549.577" y="385.595" width="33.763" height="35.645"/>
             <rect class="fp-food-court-booth" id="_1720" serif:id="1720" data-booth="1720" x="583.34" y="385.595" width="35.214" height="35.645"/>
@@ -1095,8 +1095,8 @@
             </g>
         </g>
         <rect class="fp-atm" data-amenity="atm" id="ATM-Concession" x="1137" y="514" width="14" height="14"/>
-        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-1" x="148.732" y="675.879" width="14" height="14"/>
-        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-2" x="162.732" y="675.879" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-1" x="148.732" y="668.379" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-2" x="148.732" y="683.379" width="14" height="14"/>
     
     </g>
 </svg>

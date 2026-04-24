@@ -39,23 +39,32 @@ svg = svg.replace(
 //    stay coloured by class and never receive a data-booth attribute.
 //    Some get a `data-amenity` so the React layer can show a tooltip on
 //    hover (e.g. "Men's Restroom", "Information Desk").
-const tag = (idPattern, cls, amenity = null) => {
+const tag = (idPattern, cls, extras = {}) => {
   const re = new RegExp(`<(rect|path) id="${idPattern}"`, 'g')
   svg = svg.replace(re, (_m, el) => {
-    const amenityAttr = amenity ? ` data-amenity="${amenity}"` : ''
-    return `<${el} class="${cls}"${amenityAttr} id="${idPattern}"`
+    const pieces = [`class="${cls}"`]
+    if (extras.amenity) pieces.push(`data-amenity="${extras.amenity}"`)
+    if (extras.booth) pieces.push(`data-booth="${extras.booth}"`)
+    return `<${el} ${pieces.join(' ')} id="${idPattern}"`
   })
 }
-tag('Concession-Area', 'fp-concession', 'concession')
+
+// Special-named rects that are also ACTUAL booths with a vendor on
+// them. These keep the orange-food styling (so they're visually
+// distinct from normal booths) but also carry data-booth="NNNN" so the
+// CRM can route a vendor to them like any other booth.
+tag('Food1', 'fp-food-storage', { booth: '1000' })        // Salty's Diner
+tag('Food2', 'fp-food-storage', { booth: '1700' })        // Mundo Café
+tag('Concession-Area', 'fp-food-storage', { booth: '3000' }) // Sunrise Kitchen
+
+// Pure amenities — not bookable spaces, shown as tooltips only.
 tag('Food', 'fp-food-storage')
-tag('Food1', 'fp-food-storage')
-tag('Food2', 'fp-food-storage')
 tag('Food-Court1', 'fp-food-court-zone')
-tag('INFO', 'fp-info', 'info-desk')
-tag('Men-s-Restroom', 'fp-restroom', 'mens-restroom')
-tag('Men-s-Restroom1', 'fp-restroom', 'mens-restroom')
-tag('Women-Restroom', 'fp-restroom', 'womens-restroom')
-tag('Women-Restroom1', 'fp-restroom', 'womens-restroom')
+tag('INFO', 'fp-info', { amenity: 'info-desk' })
+tag('Men-s-Restroom', 'fp-restroom', { amenity: 'mens-restroom' })
+tag('Men-s-Restroom1', 'fp-restroom', { amenity: 'mens-restroom' })
+tag('Women-Restroom', 'fp-restroom', { amenity: 'womens-restroom' })
+tag('Women-Restroom1', 'fp-restroom', { amenity: 'womens-restroom' })
 tag('Blocked', 'fp-blocked')
 
 // 3b. Inject ATM markers — three small money-green squares the source
@@ -66,10 +75,14 @@ tag('Blocked', 'fp-blocked')
 //        men's restroom (Men-s-Restroom1 ends at x=148.732), vertically
 //        centred on the restroom (y centre = 682.879)
 //    Each gets data-amenity="atm" so the tooltip describes it.
+// Both restroom ATMs hug the east wall (x = 148.732 = Men-s-Restroom1's
+// right edge) and stack vertically, centred on the restroom's midline
+// (y centre = 682.879). Two 14-unit squares + 1-unit gap → 29 units
+// total, top at 682.879 - 14.5 = 668.379.
 const ATM_MARKUP = `
         <rect class="fp-atm" data-amenity="atm" id="ATM-Concession" x="1137" y="514" width="14" height="14"/>
-        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-1" x="148.732" y="675.879" width="14" height="14"/>
-        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-2" x="162.732" y="675.879" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-1" x="148.732" y="668.379" width="14" height="14"/>
+        <rect class="fp-atm" data-amenity="atm" id="ATM-Restroom-L-2" x="148.732" y="683.379" width="14" height="14"/>
     `
 // Insert right before the closing </g> of the outer scaled group.
 svg = svg.replace(/(\s*)<\/g>\s*<\/svg>/, `${ATM_MARKUP}$1</g>\n</svg>`)
@@ -102,6 +115,12 @@ const trackedNumbers = new Set()
 const collectNumber = (num) => {
   trackedNumbers.add(num)
 }
+// The three food/concession rects don't have numeric serif:ids — they
+// were tagged with booth numbers in step 3 via extras.booth. Track them
+// manually so they land in booth-numbers.generated.ts.
+collectNumber('1000') // Food1 — Salty's Diner
+collectNumber('1700') // Food2 — Mundo Café
+collectNumber('3000') // Concession-Area — Sunrise Kitchen
 
 // 6a. <rect ... serif:id="NNNN" ... /> — id sits directly on the rect.
 svg = svg.replace(

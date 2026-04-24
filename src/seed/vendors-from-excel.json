@@ -1,0 +1,1414 @@
+{
+  "generatedAt": "run-via-scripts/extract-vendors.py",
+  "sourceFile": "Vendors 2026-03-27 (2).xlsx",
+  "vendorCount": 136,
+  "vendors": [
+    {
+      "name": "Salty's Diner",
+      "email": "sds120188@gmail.com",
+      "active": true,
+      "booths": [
+        "1000"
+      ],
+      "originalBoothsCell": "1000"
+    },
+    {
+      "name": "Mundo Café (David Toledo)",
+      "email": "",
+      "active": true,
+      "booths": [
+        "1700"
+      ],
+      "originalBoothsCell": "1700"
+    },
+    {
+      "name": "Sunrise Kitchen",
+      "email": "Sopheapnysovann@yahoo.com",
+      "active": true,
+      "booths": [
+        "3000"
+      ],
+      "originalBoothsCell": "3000"
+    },
+    {
+      "name": "Concord Rugs",
+      "email": "",
+      "active": true,
+      "booths": [
+        "202",
+        "203",
+        "204",
+        "205",
+        "206"
+      ],
+      "originalBoothsCell": "202, 203, 204, 205, 207"
+    },
+    {
+      "name": "Farmasi (Sarah Viterbo)",
+      "email": "sviterbo58@gmail.com",
+      "active": true,
+      "booths": [
+        "207"
+      ],
+      "originalBoothsCell": "207"
+    },
+    {
+      "name": "Fragrances Store (2402521 Ont)",
+      "email": "perfumeplus@mail.com",
+      "active": true,
+      "booths": [
+        "210"
+      ],
+      "originalBoothsCell": "209B, 210"
+    },
+    {
+      "name": "Creative Expressions(Romayne)",
+      "email": "",
+      "active": true,
+      "booths": [
+        "208"
+      ],
+      "originalBoothsCell": "208, 209A"
+    },
+    {
+      "name": "Chaze Trading(2771332 Ont)",
+      "email": "Anwar_Chaze@outlook.com",
+      "active": true,
+      "booths": [
+        "211",
+        "212",
+        "213"
+      ],
+      "originalBoothsCell": "211, 212, 213"
+    },
+    {
+      "name": "Sonia Hair",
+      "email": "sopheaman05@gmail.com",
+      "active": true,
+      "booths": [
+        "215"
+      ],
+      "originalBoothsCell": "215"
+    },
+    {
+      "name": "Aromatic Fumes",
+      "email": "sales@juvenileway.com",
+      "active": true,
+      "booths": [
+        "214",
+        "216",
+        "217",
+        "218",
+        "219",
+        "220"
+      ],
+      "originalBoothsCell": "214, 216, 217, 218, 219, 220"
+    },
+    {
+      "name": "Fungicopia (Cody)",
+      "email": "fungiarethefurture@yahoo.com",
+      "active": true,
+      "booths": [
+        "223",
+        "224"
+      ],
+      "originalBoothsCell": "223, 224(Booth & half No Disc.)"
+    },
+    {
+      "name": "Daniel Becky D's Party Rental & Home décor",
+      "email": "dall@live.ca",
+      "active": true,
+      "booths": [
+        "225"
+      ],
+      "originalBoothsCell": "225"
+    },
+    {
+      "name": "Royal Fashions (Prince)",
+      "email": "PUIRPAL@hotmail.com",
+      "active": true,
+      "booths": [
+        "227",
+        "228",
+        "229"
+      ],
+      "originalBoothsCell": "227, 228, 229"
+    },
+    {
+      "name": "Mad River Apiary",
+      "email": "madriverbuzzapiary@gmail.com",
+      "active": true,
+      "booths": [
+        "232"
+      ],
+      "originalBoothsCell": "232"
+    },
+    {
+      "name": "B.J.'S Die Cast, Hotwheels (Brain Flear)",
+      "email": "Jeffflear@hotmail.com",
+      "active": true,
+      "booths": [
+        "233",
+        "234",
+        "235"
+      ],
+      "originalBoothsCell": "233, 234, 235"
+    },
+    {
+      "name": "Muslim AMJ Can.",
+      "email": "salman.mangla@gmail.com",
+      "active": true,
+      "booths": [
+        "236"
+      ],
+      "originalBoothsCell": "236"
+    },
+    {
+      "name": "Tony's Carpets (Purans Carpets)",
+      "email": "WP",
+      "active": true,
+      "booths": [
+        "238",
+        "239",
+        "240",
+        "241",
+        "242"
+      ],
+      "originalBoothsCell": "238, 239, 240, 241, 242,"
+    },
+    {
+      "name": "Linda's Cosmetics",
+      "email": "lindasuliyakham@hotmail.com",
+      "active": true,
+      "booths": [
+        "244",
+        "244A",
+        "243"
+      ],
+      "originalBoothsCell": "244, 244A, 243"
+    },
+    {
+      "name": "Lost In Time",
+      "email": "01blaster@live.ca",
+      "active": true,
+      "booths": [
+        "244B",
+        "245"
+      ],
+      "originalBoothsCell": "244B, 245"
+    },
+    {
+      "name": "Dean Renowden",
+      "email": "renowden@rogers.com",
+      "active": true,
+      "booths": [
+        "246"
+      ],
+      "originalBoothsCell": "246"
+    },
+    {
+      "name": "Catrina Mcphee",
+      "email": "cdugue@hotmail.com",
+      "active": true,
+      "booths": [
+        "247"
+      ],
+      "originalBoothsCell": "247"
+    },
+    {
+      "name": "Daisy Health Care(Jennifer Buchare",
+      "email": "jenniferbuchare@hotmail.com",
+      "active": true,
+      "booths": [
+        "248"
+      ],
+      "originalBoothsCell": "248"
+    },
+    {
+      "name": "Nicky's 3 for 10",
+      "email": "WP",
+      "active": true,
+      "booths": [
+        "251",
+        "252",
+        "253"
+      ],
+      "originalBoothsCell": "251, 252, 253"
+    },
+    {
+      "name": "Lotto/ Kcups (Jack & Sam)",
+      "email": "civic30@hotmail.com",
+      "active": true,
+      "booths": [
+        "254",
+        "255"
+      ],
+      "originalBoothsCell": "254,255"
+    },
+    {
+      "name": "Harvest Treasures (Thomasz Kolodzej)",
+      "email": "info@harvesttreasures.com",
+      "active": true,
+      "booths": [
+        "256",
+        "257"
+      ],
+      "originalBoothsCell": "256, 257"
+    },
+    {
+      "name": "Naked K9 Nutrition",
+      "email": "info@nakedk9nutrition.com",
+      "active": true,
+      "booths": [
+        "260"
+      ],
+      "originalBoothsCell": "260"
+    },
+    {
+      "name": "Herbal Remedies (Val)10850519",
+      "email": "customer requested to be removed from list.",
+      "active": true,
+      "booths": [
+        "303",
+        "304"
+      ],
+      "originalBoothsCell": "303, 304"
+    },
+    {
+      "name": "Thai Massage",
+      "email": "chadaphakenwong@gmail.com",
+      "active": true,
+      "booths": [
+        "307",
+        "308"
+      ],
+      "originalBoothsCell": "307, 308"
+    },
+    {
+      "name": "Maximum Darts(Richard Smith)",
+      "email": "rick_smith@maximumdarts.com",
+      "active": true,
+      "booths": [
+        "402",
+        "403",
+        "405",
+        "406",
+        "407",
+        "408"
+      ],
+      "originalBoothsCell": "402, 403, 405, 406, 407, 408"
+    },
+    {
+      "name": "Paul's Collectables",
+      "email": "",
+      "active": true,
+      "booths": [
+        "404"
+      ],
+      "originalBoothsCell": "404"
+    },
+    {
+      "name": "Bukhari (cell accessories village)",
+      "email": "SYEDAHZAF@hotmail.com",
+      "active": true,
+      "booths": [
+        "503",
+        "504",
+        "505",
+        "506",
+        "2303",
+        "2304",
+        "2305",
+        "2306"
+      ],
+      "originalBoothsCell": "503,504,505,506, 2303, 2304, 2305, 2306"
+    },
+    {
+      "name": "Kavita's Jewellery",
+      "email": "raju72@rogers.com",
+      "active": true,
+      "booths": [
+        "501",
+        "502",
+        "507",
+        "508"
+      ],
+      "originalBoothsCell": "501, 502, 507, 508"
+    },
+    {
+      "name": "Veronica's(Cute Cute store)",
+      "email": "choytan@hotmail.com",
+      "active": true,
+      "booths": [
+        "601",
+        "602"
+      ],
+      "originalBoothsCell": "601, 602"
+    },
+    {
+      "name": "Bob's Collectables",
+      "email": "WP",
+      "active": true,
+      "booths": [
+        "603",
+        "604"
+      ],
+      "originalBoothsCell": "603, 604"
+    },
+    {
+      "name": "Matt's Surplus (9960252 Can)",
+      "email": "mattpoppe117@hotmail.com",
+      "active": true,
+      "booths": [
+        "605",
+        "606"
+      ],
+      "originalBoothsCell": "605, 606"
+    },
+    {
+      "name": "Milkcrate Vinyl",
+      "email": "milkcratealleyrecords@gmail.com",
+      "active": true,
+      "booths": [
+        "607",
+        "608"
+      ],
+      "originalBoothsCell": "607, 608"
+    },
+    {
+      "name": "Section 8, Nascar John",
+      "email": "section8apparel@rogers.com",
+      "active": true,
+      "booths": [
+        "701",
+        "702",
+        "703",
+        "704"
+      ],
+      "originalBoothsCell": "701, 702, 703, 704"
+    },
+    {
+      "name": "Stylin Sunglasses(Abrar Hussain)",
+      "email": "abrark_76@hotmail.com",
+      "active": true,
+      "booths": [
+        "708"
+      ],
+      "originalBoothsCell": "708"
+    },
+    {
+      "name": "Winston",
+      "email": "ng.winston@yahoo.ca",
+      "active": true,
+      "booths": [
+        "901",
+        "902",
+        "903",
+        "904",
+        "905",
+        "906",
+        "907",
+        "908"
+      ],
+      "originalBoothsCell": "901, 902, 903, 904, 905, 906, 907, 908"
+    },
+    {
+      "name": "Winston(1000095861 Ont Inc)",
+      "email": "ng.winston@yahoo.ca",
+      "active": true,
+      "booths": [
+        "221",
+        "222"
+      ],
+      "originalBoothsCell": "221, 222"
+    },
+    {
+      "name": "Blanket World",
+      "email": "celltech100@hotmail.com",
+      "active": true,
+      "booths": [
+        "1001",
+        "1002",
+        "1007",
+        "1008"
+      ],
+      "originalBoothsCell": "1001, 1002, 1007 ,1008"
+    },
+    {
+      "name": "Magic Accounting & Tax",
+      "email": "info@magic-accounting.ca",
+      "active": true,
+      "booths": [
+        "1005",
+        "1006"
+      ],
+      "originalBoothsCell": "1005, 1006"
+    },
+    {
+      "name": "Value Bins /Bargain Binz(MuhammadJaved) Lei Ann/Kritan Koirala",
+      "email": "ujayed@gmail.com",
+      "active": true,
+      "booths": [
+        "1101",
+        "1102",
+        "1103",
+        "1104"
+      ],
+      "originalBoothsCell": "1101, 1102, 1103, 1104"
+    },
+    {
+      "name": "Ferhan Qureshi- Watillery",
+      "email": "ferhan_qureshi@hotmail.com",
+      "active": true,
+      "booths": [
+        "1105",
+        "1106"
+      ],
+      "originalBoothsCell": "1105,1106"
+    },
+    {
+      "name": "Norm's Lazer",
+      "email": "",
+      "active": true,
+      "booths": [
+        "1107",
+        "1108"
+      ],
+      "originalBoothsCell": "1107, 1108"
+    },
+    {
+      "name": "Tatiana Gordon",
+      "email": "tatianapgordon@gmail.com",
+      "active": true,
+      "booths": [
+        "1201"
+      ],
+      "originalBoothsCell": "1201"
+    },
+    {
+      "name": "Kanda & Co.",
+      "email": "Kandaco.inc@gmail.com",
+      "active": true,
+      "booths": [
+        "1207",
+        "1208"
+      ],
+      "originalBoothsCell": "1207,1208"
+    },
+    {
+      "name": "Y2K Computer's (Adam Clark)",
+      "email": "Y2KComputers911@gmail.com",
+      "active": true,
+      "booths": [
+        "1203",
+        "1204",
+        "1205",
+        "1206"
+      ],
+      "originalBoothsCell": "1203, 1204, 1205, 1206"
+    },
+    {
+      "name": "Hollywood Closets(RTD Designs)",
+      "email": "robyndear11@gmail.com",
+      "active": true,
+      "booths": [
+        "1301",
+        "1302"
+      ],
+      "originalBoothsCell": "1301,1302"
+    },
+    {
+      "name": "Think Young Design(Robert Young)",
+      "email": "thinkyoungdesign@outlook.com",
+      "active": true,
+      "booths": [
+        "1303",
+        "1304"
+      ],
+      "originalBoothsCell": "1303, 1304"
+    },
+    {
+      "name": "Claren Zee",
+      "email": "tracychong81@gmail.com",
+      "active": true,
+      "booths": [
+        "1305",
+        "1306"
+      ],
+      "originalBoothsCell": "1305, 1306"
+    },
+    {
+      "name": "Stan's Paintings",
+      "email": "satsr13@gmail.com",
+      "active": true,
+      "booths": [
+        "1307",
+        "1308"
+      ],
+      "originalBoothsCell": "1307, 1308"
+    },
+    {
+      "name": "Bobby/Tanya",
+      "email": "tls723@gmail.com",
+      "active": true,
+      "booths": [
+        "1401",
+        "1402",
+        "1407",
+        "1408"
+      ],
+      "originalBoothsCell": "1401, 1402, 1407, 1408"
+    },
+    {
+      "name": "Profile Digital",
+      "email": "lipladycanada@gmail.com",
+      "active": true,
+      "booths": [
+        "1403",
+        "1404",
+        "1405",
+        "1406"
+      ],
+      "originalBoothsCell": "1403, 1404, 1405, 1406"
+    },
+    {
+      "name": "Oza Sugar Cellular (11957490 Can)",
+      "email": "aakash1703@gmail.com",
+      "active": true,
+      "booths": [
+        "1501",
+        "1502",
+        "1507",
+        "1508"
+      ],
+      "originalBoothsCell": "1501, 1502, 1507, 1508,"
+    },
+    {
+      "name": "World Famous Astrologer(Hari Krishna)",
+      "email": "ramswamy1000@gmail.com",
+      "active": true,
+      "booths": [
+        "1503",
+        "1504"
+      ],
+      "originalBoothsCell": "1503, 1504"
+    },
+    {
+      "name": "Tres Chic Boutique",
+      "email": "chicboutique1of1@gmail.com",
+      "active": true,
+      "booths": [
+        "1601",
+        "1602"
+      ],
+      "originalBoothsCell": "1601, 1602"
+    },
+    {
+      "name": "James Video Games",
+      "email": "hugewrestlingfan1976@gmail.com",
+      "active": true,
+      "booths": [
+        "1603",
+        "1604"
+      ],
+      "originalBoothsCell": "1603, 1604"
+    },
+    {
+      "name": "Simcoe Nuministics (1369282 Ont or Guy G)",
+      "email": "simcoecoin@hotmail.com",
+      "active": true,
+      "booths": [
+        "1607",
+        "1608"
+      ],
+      "originalBoothsCell": "1607, 1608"
+    },
+    {
+      "name": "J.T. Deli",
+      "email": "maxmarkh@gmail.com",
+      "active": true,
+      "booths": [
+        "1701",
+        "1702"
+      ],
+      "originalBoothsCell": "1701 Big Booth, 1702"
+    },
+    {
+      "name": "Mr. Canela(Titiana Gordon)",
+      "email": "regpat@gmail.com",
+      "active": true,
+      "booths": [
+        "1703",
+        "1704"
+      ],
+      "originalBoothsCell": "1703, 1704"
+    },
+    {
+      "name": "M.V. Produce",
+      "email": "TonyPiterna@gmail.com",
+      "active": true,
+      "booths": [
+        "1705"
+      ],
+      "originalBoothsCell": "1705 Big Booth(No Disc)"
+    },
+    {
+      "name": "A & D Bioaire (Fudge & Nuts)",
+      "email": "adhess@sympatico.ca",
+      "active": true,
+      "booths": [
+        "1706"
+      ],
+      "originalBoothsCell": "1706 Big Booth(No Disc)"
+    },
+    {
+      "name": "Patrice Shennette ( Heal & Eat)",
+      "email": "heateatenjoy@gmail.com",
+      "active": true,
+      "booths": [
+        "1707"
+      ],
+      "originalBoothsCell": "1707"
+    },
+    {
+      "name": "Yeti Puffs(5015465 Ont)",
+      "email": "yetipuffs@gmail.com",
+      "active": true,
+      "booths": [
+        "1708",
+        "1709"
+      ],
+      "originalBoothsCell": "1708, 1709"
+    },
+    {
+      "name": "Maya Artisan Bakery (Mad Bites)Peruhan/Sour dough Bread",
+      "email": "pkutukoglu@gmail.com",
+      "active": true,
+      "booths": [
+        "1710",
+        "1711"
+      ],
+      "originalBoothsCell": "1710, 1711"
+    },
+    {
+      "name": "Snowie By Cherry(14649940)",
+      "email": "snowiebycherry@outlook.com",
+      "active": true,
+      "booths": [
+        "1712"
+      ],
+      "originalBoothsCell": "1712"
+    },
+    {
+      "name": "Zio's",
+      "email": "Brandygreco30@gmail.com",
+      "active": true,
+      "booths": [
+        "1713",
+        "2531"
+      ],
+      "originalBoothsCell": "1713 (Big Booth, Double), 2531"
+    },
+    {
+      "name": "Sea Lux Inc (Seven Sea's Lev Izrailov)",
+      "email": "info@sealuxproducts.com",
+      "active": true,
+      "booths": [
+        "1714",
+        "1715"
+      ],
+      "originalBoothsCell": "1714, 1715 (Big Booth, Double)"
+    },
+    {
+      "name": "Olivia's Tea's( Michael Hill)",
+      "email": "oliviasteaznherbs@gmail.com",
+      "active": true,
+      "booths": [
+        "1716"
+      ],
+      "originalBoothsCell": "1716 (Big Booth, Double)"
+    },
+    {
+      "name": "Golden Whisk(Marlene Donnelly)",
+      "email": "goldenwhisk@rogers.com",
+      "active": true,
+      "booths": [
+        "1717"
+      ],
+      "originalBoothsCell": "1717"
+    },
+    {
+      "name": "Vekelstien Meats (Eugene)",
+      "email": "evguenivekselchtein@gmail.com",
+      "active": true,
+      "booths": [
+        "1718"
+      ],
+      "originalBoothsCell": "1718 Big Booth (No Disc)"
+    },
+    {
+      "name": "Smoothies",
+      "email": "Fashionjewelry@gmail.com",
+      "active": true,
+      "booths": [
+        "1720"
+      ],
+      "originalBoothsCell": "1720"
+    },
+    {
+      "name": "RFS Trading",
+      "email": "",
+      "active": true,
+      "booths": [
+        "1721"
+      ],
+      "originalBoothsCell": "1721"
+    },
+    {
+      "name": "The Print Hut(2771332 Ont Inc)",
+      "email": "printhut@outlook.com",
+      "active": true,
+      "booths": [
+        "1722"
+      ],
+      "originalBoothsCell": "1722 Big Booth (Booth & Half)"
+    },
+    {
+      "name": "Loaded Baked Potato(Barbara Kiraly)",
+      "email": "loadedlockd@gmail.com",
+      "active": true,
+      "booths": [
+        "1723"
+      ],
+      "originalBoothsCell": "1723"
+    },
+    {
+      "name": "Scottish Products (Jackies)",
+      "email": "j.edwards1724@gmail.com",
+      "active": true,
+      "booths": [],
+      "originalBoothsCell": "1724A, 1724B, 1725A"
+    },
+    {
+      "name": "Zio's Part 2(Pomodoro)",
+      "email": "Pomodoroitaliansauce@gmail.com",
+      "active": true,
+      "booths": [],
+      "originalBoothsCell": "1725B"
+    },
+    {
+      "name": "Zio's Part 2(Pomodoro)",
+      "email": "",
+      "active": true,
+      "booths": [
+        "2530"
+      ],
+      "originalBoothsCell": "2530"
+    },
+    {
+      "name": "BookMan/Grant McKay",
+      "email": "",
+      "active": true,
+      "booths": [
+        "1803",
+        "1804"
+      ],
+      "originalBoothsCell": "1803, 1804"
+    },
+    {
+      "name": "QSC",
+      "email": "fashionjewelry@gmail.com",
+      "active": true,
+      "booths": [
+        "1805",
+        "1806",
+        "1807"
+      ],
+      "originalBoothsCell": "1805, 1806, 1807"
+    },
+    {
+      "name": "All Things Dead(Ashley Burgos)",
+      "email": "atdinquires@outlook.com",
+      "active": true,
+      "booths": [
+        "1808"
+      ],
+      "originalBoothsCell": "1808"
+    },
+    {
+      "name": "Witch Plz(Kendra Pape-Green",
+      "email": "witchplz@icloud.com",
+      "active": true,
+      "booths": [
+        "1901",
+        "1902",
+        "1907",
+        "1908"
+      ],
+      "originalBoothsCell": "1901, 1902, 1907, 1908"
+    },
+    {
+      "name": "D.Enman Collectibles",
+      "email": "davidenman24@gmail.com",
+      "active": true,
+      "booths": [
+        "2001"
+      ],
+      "originalBoothsCell": "2001"
+    },
+    {
+      "name": "3D Distribution(Rapinder)",
+      "email": "roop@rogers.com",
+      "active": true,
+      "booths": [
+        "2002",
+        "2003",
+        "2004",
+        "2005",
+        "2006"
+      ],
+      "originalBoothsCell": "2002, 2003, 2004, 2005, 2006"
+    },
+    {
+      "name": "Camp Hill",
+      "email": "finance@camphill.on.ca",
+      "active": true,
+      "booths": [
+        "2007",
+        "2008"
+      ],
+      "originalBoothsCell": "2007, 2008"
+    },
+    {
+      "name": "JD Marketing(John Dahmer)",
+      "email": "johndahmer@live.com",
+      "active": true,
+      "booths": [
+        "2101",
+        "2102"
+      ],
+      "originalBoothsCell": "2101, 2102"
+    },
+    {
+      "name": "Innisfil Creek Honey",
+      "email": "brian@innisfilcreekhoney.com",
+      "active": true,
+      "booths": [
+        "2104"
+      ],
+      "originalBoothsCell": "2104"
+    },
+    {
+      "name": "Xtreme Music",
+      "email": "xtremeaudior441@gmail.com",
+      "active": true,
+      "booths": [
+        "2105",
+        "2106",
+        "2111",
+        "2112"
+      ],
+      "originalBoothsCell": "2105, 2106, 2111, 2112"
+    },
+    {
+      "name": "Pang's, Raymond",
+      "email": "rpang20041@hotmail.com",
+      "active": true,
+      "booths": [
+        "2107",
+        "2108",
+        "2109",
+        "2110"
+      ],
+      "originalBoothsCell": "2107, 2108, 2109, 2110"
+    },
+    {
+      "name": "Garelli Leather (2344276 Ont Inc)",
+      "email": "garenkeunelian@yahoo.com",
+      "active": true,
+      "booths": [
+        "2201",
+        "2202",
+        "2207",
+        "2208"
+      ],
+      "originalBoothsCell": "2201, 2202, 2207, 2208"
+    },
+    {
+      "name": "Chris Moyer( Pharmacy)",
+      "email": "chris.moyer94@gmail.com",
+      "active": true,
+      "booths": [
+        "2203",
+        "2204",
+        "2205",
+        "2206"
+      ],
+      "originalBoothsCell": "2203,2204,2205,2206"
+    },
+    {
+      "name": "Perfume Warehouse Limited (Sanjay Michandany)",
+      "email": "",
+      "active": true,
+      "booths": [
+        "2301",
+        "2302"
+      ],
+      "originalBoothsCell": "2301,2302"
+    },
+    {
+      "name": "Yaffa Skin Care",
+      "email": "sales@yaffa-skincare.com",
+      "active": true,
+      "booths": [
+        "2307",
+        "2308"
+      ],
+      "originalBoothsCell": "2307, 2308"
+    },
+    {
+      "name": "Jose Mucho Latin Products",
+      "email": "",
+      "active": true,
+      "booths": [
+        "2403",
+        "2404"
+      ],
+      "originalBoothsCell": "2403, 2404"
+    },
+    {
+      "name": "Scarlett Crafts(Michelle)",
+      "email": "admin@thescarlettphoenix.ca",
+      "active": true,
+      "booths": [
+        "2405",
+        "2406",
+        "2407",
+        "2408"
+      ],
+      "originalBoothsCell": "2405, 2406, 2407, 2408"
+    },
+    {
+      "name": "Georgian Bay Liquidation 2757225 Ont Ltd.",
+      "email": "NP",
+      "active": true,
+      "booths": [
+        "1801",
+        "1802",
+        "2501",
+        "2502",
+        "2503"
+      ],
+      "originalBoothsCell": "1801,1802, 2501, 2502, 2503"
+    },
+    {
+      "name": "Art Place (8771561) Rich & Vicky(2861631)",
+      "email": "artplace@hotmail.com",
+      "active": true,
+      "booths": [
+        "2505",
+        "2506",
+        "2507",
+        "2508",
+        "2509"
+      ],
+      "originalBoothsCell": "2505, 2506, 2507, 2508, 2509"
+    },
+    {
+      "name": "Eckankar",
+      "email": "cosmic.window@hotmail.com",
+      "active": true,
+      "booths": [
+        "2510",
+        "2511"
+      ],
+      "originalBoothsCell": "2510, 2511"
+    },
+    {
+      "name": "Jerrys Sign Factory",
+      "email": "thesignfactory@hotmail.ca",
+      "active": true,
+      "booths": [
+        "2512"
+      ],
+      "originalBoothsCell": "2512"
+    },
+    {
+      "name": "Plant Shop (Emerita Enriqug)",
+      "email": "elbarra@live.ca",
+      "active": true,
+      "booths": [
+        "2514"
+      ],
+      "originalBoothsCell": "2514"
+    },
+    {
+      "name": "Video 101",
+      "email": "ryangenno@hotmail.com",
+      "active": true,
+      "booths": [
+        "2515"
+      ],
+      "originalBoothsCell": "2515"
+    },
+    {
+      "name": "Northern Realm (Stewart Frederick)",
+      "email": "northernrealmccg@gmail.com",
+      "active": true,
+      "booths": [
+        "2516",
+        "2517"
+      ],
+      "originalBoothsCell": "2516, 2517"
+    },
+    {
+      "name": "Brookstone Academy (Shelly Long Botma)",
+      "email": "youbelong@brookstoneacademy.ca",
+      "active": true,
+      "booths": [
+        "2518"
+      ],
+      "originalBoothsCell": "2518"
+    },
+    {
+      "name": "Wolfies Fishing Lures",
+      "email": "wolfiescustomlures.com",
+      "active": true,
+      "booths": [
+        "2519"
+      ],
+      "originalBoothsCell": "2519"
+    },
+    {
+      "name": "All Steel Windows(1888890 Ont)",
+      "email": "renosaver@gmail.com",
+      "active": true,
+      "booths": [
+        "2520",
+        "2521"
+      ],
+      "originalBoothsCell": "2520, 2521"
+    },
+    {
+      "name": "Susan Wade (JW)",
+      "email": "andrew.wade12984@outlook.com",
+      "active": true,
+      "booths": [
+        "2522"
+      ],
+      "originalBoothsCell": "2522, 2523A"
+    },
+    {
+      "name": "Dogel Bricks (Tara Krale)",
+      "email": "kralefamily@gmail.com",
+      "active": true,
+      "booths": [
+        "2524"
+      ],
+      "originalBoothsCell": "2524"
+    },
+    {
+      "name": "Growise Hydroponices (Chad Butler)",
+      "email": "chadButler@rogers.com",
+      "active": true,
+      "booths": [
+        "2526",
+        "2527"
+      ],
+      "originalBoothsCell": "2526,2527"
+    },
+    {
+      "name": "Scarlett Crafts(Michelle)",
+      "email": "admin@thescarlettphoenix.ca",
+      "active": true,
+      "booths": [
+        "2528",
+        "2529"
+      ],
+      "originalBoothsCell": "2528, 2529"
+    },
+    {
+      "name": "Growise Hydroponices (Chad Butler)",
+      "email": "chadButler@rogers.com",
+      "active": true,
+      "booths": [
+        "2533"
+      ],
+      "originalBoothsCell": "2533"
+    },
+    {
+      "name": "Eze Dockers (Wayne Dennis)Rex's Corner",
+      "email": "wayne@dennis.financial",
+      "active": true,
+      "booths": [
+        "2536",
+        "2537",
+        "2538",
+        "3201",
+        "3503",
+        "3504",
+        "3505",
+        "3506"
+      ],
+      "originalBoothsCell": "2536, 2537, 2538,3201, 3503, 3504, 3505, 3506"
+    },
+    {
+      "name": "Lisa's Jewellery(Nadiri Ali)",
+      "email": "kristinapniewski26@icloud.com",
+      "active": true,
+      "booths": [
+        "2539"
+      ],
+      "originalBoothsCell": "2539"
+    },
+    {
+      "name": "Ed's Knife Sharpening",
+      "email": "WP",
+      "active": true,
+      "booths": [
+        "2600"
+      ],
+      "originalBoothsCell": "2600 (small Booth, was broom closet)"
+    },
+    {
+      "name": "Comic's, toy's & collectibles)",
+      "email": "domg514@yahoo.com",
+      "active": true,
+      "booths": [
+        "2601",
+        "2602",
+        "2603",
+        "2604",
+        "2605",
+        "2606",
+        "2607",
+        "2608"
+      ],
+      "originalBoothsCell": "2601, 2602, 2603, 2604, 2605,2606,2607, 2608"
+    },
+    {
+      "name": "Mystic Crayon",
+      "email": "MysticCrayonLady@hotmail.com",
+      "active": true,
+      "booths": [
+        "2701"
+      ],
+      "originalBoothsCell": "2701"
+    },
+    {
+      "name": "EFT Farms",
+      "email": "",
+      "active": true,
+      "booths": [
+        "2702",
+        "2703",
+        "2704"
+      ],
+      "originalBoothsCell": "2702, 2703, 2704"
+    },
+    {
+      "name": "Master Quality (Linas Clothing)",
+      "email": "chhunsrypich@yahoo.com",
+      "active": true,
+      "booths": [
+        "2705",
+        "2706",
+        "2707",
+        "2708"
+      ],
+      "originalBoothsCell": "2705, 2706, 2707, 2708"
+    },
+    {
+      "name": "The Computer Store",
+      "email": "userlo105@aol.com",
+      "active": true,
+      "booths": [
+        "2801",
+        "2802",
+        "2807",
+        "2808"
+      ],
+      "originalBoothsCell": "2801, 2802, 2807, 2808"
+    },
+    {
+      "name": "Retrocade",
+      "email": "jorge.cabezas25@gmail.com",
+      "active": true,
+      "booths": [
+        "2805",
+        "2806"
+      ],
+      "originalBoothsCell": "2805, 2806"
+    },
+    {
+      "name": "Buzz Boxes (Jim)",
+      "email": "sales@buzzboxes.ca",
+      "active": true,
+      "booths": [
+        "2901"
+      ],
+      "originalBoothsCell": "2901 (small booth, front wall))"
+    },
+    {
+      "name": "Toulison Nutraceuticals (Anna)",
+      "email": "support@toulison.com",
+      "active": true,
+      "booths": [
+        "2902"
+      ],
+      "originalBoothsCell": "2902"
+    },
+    {
+      "name": "Krafty Kreations",
+      "email": "kraftykreations400@yahoo.com",
+      "active": true,
+      "booths": [
+        "2903"
+      ],
+      "originalBoothsCell": "2903"
+    },
+    {
+      "name": "Nashit Kalva Cellular",
+      "email": "nkalva@gmail.com",
+      "active": true,
+      "booths": [
+        "3001",
+        "3002",
+        "3007",
+        "3008"
+      ],
+      "originalBoothsCell": "3001, 3002, 3007, 3008"
+    },
+    {
+      "name": "Earth Elements (Nora Vahle)",
+      "email": "vahledoris@gmail.com",
+      "active": true,
+      "booths": [
+        "3003",
+        "3004",
+        "3005",
+        "3006"
+      ],
+      "originalBoothsCell": "3003, 3004, 3005, 3006"
+    },
+    {
+      "name": "Sanmark Network",
+      "email": "sanmarnetwork@gmail.com",
+      "active": true,
+      "booths": [
+        "3101",
+        "3102",
+        "3103",
+        "3104",
+        "3105",
+        "3106",
+        "3107",
+        "3108"
+      ],
+      "originalBoothsCell": "3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108"
+    },
+    {
+      "name": "Farshin Table Cloths( Also Designs)",
+      "email": "NP",
+      "active": true,
+      "booths": [
+        "3204"
+      ],
+      "originalBoothsCell": "3204"
+    },
+    {
+      "name": "Rainbow Jewellers",
+      "email": "CHOENG.BUT@GMAIL.COM",
+      "active": true,
+      "booths": [
+        "3301",
+        "3303",
+        "3304"
+      ],
+      "originalBoothsCell": "3301, 3303, 3304"
+    },
+    {
+      "name": "Rasta Closet(Adrian Campbell)",
+      "email": "rastacloset@yahoo.ca",
+      "active": true,
+      "booths": [
+        "3401",
+        "3402"
+      ],
+      "originalBoothsCell": "3401, 3402"
+    },
+    {
+      "name": "Ty's Blechlab",
+      "email": "tysblechlab@gmail.com",
+      "active": true,
+      "booths": [
+        "3403"
+      ],
+      "originalBoothsCell": "3403"
+    },
+    {
+      "name": "You & Magnets 4 Ever",
+      "email": "WP",
+      "active": true,
+      "booths": [
+        "3404"
+      ],
+      "originalBoothsCell": "3404"
+    },
+    {
+      "name": "Polestar",
+      "email": "michell@polestarconsulting.ca",
+      "active": true,
+      "booths": [
+        "3501",
+        "3502",
+        "3507",
+        "3508"
+      ],
+      "originalBoothsCell": "3501, 3502,3507,3508"
+    },
+    {
+      "name": "Farm Fresh Diet (Pasquale Calautti)",
+      "email": "",
+      "active": true,
+      "booths": [
+        "3601",
+        "3602",
+        "3603",
+        "3604"
+      ],
+      "originalBoothsCell": "3601, 3602, 3603, 3604"
+    },
+    {
+      "name": "Dave Graham",
+      "email": "WP",
+      "active": true,
+      "booths": [
+        "3607",
+        "3608"
+      ],
+      "originalBoothsCell": "3607,3608"
+    },
+    {
+      "name": "Pocket Knives (10796930)",
+      "email": "sales@thepocketblade.com",
+      "active": true,
+      "booths": [
+        "3703",
+        "3704",
+        "3705",
+        "3706"
+      ],
+      "originalBoothsCell": "3703, '3704, 3705, '3706"
+    },
+    {
+      "name": "Birdman Victor",
+      "email": "WP",
+      "active": true,
+      "booths": [
+        "141"
+      ],
+      "originalBoothsCell": "141"
+    }
+  ]
+}
