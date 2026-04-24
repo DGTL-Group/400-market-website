@@ -149,25 +149,19 @@ const styleBlock = `  <style>
       cursor: pointer;
     }
 
-    /* Hover + keyboard focus state — a mango outline so the cursor's
-       target is obvious without hiding the status fill. */
-    rect[data-booth]:hover,
+    /* Hover + focus styling is NOT applied here — the React layer
+       renders a dedicated overlay rect on top of everything so the
+       highlight never gets hidden behind neighbouring booths as the
+       cursor moves around. Keyboard focus still shows the browser's
+       default outline (removed only when we're rendering the overlay). */
     rect[data-booth]:focus-visible,
-    rect[data-booth].fp-hover {
-      stroke: #E57200;
-      stroke-width: 3;
+    [data-amenity]:focus-visible {
       outline: none;
     }
 
     /* Amenities (restrooms, info, concession) — hoverable but not
-       clickable, so we flag them with a help cursor + same mango outline. */
+       clickable, so we flag them with a help cursor. */
     [data-amenity] { cursor: help; }
-    [data-amenity]:hover,
-    [data-amenity]:focus-visible {
-      stroke: #E57200;
-      stroke-width: 2.5;
-      outline: none;
-    }
 
     /* Food court booths share the status system but keep their pale base. */
     .fp-food-court-booth {

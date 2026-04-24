@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -28,22 +29,44 @@ type Props = {
  * Interactive floor plan.
  *
  * The SVG itself (public/images/floor-plan.svg) is the visual layer —
- * every rentable booth rect carries `data-booth="NNNN"` (added by
- * scripts/brand-floor-plan.mjs). After it mounts we do three things:
+ * every rentable booth rect carries `data-booth="NNNN"`. A few behaviours
+ * are layered on top:
  *
- *   1. Stamp `data-status` on every booth rect so the embedded CSS can
- *      fill it correctly for `available` / `rented` / `reserved`.
- *   2. Delegate pointer + click events on the wrapper div — saving 400+
- *      individual React listeners while still giving us per-booth behavior.
- *   3. Render a DOM tooltip outside the SVG so it isn't clipped by the
- *      container's rounded-button overflow-hidden.
+ *   1. **Stable DOM.** The SVG is rendered by a memoized `<StaticSvg>`
+ *      child so the parent's hover-state changes never trigger React
+ *      to re-evaluate `dangerouslySetInnerHTML` and wipe the SVG DOM.
+ *      Without this, useEffect-stamped attributes and the dev-only booth
+ *      number labels flickered with every pointermove.
+ *   2. **Always-on-top hover highlight.** Rather than a CSS `:hover`
+ *      stroke on each rect (which gets painted over by later-drawn
+ *      neighbours as the cursor moves), we render ONE overlay rect at
+ *      the end of the SVG and update its geometry to match the hovered
+ *      target. Being the last element in the SVG, it's always drawn on
+ *      top — no flicker, no z-order issues.
+ *   3. **Single tooltip state.** Whether the cursor is on a booth or an
+ *      amenity (restroom, info desk, concession), the descriptor flows
+ *      through one unified state and one tooltip component.
  */
+
+// ──────────────────────────────────────────────────────────────────────────
+// StaticSvg — memoized wrapper around dangerouslySetInnerHTML.
+// Re-renders ONLY when svgMarkup changes, so the parent's transient state
+// (hoveredDescriptor, tooltipPos, svgBounds) never causes the inner DOM to
+// be replaced.
+// ──────────────────────────────────────────────────────────────────────────
+const StaticSvg = memo(function StaticSvg({ svgMarkup }: { svgMarkup: string }) {
+  return (
+    <div
+      className="[&_svg]:block [&_svg]:w-full [&_svg]:h-auto"
+      dangerouslySetInnerHTML={{ __html: svgMarkup }}
+    />
+  )
+})
+
 export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
   const router = useRouter()
   const containerRef = useRef<HTMLDivElement | null>(null)
 
-  /** What the cursor is currently over — either a booth, an amenity,
-   *  or nothing. Unified into one state so only one tooltip renders. */
   const [hoveredDescriptor, setHoveredDescriptor] =
     useState<TooltipDescriptor | null>(null)
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
@@ -70,11 +93,9 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
   }, [booths])
 
   /**
-   * Sync per-rect attributes after mount and whenever state changes.
-   * - `data-status` drives fill via the embedded stylesheet.
-   * - `tabindex` makes rentable booths focusable for keyboard users.
-   * - `aria-label` gives screen readers a useful description.
-   * - `.fp-mode-*` on the root SVG switches cursor behaviour by page.
+   * Sync per-rect attributes + dev labels + overlay + dots when state
+   * changes. Relies on `StaticSvg` keeping the DOM stable, so
+   * useEffect-stamped attributes persist across parent re-renders.
    */
   useEffect(() => {
     const container = containerRef.current
@@ -98,8 +119,7 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
       rect.setAttribute('role', clickable ? 'button' : 'img')
     })
 
-    // Draw the multi-booth vendor dots (same concept as the prior overlay).
-    // Scrub any previous dots first so re-renders don't stack.
+    // Multi-booth vendor dots (vendor id → dot on second+ booth).
     svg.querySelectorAll('[data-fp-dot]').forEach((d) => d.remove())
     const dotLayer = ensureDotLayer(svg)
 
@@ -124,10 +144,16 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
       dotLayer.appendChild(dot)
     })
 
-    // Dev-only: stamp each booth's number over its rect so the real
-    // market layout is easy to eyeball against the CRM. Inlined as a
-    // sibling <text> so it inherits the rect's parent transform matrix
-    // (some booths live inside <g transform="matrix(…)"> wrappers).
+    // Hover highlight overlay — one rect sits at the END of the SVG so
+    // it paints on top of every other element. We move it around on
+    // pointermove; hide it on pointerleave. It's NEVER removed between
+    // renders, so no flicker.
+    ensureHoverOverlay(svg)
+
+    // Dev-only: stamp each booth's number over its rect so the layout is
+    // easy to eyeball against the CRM. Added as a sibling <text> so it
+    // inherits the rect's parent transform (some booths live inside
+    // nested <g transform="matrix(…)"> wrappers).
     if (process.env.NODE_ENV === 'development') {
       svg.querySelectorAll('[data-fp-label]').forEach((el) => el.remove())
       rects.forEach((rect) => {
@@ -156,17 +182,16 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
 
   /**
    * Walk up from the event target looking for either a booth rect
-   * (`data-booth`) or an amenity (`data-amenity`). Walking the parent
-   * chain matters for the restrooms: Women-Restroom is a <path> inside
-   * a <g> — if the cursor lands on something nested the hit target
-   * might be the child, not the amenity-bearing element.
+   * (`data-booth`) or an amenity (`data-amenity`). Returns the
+   * SVGElement that owns the attribute so the caller can position
+   * the hover overlay on exactly that element.
    */
-  const getHoverTargetFromEvent = useCallback(
+  const getHoverTarget = useCallback(
     (
       target: EventTarget | null,
     ):
-      | { kind: 'booth'; booth: BoothView }
-      | { kind: 'amenity'; amenity: AmenityKind }
+      | { kind: 'booth'; booth: BoothView; el: SVGGraphicsElement }
+      | { kind: 'amenity'; amenity: AmenityKind; el: SVGGraphicsElement }
       | null => {
       if (!target || !(target instanceof Element)) return null
       let el: Element | null = target
@@ -174,11 +199,17 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
         const boothNum = el.getAttribute('data-booth')
         if (boothNum) {
           const booth = boothMap.get(boothNum)
-          return booth ? { kind: 'booth', booth } : null
+          return booth
+            ? { kind: 'booth', booth, el: el as SVGGraphicsElement }
+            : null
         }
         const amenity = el.getAttribute('data-amenity')
         if (amenity) {
-          return { kind: 'amenity', amenity: amenity as AmenityKind }
+          return {
+            kind: 'amenity',
+            amenity: amenity as AmenityKind,
+            el: el as SVGGraphicsElement,
+          }
         }
         el = el.parentElement
       }
@@ -189,40 +220,43 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      const hit = getHoverTargetFromEvent(e.target)
+      const hit = getHoverTarget(e.target)
       const container = containerRef.current
       if (!container) return
+      const svg = container.querySelector('svg')
       const rect = container.getBoundingClientRect()
 
-      if (hit) {
+      if (hit && svg) {
         const descriptor =
           hit.kind === 'booth'
             ? describeBooth(hit.booth, mode)
             : describeAmenity(hit.amenity)
         setHoveredDescriptor(descriptor)
         setTooltipPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+        updateHoverOverlay(svg, hit.el)
       } else {
-        // Cursor is on floor / wall / non-target — dismiss any open tooltip.
         setHoveredDescriptor((prev) => (prev ? null : prev))
         setTooltipPos((prev) => (prev ? null : prev))
+        if (svg) hideHoverOverlay(svg)
       }
 
       if (rect.width !== svgBounds.w || rect.height !== svgBounds.h) {
         setSvgBounds({ w: rect.width, h: rect.height })
       }
     },
-    [getHoverTargetFromEvent, mode, svgBounds.h, svgBounds.w],
+    [getHoverTarget, mode, svgBounds.h, svgBounds.w],
   )
 
   const handlePointerLeave = useCallback(() => {
     setHoveredDescriptor(null)
     setTooltipPos(null)
+    const svg = containerRef.current?.querySelector('svg')
+    if (svg) hideHoverOverlay(svg)
   }, [])
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const hit = getHoverTargetFromEvent(e.target)
-      // Amenities aren't clickable — they're decorative hover targets.
+      const hit = getHoverTarget(e.target)
       if (!hit || hit.kind !== 'booth') return
       const { booth } = hit
       if (booth.status === 'reserved' || booth.status === 'blocked') return
@@ -249,19 +283,18 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
         )
       }
     },
-    [getHoverTargetFromEvent, mode, router],
+    [getHoverTarget, mode, router],
   )
 
-  // Keyboard enter/space activates the focused booth — mirrors click.
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key !== 'Enter' && e.key !== ' ') return
-      const hit = getHoverTargetFromEvent(e.target)
+      const hit = getHoverTarget(e.target)
       if (!hit || hit.kind !== 'booth') return
       e.preventDefault()
       handleClick(e as unknown as React.MouseEvent<HTMLDivElement>)
     },
-    [getHoverTargetFromEvent, handleClick],
+    [getHoverTarget, handleClick],
   )
 
   return (
@@ -273,9 +306,9 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
           onPointerLeave={handlePointerLeave}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
-          className="[&_svg]:block [&_svg]:w-full [&_svg]:h-auto"
-          dangerouslySetInnerHTML={{ __html: svgMarkup }}
-        />
+        >
+          <StaticSvg svgMarkup={svgMarkup} />
+        </div>
       </div>
 
       {hoveredDescriptor && tooltipPos && (
@@ -325,9 +358,73 @@ function ensureDotLayer(svg: SVGSVGElement): SVGGElement {
   layer = document.createElementNS('http://www.w3.org/2000/svg', 'g')
   layer.setAttribute('data-fp-dot-layer', '1')
   layer.setAttribute('pointer-events', 'none')
-  // Append so dots sit on top of everything else in the SVG.
   svg.appendChild(layer)
   return layer
+}
+
+/**
+ * Create the single hover-highlight rect once and stash it at the end
+ * of the SVG so it paints on top of every other element. Idempotent.
+ */
+function ensureHoverOverlay(svg: SVGSVGElement): SVGRectElement {
+  let overlay = svg.querySelector<SVGRectElement>('rect[data-fp-hover]')
+  if (overlay) {
+    // Always move it to the end — it needs to paint last. Appending a
+    // node that's already in the tree moves it to the new position.
+    svg.appendChild(overlay)
+    return overlay
+  }
+  overlay = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'rect',
+  ) as SVGRectElement
+  overlay.setAttribute('data-fp-hover', '1')
+  overlay.setAttribute('vector-effect', 'non-scaling-stroke')
+  overlay.setAttribute('pointer-events', 'none')
+  // Inline style beats the SVG's embedded stylesheet rules for `rect`
+  // (which would otherwise paint the overlay yellow like every other
+  // rect — the stylesheet uses plain `rect` selectors without :not).
+  overlay.style.fill = 'none'
+  overlay.style.stroke = '#E57200'
+  overlay.style.strokeWidth = '3px'
+  overlay.style.transition = 'none'
+  overlay.style.display = 'none'
+  svg.appendChild(overlay)
+  return overlay
+}
+
+function hideHoverOverlay(svg: SVGSVGElement) {
+  const overlay = svg.querySelector<SVGRectElement>('rect[data-fp-hover]')
+  if (overlay) overlay.style.display = 'none'
+}
+
+/**
+ * Position the hover overlay over the given hit element, regardless of
+ * whatever nested `<g transform>` wrappers the hit lives inside. We work
+ * entirely in viewport pixels (getBoundingClientRect) and project back
+ * into the SVG's root coordinate space — the overlay sits at the SVG
+ * root, so it uses root coords directly.
+ */
+function updateHoverOverlay(svg: SVGSVGElement, hit: SVGGraphicsElement) {
+  const overlay = ensureHoverOverlay(svg)
+  const hitRect = hit.getBoundingClientRect()
+  const screenCTM = svg.getScreenCTM()
+  if (!screenCTM) return
+  const inv = screenCTM.inverse()
+
+  const pt = svg.createSVGPoint()
+  pt.x = hitRect.left
+  pt.y = hitRect.top
+  const topLeft = pt.matrixTransform(inv)
+  pt.x = hitRect.right
+  pt.y = hitRect.bottom
+  const botRight = pt.matrixTransform(inv)
+
+  overlay.setAttribute('x', String(topLeft.x))
+  overlay.setAttribute('y', String(topLeft.y))
+  overlay.setAttribute('width', String(botRight.x - topLeft.x))
+  overlay.setAttribute('height', String(botRight.y - topLeft.y))
+  overlay.style.display = 'block'
 }
 
 function vendorHue(vendorId: string | number): number {

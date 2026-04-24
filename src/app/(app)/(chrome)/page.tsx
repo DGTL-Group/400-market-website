@@ -156,17 +156,17 @@ export default async function HomePage() {
       {/* Yellow stat bar right under the hero. On mobile it stacks 2×2;
           on desktop it's a single horizontal row of 4. */}
       <section className="bg-brand-yellow">
-        <div className="max-w-content mx-auto px-6 md:px-20 py-6 md:py-5 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
-          <div className="font-display text-[13px] md:text-[14px] uppercase tracking-wide text-brand-dark font-bold leading-tight">
+        <div className="max-w-content mx-auto px-6 md:px-20 pt-6 md:pt-[15px] pb-6 md:pb-[25px] grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 items-center text-center">
+          <div className="font-display text-[16px] md:text-[17px] uppercase tracking-wide text-brand-dark font-black leading-none">
             SAT&ndash;SUN 9AM&ndash;5PM
           </div>
-          <div className="font-display text-[13px] md:text-[14px] uppercase tracking-wide text-brand-dark font-bold leading-tight">
+          <div className="font-display text-[16px] md:text-[17px] uppercase tracking-wide text-brand-dark font-black leading-none">
             2207 Industrial Park Rd, Innisfil ON
           </div>
-          <div className="font-display text-[13px] md:text-[14px] uppercase tracking-wide text-brand-dark font-bold leading-tight">
+          <div className="font-display text-[16px] md:text-[17px] uppercase tracking-wide text-brand-dark font-black leading-none">
             105,000 SQ FT OF SHOPPING
           </div>
-          <div className="font-display text-[13px] md:text-[14px] uppercase tracking-wide text-brand-dark font-bold leading-tight">
+          <div className="font-display text-[16px] md:text-[17px] uppercase tracking-wide text-brand-dark font-black leading-none">
             HUNDREDS OF UNIQUE VENDORS
           </div>
         </div>
