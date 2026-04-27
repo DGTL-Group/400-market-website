@@ -19,7 +19,11 @@
       stroke: #2C2C2C;
       stroke-width: 1;
       vector-effect: non-scaling-stroke;
-      transition: fill 150ms ease, stroke-width 120ms ease;
+      /* Transition stroke only — animating fill here was causing
+         Chrome to pin the computed fill at the start value when the
+         page-level mode class flipped the cascade target, leaving
+         become-a-vendor available booths stuck on white. */
+      transition: stroke-width 120ms ease;
     }
 
     /* Interactive states driven by data-status on the rect. */
@@ -37,6 +41,57 @@
       cursor: pointer;
     }
 
+    /* On become-a-vendor the palette FLIPS: the thing the visitor is
+       hunting for (open booths) becomes the eye-catching yellow, and
+       already-rented booths fade back to white so they read as
+       "context, not target". Reserved + blocked stay as-is.
+
+       !important is here because Chrome's transition machinery on the
+       blanket "rect { fill: #FFFFFF; transition: fill 150ms; }" rule
+       was pinning the fill at the start value even though our class-
+       scoped selectors are higher specificity. Forcing the cascade
+       with !important is the path of least resistance — the rest of
+       the SVG palette is static so there is no cross-rule fight to
+       worry about. */
+    .fp-mode-become-a-vendor rect[data-booth][data-status="available"] {
+      fill: #F7D117 !important;
+      stroke: #2C2C2C !important;
+    }
+    .fp-mode-become-a-vendor rect[data-booth][data-status="rented"] {
+      fill: #FFFFFF !important;
+    }
+    .fp-mode-become-a-vendor path[data-fp-merged],
+    .fp-mode-become-a-vendor rect[data-fp-merged] {
+      fill: #FFFFFF !important;
+    }
+    .fp-mode-become-a-vendor .fp-food-court-booth[data-status="available"] {
+      fill: #F7D117 !important;
+    }
+    .fp-mode-become-a-vendor .fp-food-court-booth[data-status="rented"] {
+      fill: #FFFFFF !important;
+    }
+
+    /* Dim everything that is NOT an available booth so the yellow
+       targets pop. Rented (white), reserved (orange), blocked (gray),
+       merged clusters, and food-court rented all fade back. The dev
+       labels and the merged vendor name fade with them so the noise
+       follows the booth. Filter overlay (the search/legend pulse)
+       still wins because it sets data-filter and has its own opacity
+       rules with higher specificity in this same stylesheet. */
+    .fp-mode-become-a-vendor rect[data-booth][data-status="rented"],
+    .fp-mode-become-a-vendor rect[data-booth][data-status="reserved"],
+    .fp-mode-become-a-vendor rect[data-booth][data-status="blocked"],
+    .fp-mode-become-a-vendor path[data-fp-merged],
+    .fp-mode-become-a-vendor rect[data-fp-merged],
+    .fp-mode-become-a-vendor .fp-food-court-booth[data-status="rented"],
+    .fp-mode-become-a-vendor .fp-food-court-booth[data-status="reserved"] {
+      opacity: 0.55;
+    }
+    .fp-mode-become-a-vendor text[data-fp-merged],
+    .fp-mode-become-a-vendor text[data-fp-label] {
+      opacity: 0.55;
+    }
+
     /* Hover + focus styling is NOT applied here — the React layer
        renders a dedicated overlay rect on top of everything so the
        highlight never gets hidden behind neighbouring booths as the
@@ -47,9 +102,11 @@
       outline: none;
     }
 
-    /* Merged adjacent-booth rect — a single big rectangle drawn over
-       a cluster of same-vendor booths. Slightly thicker stroke so it
-       reads as one unit, not four stacked rects. */
+    /* Merged adjacent-booth shape — a polygon path tracing the
+       cluster's outer perimeter (handles L/T/U-shapes). Slightly
+       thicker stroke so it reads as one unit, no internal borders
+       between the cluster's component booths. */
+    path[data-fp-merged],
     rect[data-fp-merged] {
       fill: #F7D117;
       stroke: #2C2C2C;

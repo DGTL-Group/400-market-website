@@ -24,9 +24,29 @@ export default buildConfig({
     // connections, so during build we shrink the pool aggressively.
     // At runtime we use defaults (no connectionTimeout, no min) so the pool
     // doesn't churn or fail under cold-start network latency.
+    //
+    // SSL: the VPS Postgres requires TLS for any external IP and serves a
+    // self-signed cert. `rejectUnauthorized: false` lets us accept that
+    // cert without bundling a CA file. The connection IS still encrypted
+    // — we're skipping cert-chain verification, not the TLS handshake.
+    //
+    // We deliberately do NOT put `?sslmode=require` in DATABASE_URI: pg
+    // parses the URI flag last and overwrites our explicit `ssl` object
+    // with a strict { rejectUnauthorized: true }, which then rejects the
+    // self-signed cert. Setting `ssl` via the pool config — and only via
+    // the pool config — keeps the override path clean.
+    //
+    // For host-strings that are obviously non-TLS (local docker, local
+    // dev DB on 127.0.0.1) we drop SSL entirely so day-one setups still
+    // work without a cert.
     pool: {
       connectionString: process.env.DATABASE_URI || '',
       max: process.env.NEXT_PHASE === 'phase-production-build' ? 3 : 10,
+      ssl: /@(localhost|127\.0\.0\.1|0\.0\.0\.0)[:/]/.test(
+        process.env.DATABASE_URI || '',
+      )
+        ? undefined
+        : { rejectUnauthorized: false },
     },
   }),
   editor: lexicalEditor(),

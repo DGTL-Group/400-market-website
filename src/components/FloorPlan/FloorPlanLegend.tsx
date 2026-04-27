@@ -1,5 +1,7 @@
 'use client'
 
+import type { FloorPlanMode } from '@/lib/floorPlan/types'
+
 export type LegendKey =
   | 'rented'
   | 'available'
@@ -15,6 +17,12 @@ type Props = {
   active: LegendKey | null
   /** Click handler — pass the same key to clear. */
   onToggle: (key: LegendKey | null) => void
+  /**
+   * The page mode — drives the legend's rented/available swatch colours.
+   * On become-a-vendor the map flips (available = yellow, rented = white)
+   * so the legend has to flip with it or the swatches lie.
+   */
+  mode: FloorPlanMode
 }
 
 type Item = {
@@ -23,9 +31,23 @@ type Item = {
   swatch: 'yellow' | 'white' | 'orange' | 'gray-restroom' | 'dark' | 'green' | 'food-zone'
 }
 
-const ITEMS: Item[] = [
+const PUBLIC_ITEMS: Item[] = [
   { key: 'rented', label: 'Rented booth', swatch: 'yellow' },
   { key: 'available', label: 'Available booth', swatch: 'white' },
+  { key: 'reserved', label: 'Reserved', swatch: 'orange' },
+  { key: 'food-court', label: 'Food court', swatch: 'food-zone' },
+  { key: 'mens-restroom', label: "Men's restroom", swatch: 'gray-restroom' },
+  { key: 'womens-restroom', label: "Women's restroom", swatch: 'gray-restroom' },
+  { key: 'info-desk', label: 'Information desk', swatch: 'dark' },
+  { key: 'atm', label: 'ATM', swatch: 'green' },
+]
+
+// Become-a-vendor flips rented + available so the swatch matches what's
+// on the map. "Available" leads the list because that's what the visitor
+// is hunting for.
+const BECOME_A_VENDOR_ITEMS: Item[] = [
+  { key: 'available', label: 'Available booth', swatch: 'yellow' },
+  { key: 'rented', label: 'Rented booth', swatch: 'white' },
   { key: 'reserved', label: 'Reserved', swatch: 'orange' },
   { key: 'food-court', label: 'Food court', swatch: 'food-zone' },
   { key: 'mens-restroom', label: "Men's restroom", swatch: 'gray-restroom' },
@@ -51,10 +73,12 @@ const SWATCH_STYLE: Record<Item['swatch'], string> = {
  * to clear the highlight. Search and legend are mutually exclusive —
  * triggering one clears the other.
  */
-export function FloorPlanLegend({ active, onToggle }: Props) {
+export function FloorPlanLegend({ active, onToggle, mode }: Props) {
+  const items =
+    mode === 'become-a-vendor' ? BECOME_A_VENDOR_ITEMS : PUBLIC_ITEMS
   return (
     <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
-      {ITEMS.map((item) => {
+      {items.map((item) => {
         const isActive = active === item.key
         return (
           <button

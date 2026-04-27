@@ -40,7 +40,7 @@ export function FloorPlanTooltip({
   descriptor,
   x,
   y,
-  containerWidth,
+  containerWidth: _containerWidth,
   containerHeight: _containerHeight,
 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null)
@@ -55,19 +55,19 @@ export function FloorPlanTooltip({
 
   const measured = dims !== null
 
-  const PAD = 10
   const ARROW = 6
   const tooltipW = dims?.w ?? 0
   const tooltipH = dims?.h ?? 0
 
-  const placeBelow = y < tooltipH + ARROW + PAD
+  const placeBelow = y < tooltipH + ARROW + 10
   const top = placeBelow ? y + ARROW : y - tooltipH - ARROW
 
-  let left = x - tooltipW / 2
-  if (containerWidth > 0) {
-    left = Math.max(PAD, Math.min(left, containerWidth - tooltipW - PAD))
-  }
-  const arrowLeft = Math.max(8, Math.min(x - left, tooltipW - 8))
+  // Centre the tooltip on the cursor and DON'T clamp to the floor
+  // plan's container — booths near the edges deserve a tooltip too,
+  // and the parent card has no overflow-hidden in the tooltip's path
+  // so it's fine for the bubble to extend past the card edges.
+  const left = x - tooltipW / 2
+  const arrowLeft = tooltipW / 2
 
   return (
     <div
@@ -80,7 +80,14 @@ export function FloorPlanTooltip({
       }}
       role="tooltip"
     >
-      <div className="animate-est-fade bg-brand-yellow text-brand-dark rounded-button px-3 py-2 shadow-lg min-w-[180px] max-w-[260px] relative">
+      {/* No animate-est-fade here: that keyframe bakes in
+          `transform: translateX(-50%)` (designed for a tooltip
+          positioned at `left: 50%`), which fought our pixel-perfect
+          `left = x - tooltipW/2` math and shifted the visible bubble
+          a full tooltip-width to the left of the cursor. The outer
+          wrapper's `opacity: 0 → 1` after measurement is enough of a
+          fade for our purposes. */}
+      <div className="bg-brand-yellow text-brand-dark rounded-button px-3 py-2 shadow-lg min-w-[180px] max-w-[260px] relative">
         <div className="font-body text-body-sm leading-snug">
           {descriptor.eyebrow}
         </div>
@@ -141,6 +148,18 @@ export function describeBooth(
   const eyebrow = `Booth ${booth.number}`
   switch (booth.status) {
     case 'rented': {
+      // On the merchant-application page the visitor is shopping for an
+      // open booth, so naming the current renter is noise (and slightly
+      // off-brand — vendor info isn't the point on this page). Show
+      // "Booth Unavailable" instead so the rented mass reads as
+      // "context, not target" alongside its dimmed fill.
+      if (mode === 'become-a-vendor') {
+        return {
+          eyebrow,
+          title: 'Booth Unavailable',
+          subtitle: 'Already rented',
+        }
+      }
       if (!booth.vendor) return { eyebrow, title: 'Rented' }
       const cats = booth.vendor.category ?? []
       const primary = cats[0] ? CATEGORY_LABEL[cats[0]] ?? cats[0] : undefined

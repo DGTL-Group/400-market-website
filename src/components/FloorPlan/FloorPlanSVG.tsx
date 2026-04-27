@@ -231,11 +231,19 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
 
     // Adjacency-based merge: booths with the same vendor, rented, and
     // spatially adjacent (within 2 outer-g units on either axis) get
-    // rendered as ONE big rect with the vendor name in the middle and
-    // the booth-number range tucked into the top-left. The individual
-    // booth rects go visibility:hidden so they stop intercepting
-    // pointer events — hits route to the merged rect instead.
-    if (outerG && outerCTM) {
+    // rendered as ONE merged shape — a polygon-union <path> that
+    // traces the actual perimeter of the cluster, NOT the bbox. This
+    // matters for L/T-shaped clusters (3D Distribution, Maximum
+    // Darts, etc.): a bbox-spanning rect would cover gaps and steal
+    // pointer events from neighbouring booths. The path approach
+    // gives one visually-merged shape with no internal borders AND
+    // correct hit-testing for any cluster shape.
+    //
+    // become-a-vendor mode skips merging entirely — visitors there
+    // need to see/click each booth as its own cell, and rented
+    // booths read as dimmed individual context rather than a fused
+    // mass.
+    if (outerG && outerCTM && mode !== 'become-a-vendor') {
       const candidates: Array<{
         number: string
         booth: BoothView
@@ -315,7 +323,7 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
       }
 
       for (const cluster of clusters) {
-        renderMergedCluster({ svg, outerG, cluster })
+        renderMergedCluster({ svg, outerG, cluster, mode })
       }
     }
 
@@ -325,28 +333,106 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     // renders, so no flicker.
     ensureHoverOverlay(svg)
 
-    // Dev-only: stamp each booth's number over its rect so the layout is
-    // easy to eyeball against the CRM. We append each label to the
-    // outermost scaled `<g>` rather than as a sibling of its rect,
-    // because some booths live inside nested `<g transform="matrix(1, 0,
-    // 0, 0.75, …)">` wrappers that scale the y axis non-uniformly. A
-    // sibling would inherit that squish and the digits render smooshed;
-    // placing them at the outer g keeps every label at the same visual
-    // size.
+    // ── Mode-aware on-rect labels ───────────────────────────────────
+    // Each mode shows the audience the thing they came for:
+    //   • homepage / vendors → vendor name on every rented booth
+    //     (single rects only — clusters already show the name from
+    //     renderMergedCluster).
+    //   • become-a-vendor → booth number on every available booth.
+    // Rented booths in become-a-vendor mode and available booths in
+    // public modes deliberately render with NO on-rect label — the
+    // hover tooltip carries the full info. This stops the cramped
+    // "vendor name + number + range" stack we used to render.
+    svg.querySelectorAll('[data-fp-rect-label]').forEach((el) => el.remove())
+    const labeledBooths = new Set<string>()
+    if (outerG && outerCTM) {
+      // Track which booths the cluster pass already absorbed — they get
+      // ALL added to labeledBooths so the dev-label fallback below can't
+      // stamp a stray booth number on top of the merged rect's centred
+      // vendor name. (The bug we just fixed: previously only the merged
+      // rect's primary booth went into labeledBooths, so the other
+      // cluster members' dev labels showed through.)
+      svg.querySelectorAll<SVGRectElement>(
+        'rect[data-booth][data-hidden-by-merge]',
+      ).forEach((r) => {
+        const num = r.getAttribute('data-booth')
+        if (num) labeledBooths.add(num)
+      })
+      svg.querySelectorAll<SVGRectElement>(
+        'rect[data-fp-merged][data-booth]',
+      ).forEach((r) => {
+        const num = r.getAttribute('data-booth')
+        if (num) labeledBooths.add(num)
+      })
+
+      if (mode === 'homepage' || mode === 'vendors') {
+        for (const b of booths) {
+          if (b.status !== 'rented' || !b.vendor) continue
+          if (labeledBooths.has(b.number)) continue
+          const rect = svg.querySelector<SVGRectElement>(
+            `rect[data-booth="${cssEscape(b.number)}"]`,
+          )
+          if (!rect) continue
+          addRectLabel({
+            svg,
+            outerG,
+            outerCTM,
+            rect,
+            text: displayName(b.vendor.name),
+            maxFontSize: 11,
+            minFontSize: 6,
+            weight: 700,
+          })
+          labeledBooths.add(b.number)
+        }
+      } else if (mode === 'become-a-vendor') {
+        // Number every non-blocked booth on this page. Available
+        // booths get a brighter weight so they read as "click me",
+        // and rented/reserved get a quieter weight to signal
+        // "context, not target" — both still numbered so the
+        // visitor can identify any booth on the map by sight.
+        for (const b of booths) {
+          if (b.status === 'blocked') continue
+          const rect = svg.querySelector<SVGRectElement>(
+            `rect[data-booth="${cssEscape(b.number)}"]`,
+          )
+          if (!rect) continue
+          const isAvail = b.status === 'available'
+          addRectLabel({
+            svg,
+            outerG,
+            outerCTM,
+            rect,
+            text: b.number,
+            maxFontSize: isAvail ? 9 : 7,
+            minFontSize: 5,
+            weight: isAvail ? 600 : 500,
+          })
+          labeledBooths.add(b.number)
+        }
+      }
+    }
+
+    // ── Dev-only fallback labels ────────────────────────────────────
+    // In development we want booth numbers visible on EVERY booth so
+    // the layout can be eyeballed against the CRM, but only on booths
+    // that didn't already get a mode-aware label (otherwise we're back
+    // to the cramped two-strings-per-rect problem). Append each label
+    // to the outermost scaled `<g>` rather than as a sibling of its
+    // rect, because some booths live inside nested
+    // `<g transform="matrix(1, 0, 0, 0.75, …)">` wrappers that scale
+    // the y axis non-uniformly.
     if (process.env.NODE_ENV === 'development') {
       svg.querySelectorAll('[data-fp-label]').forEach((el) => el.remove())
       if (outerG && outerCTM) {
         rects.forEach((rect) => {
           const number = rect.getAttribute('data-booth') ?? ''
           if (!number) return
+          if (labeledBooths.has(number)) return
           const x = parseFloat(rect.getAttribute('x') ?? '0')
           const y = parseFloat(rect.getAttribute('y') ?? '0')
           const w = parseFloat(rect.getAttribute('width') ?? '0')
           const h = parseFloat(rect.getAttribute('height') ?? '0')
-          // Project the rect's centre out of its local coord space
-          // (including any nested transforms) into the outer g's coord
-          // space, so the label sits at the right visual spot without
-          // inheriting any of the non-uniform scales.
           const rectCTM = rect.getCTM()
           if (!rectCTM || !outerCTM) return
           const pt = svg.createSVGPoint()
@@ -359,10 +445,11 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
           text.setAttribute('y', String(projected.y))
           text.setAttribute('text-anchor', 'middle')
           text.setAttribute('dominant-baseline', 'central')
-          text.setAttribute('font-size', '9')
+          text.setAttribute('font-size', '7')
           text.setAttribute('font-family', 'DM Sans, sans-serif')
-          text.setAttribute('font-weight', '700')
+          text.setAttribute('font-weight', '600')
           text.setAttribute('fill', '#2C2C2C')
+          text.setAttribute('opacity', '0.55')
           text.setAttribute('pointer-events', 'none')
           text.setAttribute('data-fp-label', '1')
           text.textContent = number
@@ -578,6 +665,7 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
           onToggle={(key) =>
             setFilter(key ? { kind: 'legend', legend: key } : { kind: 'none' })
           }
+          mode={mode}
         />
       </div>
     </div>
@@ -644,37 +732,88 @@ function ensureHoverOverlay(svg: SVGSVGElement): SVGRectElement {
 }
 
 function hideHoverOverlay(svg: SVGSVGElement) {
-  const overlay = svg.querySelector<SVGRectElement>('rect[data-fp-hover]')
-  if (overlay) overlay.style.display = 'none'
+  svg.querySelectorAll('[data-fp-hover]').forEach((el) => {
+    ;(el as SVGElement).style.display = 'none'
+  })
 }
 
 /**
- * Position the hover overlay over the given hit element, regardless of
- * whatever nested `<g transform>` wrappers the hit lives inside. We work
- * entirely in viewport pixels (getBoundingClientRect) and project back
- * into the SVG's root coordinate space — the overlay sits at the SVG
- * root, so it uses root coords directly.
+ * Render the orange highlight by CLONING the hit element (preserves
+ * its shape — rect, path, or anything else), stripping its identity
+ * attributes, swapping its fill/stroke for highlight styling, and
+ * appending the clone to the SVG root with a `transform` attribute
+ * that places it at the same screen position the original occupies.
+ *
+ * Why a clone instead of a positioned rect overlay:
+ *
+ *   - For rectangular booths, a rect overlay was fine.
+ *   - For merged clusters that are now rendered as polygon paths
+ *     (L/T/U-shapes), a rect overlay would highlight the bbox and
+ *     bleed into neighbouring booths. Cloning the path gives us
+ *     the exact perimeter for free.
+ *
+ * The transform we apply is `hit.getCTM()` — the chain of ancestor
+ * transforms that maps hit's local coords into SVG root coords.
+ * The clone lives at the SVG root with no other transforms, so
+ * applying that CTM puts it at the same place hit currently
+ * renders, regardless of how deeply nested hit was.
  */
 function updateHoverOverlay(svg: SVGSVGElement, hit: SVGGraphicsElement) {
-  const overlay = ensureHoverOverlay(svg)
-  const hitRect = hit.getBoundingClientRect()
-  const screenCTM = svg.getScreenCTM()
-  if (!screenCTM) return
-  const inv = screenCTM.inverse()
+  // Always rebuild — the overlay shape needs to match whatever was
+  // just hovered, and the perf cost of a clone+attribute strip is
+  // negligible at pointermove rate.
+  svg.querySelectorAll('[data-fp-hover]').forEach((el) => el.remove())
 
-  const pt = svg.createSVGPoint()
-  pt.x = hitRect.left
-  pt.y = hitRect.top
-  const topLeft = pt.matrixTransform(inv)
-  pt.x = hitRect.right
-  pt.y = hitRect.bottom
-  const botRight = pt.matrixTransform(inv)
-
-  overlay.setAttribute('x', String(topLeft.x))
-  overlay.setAttribute('y', String(topLeft.y))
-  overlay.setAttribute('width', String(botRight.x - topLeft.x))
-  overlay.setAttribute('height', String(botRight.y - topLeft.y))
+  const overlay = hit.cloneNode(false) as SVGGraphicsElement
+  ;[
+    'data-booth',
+    'data-status',
+    'data-fp-merged',
+    'data-hidden-by-merge',
+    'data-amenity',
+    'data-filter',
+    'aria-label',
+    'role',
+    'tabindex',
+    'class',
+    'id',
+  ].forEach((a) => overlay.removeAttribute(a))
+  overlay.setAttribute('data-fp-hover', '1')
+  overlay.setAttribute('pointer-events', 'none')
+  overlay.setAttribute('vector-effect', 'non-scaling-stroke')
+  // Wipe any inline styles inherited from the source (e.g. the merged
+  // path may have transition rules that would lag the highlight).
+  overlay.style.cssText = ''
+  overlay.style.fill = 'none'
+  overlay.style.stroke = '#E57200'
+  overlay.style.strokeWidth = '3px'
+  overlay.style.transition = 'none'
+  overlay.style.opacity = '1'
+  overlay.style.visibility = 'visible'
   overlay.style.display = 'block'
+
+  // We want overlay (a child of <svg>) to render at the same screen
+  // position as `hit`. Both elements live inside the same SVG, so:
+  //   overlay.screenCTM = svg.screenCTM × overlayAttrTransform
+  //   we want overlay.screenCTM = hit.screenCTM
+  // → overlayAttrTransform = svg.screenCTM⁻¹ × hit.screenCTM
+  // Using getCTM() instead of getScreenCTM() doesn't work here:
+  // some browsers return a screen-space CTM for direct svg
+  // descendants which then double-applies the viewBox scale when
+  // we re-attach the overlay under the SVG root.
+  const hitScreen = hit.getScreenCTM()
+  const svgScreen = svg.getScreenCTM()
+  if (hitScreen && svgScreen) {
+    const t = svgScreen.inverse().multiply(hitScreen)
+    overlay.setAttribute(
+      'transform',
+      `matrix(${t.a} ${t.b} ${t.c} ${t.d} ${t.e} ${t.f})`,
+    )
+  } else {
+    overlay.removeAttribute('transform')
+  }
+
+  svg.appendChild(overlay)
 }
 
 /**
@@ -702,6 +841,87 @@ type MergedBBox = {
   h: number
   right: number
   bottom: number
+}
+
+/**
+ * Compute the perimeter polygon of a cluster of axis-aligned rects
+ * as an SVG path "d" string. Works for any shape — rectangle,
+ * L, T, U, ring, etc. — by:
+ *
+ *   1. Emitting all 4 directed edges of every rect (clockwise).
+ *   2. Cancelling out edge pairs that point in opposite directions
+ *      along the same segment — those are interior shared edges
+ *      between adjacent rects.
+ *   3. Chaining the surviving (perimeter) edges into a closed loop
+ *      by following endpoint connectivity.
+ *
+ * Two collinear segments may meet at a corner with no cancellation;
+ * the resulting path simply has co-linear `L` segments which render
+ * fine. Tolerance covers floating-point drift in the projected
+ * bboxes (we work in outer-g coords).
+ */
+function computeClusterPath(
+  cluster: Array<{ bbox: MergedBBox }>,
+  tol: number,
+): string | null {
+  if (cluster.length === 0) return null
+
+  type Edge = { x1: number; y1: number; x2: number; y2: number }
+  const edges: Edge[] = []
+  for (const c of cluster) {
+    const { x, y, w, h } = c.bbox
+    // Clockwise winding so opposing-edge cancellation works.
+    edges.push({ x1: x, y1: y, x2: x + w, y2: y })           // top →
+    edges.push({ x1: x + w, y1: y, x2: x + w, y2: y + h })   // right ↓
+    edges.push({ x1: x + w, y1: y + h, x2: x, y2: y + h })   // bottom ←
+    edges.push({ x1: x, y1: y + h, x2: x, y2: y })           // left ↑
+  }
+
+  const close = (a: number, b: number) => Math.abs(a - b) < tol
+  const isOpposing = (a: Edge, b: Edge) =>
+    close(a.x1, b.x2) &&
+    close(a.y1, b.y2) &&
+    close(a.x2, b.x1) &&
+    close(a.y2, b.y1)
+
+  const removed = new Array<boolean>(edges.length).fill(false)
+  for (let i = 0; i < edges.length; i++) {
+    if (removed[i]) continue
+    for (let j = i + 1; j < edges.length; j++) {
+      if (removed[j]) continue
+      if (isOpposing(edges[i], edges[j])) {
+        removed[i] = true
+        removed[j] = true
+        break
+      }
+    }
+  }
+
+  const perimeter = edges.filter((_, i) => !removed[i])
+  if (perimeter.length === 0) return null
+
+  const used = new Array<boolean>(perimeter.length).fill(false)
+  const ordered: Edge[] = [perimeter[0]]
+  used[0] = true
+  while (ordered.length < perimeter.length) {
+    const last = ordered[ordered.length - 1]
+    let next = -1
+    for (let i = 0; i < perimeter.length; i++) {
+      if (used[i]) continue
+      if (close(perimeter[i].x1, last.x2) && close(perimeter[i].y1, last.y2)) {
+        next = i
+        break
+      }
+    }
+    if (next === -1) break // disconnected (shouldn't happen for a connected cluster)
+    ordered.push(perimeter[next])
+    used[next] = true
+  }
+
+  let d = `M ${ordered[0].x1} ${ordered[0].y1}`
+  for (const e of ordered) d += ` L ${e.x2} ${e.y2}`
+  d += ' Z'
+  return d
 }
 
 /**
@@ -769,15 +989,22 @@ function fitTextWidth(
 }
 
 /**
- * For a cluster of rented booths owned by one vendor, build a single
- * merged rectangle spanning their bounding box, hide the individual
- * booth rects, and label the merged rect with the vendor name +
- * booth-number range (Option E layout per the merge design brief).
+ * For a cluster of rented booths owned by one vendor, build ONE
+ * merged shape (an SVG <path> tracing the cluster's actual perimeter
+ * — handles L/T/U-shapes correctly, no internal borders) and hide
+ * the individual booth rects underneath. The vendor name label is
+ * added only on public modes (homepage / vendors); become-a-vendor
+ * skips merging upstream so this function is never called there.
+ *
+ * The label is positioned at the cluster's area-weighted centroid,
+ * not the bbox centre — for an L-shape the bbox centre lands in the
+ * empty corner, but the centroid stays inside the actual cluster.
  */
 function renderMergedCluster({
-  svg,
+  svg: _svg,
   outerG,
   cluster,
+  mode,
 }: {
   svg: SVGSVGElement
   outerG: SVGGElement
@@ -787,49 +1014,30 @@ function renderMergedCluster({
     rect: SVGRectElement
     bbox: MergedBBox
   }>
+  mode: FloorPlanMode
 }) {
-  const minX = Math.min(...cluster.map((c) => c.bbox.x))
-  const minY = Math.min(...cluster.map((c) => c.bbox.y))
-  const maxX = Math.max(...cluster.map((c) => c.bbox.right))
-  const maxY = Math.max(...cluster.map((c) => c.bbox.bottom))
-  const w = maxX - minX
-  const h = maxY - minY
+  const d = computeClusterPath(cluster, 2)
+  if (!d) return
 
-  // Hide the individual booths so pointer events reach the merged rect
-  // (visibility:hidden blocks pointers; display:none would remove the
-  // tooltip target we need for backup hovers).
+  // Hide the individual booths so pointer events reach the merged
+  // path. visibility:hidden blocks pointers; display:none would
+  // remove backup tooltip targets, so we use the former.
   cluster.forEach((c) => {
     c.rect.style.visibility = 'hidden'
     c.rect.setAttribute('data-hidden-by-merge', '1')
   })
 
-  // Hide any dev-only booth labels inside this cluster — the vendor
-  // name + range replaces them.
-  cluster.forEach((c) => {
-    const labels = svg.querySelectorAll<SVGTextElement>(
-      `text[data-fp-label]`,
-    )
-    labels.forEach((lbl) => {
-      if (lbl.textContent === c.number) lbl.style.visibility = 'hidden'
-    })
-  })
-
   const primary = cluster[0]
   const booth = primary.booth
 
-  // Merged rect (rented fill via data-status; data-booth so existing
-  // hit-test + hover-overlay + filter systems treat it like any booth).
   const merged = document.createElementNS(
     'http://www.w3.org/2000/svg',
-    'rect',
-  ) as SVGRectElement
+    'path',
+  ) as SVGPathElement
+  merged.setAttribute('d', d)
   merged.setAttribute('data-fp-merged', '1')
   merged.setAttribute('data-booth', primary.number)
   merged.setAttribute('data-status', 'rented')
-  merged.setAttribute('x', String(minX))
-  merged.setAttribute('y', String(minY))
-  merged.setAttribute('width', String(w))
-  merged.setAttribute('height', String(h))
   merged.setAttribute(
     'aria-label',
     `${booth.vendor?.name ?? 'Vendor'} — booths ${formatBoothRange(
@@ -840,44 +1048,149 @@ function renderMergedCluster({
   merged.setAttribute('tabindex', '0')
   outerG.appendChild(merged)
 
-  // Booth-number range — tiny text in the top-left corner.
-  const range = formatBoothRange(cluster.map((c) => c.number))
-  const rangeText = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'text',
-  ) as SVGTextElement
-  rangeText.setAttribute('data-fp-merged', '1')
-  rangeText.setAttribute('data-merged-label', 'range')
-  rangeText.setAttribute('x', String(minX + 2))
-  rangeText.setAttribute('y', String(minY + 2))
-  rangeText.setAttribute('dominant-baseline', 'hanging')
-  rangeText.setAttribute('font-family', 'DM Sans, sans-serif')
-  rangeText.setAttribute('font-weight', '600')
-  rangeText.setAttribute('font-size', '6')
-  rangeText.setAttribute('fill', '#2C2C2C')
-  rangeText.setAttribute('pointer-events', 'none')
-  rangeText.textContent = range
-  outerG.appendChild(rangeText)
-  // Clamp range text width to the merged rect.
-  fitTextWidth(rangeText, w - 4, 6, 3.5)
+  if (mode === 'homepage' || mode === 'vendors') {
+    // Area-weighted centroid: stays inside an L/T-shape's actual
+    // mass, never lands in the empty corner like a bbox centre would.
+    const totalArea = cluster.reduce(
+      (s, c) => s + c.bbox.w * c.bbox.h,
+      0,
+    )
+    const cx =
+      cluster.reduce(
+        (s, c) =>
+          s + (c.bbox.x + c.bbox.w / 2) * (c.bbox.w * c.bbox.h),
+        0,
+      ) / totalArea
+    const cy =
+      cluster.reduce(
+        (s, c) =>
+          s + (c.bbox.y + c.bbox.h / 2) * (c.bbox.w * c.bbox.h),
+        0,
+      ) / totalArea
 
-  // Vendor name — big and centred.
-  const nameText = document.createElementNS(
+    // Sizing reference: the booth at the centroid is the tightest
+    // local constraint (text shouldn't bleed across a gap if the
+    // cluster has one). Fall back to the smallest booth.
+    const containingBooth =
+      cluster.find(
+        (c) =>
+          cx >= c.bbox.x &&
+          cx <= c.bbox.right &&
+          cy >= c.bbox.y &&
+          cy <= c.bbox.bottom,
+      ) ??
+      cluster.reduce((a, b) =>
+        a.bbox.w * a.bbox.h <= b.bbox.w * b.bbox.h ? a : b,
+      )
+    const localW = containingBooth.bbox.w
+    const localH = containingBooth.bbox.h
+
+    const nameText = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text',
+    ) as SVGTextElement
+    nameText.setAttribute('data-fp-merged', '1')
+    nameText.setAttribute('data-merged-label', 'name')
+    nameText.setAttribute('x', String(cx))
+    nameText.setAttribute('y', String(cy))
+    nameText.setAttribute('text-anchor', 'middle')
+    nameText.setAttribute('dominant-baseline', 'central')
+    nameText.setAttribute('font-family', 'DM Sans, sans-serif')
+    nameText.setAttribute('font-weight', '700')
+    nameText.setAttribute('fill', '#2C2C2C')
+    nameText.setAttribute('pointer-events', 'none')
+    nameText.textContent = displayName(booth.vendor?.name ?? '')
+    outerG.appendChild(nameText)
+    fitTextWidth(
+      nameText,
+      localW * 1.6, // can extend slightly past the centroid booth
+      Math.min(14, localH * 0.55),
+      6,
+    )
+  }
+}
+
+/**
+ * Strip parenthetical descriptors from a vendor name for on-rect
+ * labelling. The hover tooltip carries the full string, so the rect
+ * itself only needs the headline name. Without this, names like
+ * "Sea Lux Inc (Seven Sea's Lavender Yellow)" force the fitter all
+ * the way down to font-size 6 to fit the parenthetical, leaving the
+ * actual business name unreadable.
+ *
+ * If stripping leaves an empty string (the whole name was wrapped
+ * in parens, somehow) we fall back to the original.
+ */
+function displayName(name: string): string {
+  const stripped = name.replace(/\s*\([^)]*\)\s*/g, ' ').trim()
+  return stripped || name.trim()
+}
+
+/**
+ * Drop a centred text label inside a single booth rect, projected out
+ * of any nested transforms into the outer scaled-group's coord space.
+ * Auto-shrinks to fit; ellipses if it still overflows at minFontSize.
+ */
+function addRectLabel({
+  svg,
+  outerG,
+  outerCTM,
+  rect,
+  text: content,
+  maxFontSize,
+  minFontSize,
+  weight,
+}: {
+  svg: SVGSVGElement
+  outerG: SVGGElement
+  outerCTM: DOMMatrix
+  rect: SVGRectElement
+  text: string
+  maxFontSize: number
+  minFontSize: number
+  weight: number
+}) {
+  const x = parseFloat(rect.getAttribute('x') ?? '0')
+  const y = parseFloat(rect.getAttribute('y') ?? '0')
+  const w = parseFloat(rect.getAttribute('width') ?? '0')
+  const h = parseFloat(rect.getAttribute('height') ?? '0')
+  const rectCTM = rect.getCTM()
+  if (!rectCTM) return
+
+  const transform = outerCTM.inverse().multiply(rectCTM)
+  const tl = svg.createSVGPoint()
+  tl.x = x
+  tl.y = y
+  const br = svg.createSVGPoint()
+  br.x = x + w
+  br.y = y + h
+  const pTL = tl.matrixTransform(transform)
+  const pBR = br.matrixTransform(transform)
+  const projW = pBR.x - pTL.x
+  const projH = pBR.y - pTL.y
+  const cx = (pTL.x + pBR.x) / 2
+  const cy = (pTL.y + pBR.y) / 2
+
+  const text = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'text',
   ) as SVGTextElement
-  nameText.setAttribute('data-fp-merged', '1')
-  nameText.setAttribute('data-merged-label', 'name')
-  nameText.setAttribute('x', String(minX + w / 2))
-  nameText.setAttribute('y', String(minY + h / 2))
-  nameText.setAttribute('text-anchor', 'middle')
-  nameText.setAttribute('dominant-baseline', 'central')
-  nameText.setAttribute('font-family', 'DM Sans, sans-serif')
-  nameText.setAttribute('font-weight', '700')
-  nameText.setAttribute('fill', '#2C2C2C')
-  nameText.setAttribute('pointer-events', 'none')
-  nameText.textContent = (booth.vendor?.name ?? '').trim()
-  outerG.appendChild(nameText)
-  fitTextWidth(nameText, w - 6, Math.min(14, h * 0.45), 5)
+  text.setAttribute('x', String(cx))
+  text.setAttribute('y', String(cy))
+  text.setAttribute('text-anchor', 'middle')
+  text.setAttribute('dominant-baseline', 'central')
+  text.setAttribute('font-family', 'DM Sans, sans-serif')
+  text.setAttribute('font-weight', String(weight))
+  text.setAttribute('fill', '#2C2C2C')
+  text.setAttribute('pointer-events', 'none')
+  text.setAttribute('data-fp-rect-label', '1')
+  text.textContent = content.trim()
+  outerG.appendChild(text)
+  fitTextWidth(
+    text,
+    projW * 0.85,
+    Math.min(maxFontSize, projH * 0.55),
+    minFontSize,
+  )
 }
 
