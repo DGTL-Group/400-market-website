@@ -123,18 +123,26 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     if (filter.kind === 'search') {
       const q = filter.query.toLowerCase()
       if (!q) return null
+      // Names and categories use a word-boundary match so the
+      // query has to land at the START of a word: "Art" matches
+      // "Art Place" but not "Mart" / "Walmart" / "Smart". Without
+      // this, a 3-letter search would dim almost nothing because
+      // it overlapped a letter in too many vendor names.
+      // Booth numbers keep substring semantics so "17" still
+      // finds "1702".
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const wordBoundaryRe = new RegExp(`\\b${escaped}`, 'i')
       for (const b of booths) {
         if (b.number.toLowerCase().includes(q)) {
           boothNumbers.add(b.number)
           continue
         }
-        const name = b.vendor?.name.toLowerCase() ?? ''
-        if (name.includes(q)) {
+        if (b.vendor?.name && wordBoundaryRe.test(b.vendor.name)) {
           boothNumbers.add(b.number)
           continue
         }
         const cats = b.vendor?.category ?? []
-        if (cats.some((c) => c.toLowerCase().includes(q))) {
+        if (cats.some((c) => wordBoundaryRe.test(c))) {
           boothNumbers.add(b.number)
         }
       }
@@ -452,6 +460,9 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
           text.setAttribute('opacity', '0.55')
           text.setAttribute('pointer-events', 'none')
           text.setAttribute('data-fp-label', '1')
+          // Same booth number on the label so the filter effect
+          // dims/matches dev labels in step with their booth rect.
+          text.setAttribute('data-booth', number)
           text.textContent = number
           outerG.appendChild(text)
         })
@@ -509,21 +520,55 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     if (!svg) return
 
     const rects = svg.querySelectorAll<SVGRectElement>('rect[data-booth]')
+    // Single-booth labels (vendor names on un-merged rented booths)
+    // and dev booth-number labels both carry data-booth, so a single
+    // selector handles them and they dim/match in step with the
+    // rects they sit on.
+    const labelTexts = svg.querySelectorAll<SVGTextElement>('text[data-booth]')
     const amenityEls = svg.querySelectorAll<SVGGraphicsElement>('[data-amenity]')
-    const foodCourtGroup = svg.querySelector<SVGGElement>('g[id="Food-Court"]')
+    // Merged-cluster shapes (path) and their labels both carry
+    // `data-cluster-booths` listing every booth in the cluster, so
+    // a single query handles them together. They highlight when ANY
+    // of their member booths matches the search.
+    const clusterEls = svg.querySelectorAll<SVGElement>(
+      '[data-cluster-booths]',
+    )
+    // The food court's dashed orange border + "FOOD COURT" label.
+    // These are decorative and don't have data-booth, so we treat
+    // them as a unit: they stay full opacity when the active
+    // filter is "food court" itself OR "active vendors / rented"
+    // (since the food court is full of rented stalls, dimming it
+    // alongside the empty floor would be misleading). For every
+    // other filter — restrooms, ATM, an arbitrary search — they
+    // dim with everything else.
+    const foodCourtFrame = svg.querySelectorAll<SVGElement>(
+      '.fp-food-court-zone, .fp-food-court-label',
+    )
 
     if (!filterMatch) {
       rects.forEach((r) => r.removeAttribute('data-filter'))
+      labelTexts.forEach((t) => t.removeAttribute('data-filter'))
       amenityEls.forEach((el) => el.removeAttribute('data-filter'))
-      foodCourtGroup?.removeAttribute('data-filter')
+      clusterEls.forEach((el) => el.removeAttribute('data-filter'))
+      foodCourtFrame.forEach((el) => el.removeAttribute('data-filter'))
       return
     }
 
-    const { boothNumbers, amenities, foodCourt } = filterMatch
+    const { boothNumbers, amenities } = filterMatch
+    const foodCourtRelevant =
+      filter.kind === 'legend' &&
+      (filter.legend === 'food-court' || filter.legend === 'rented')
 
-    rects.forEach((r) => {
-      const num = r.getAttribute('data-booth') ?? ''
-      r.setAttribute('data-filter', boothNumbers.has(num) ? 'match' : 'dim')
+    const stampBoothFilter = (el: Element) => {
+      const num = el.getAttribute('data-booth') ?? ''
+      el.setAttribute('data-filter', boothNumbers.has(num) ? 'match' : 'dim')
+    }
+    rects.forEach(stampBoothFilter)
+    labelTexts.forEach(stampBoothFilter)
+    clusterEls.forEach((el) => {
+      const list = (el.getAttribute('data-cluster-booths') ?? '').split(',')
+      const matches = list.some((n) => boothNumbers.has(n))
+      el.setAttribute('data-filter', matches ? 'match' : 'dim')
     })
     amenityEls.forEach((el) => {
       const kind = el.getAttribute('data-amenity') as AmenityKind | null
@@ -532,10 +577,17 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
         kind && amenities.has(kind) ? 'match' : 'dim',
       )
     })
-    if (foodCourtGroup) {
-      foodCourtGroup.setAttribute('data-filter', foodCourt ? 'match' : 'dim')
-    }
-  }, [filterMatch])
+    // Frame is decorative — it should never wear the orange match
+    // outline. Either it dims with everything else, or it goes back
+    // to its default rendering. No "match" state.
+    foodCourtFrame.forEach((el) => {
+      if (foodCourtRelevant) {
+        el.removeAttribute('data-filter')
+      } else {
+        el.setAttribute('data-filter', 'dim')
+      }
+    })
+  }, [filterMatch, filter])
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -620,7 +672,7 @@ export function FloorPlanSVG({ mode, svgMarkup, booths }: Props) {
     <div>
       {/* Breathing room above the search input — the map used to slam
           up against whatever was above it. */}
-      <div className="pt-6 md:pt-8">
+      <div className="py-6 md:py-8">
         {/* Search bar — typing clears any pinned legend row. */}
         <FloorPlanSearch
           matchCount={searchMatchCount}
@@ -844,84 +896,210 @@ type MergedBBox = {
 }
 
 /**
- * Compute the perimeter polygon of a cluster of axis-aligned rects
- * as an SVG path "d" string. Works for any shape — rectangle,
- * L, T, U, ring, etc. — by:
+ * Discretise a cluster of axis-aligned rects into a uniform grid
+ * whose cell boundaries fall at every booth edge. Returns the grid
+ * (`filled[r][c]` = is cell (r, c) covered by some booth) plus the
+ * sorted x and y boundary coordinates. This grid is the shared
+ * foundation for both the perimeter trace AND the largest-
+ * inscribed-rect search — every booth aligns to the grid by
+ * construction, so the only question for any cell is "filled or
+ * empty?".
+ */
+function buildClusterGrid(
+  cluster: Array<{ bbox: MergedBBox }>,
+  tol: number,
+): { filled: boolean[][]; xs: number[]; ys: number[] } | null {
+  if (cluster.length === 0) return null
+  const xSet = new Set<number>()
+  const ySet = new Set<number>()
+  for (const c of cluster) {
+    xSet.add(c.bbox.x)
+    xSet.add(c.bbox.right)
+    ySet.add(c.bbox.y)
+    ySet.add(c.bbox.bottom)
+  }
+  const xs = [...xSet].sort((a, b) => a - b)
+  const ys = [...ySet].sort((a, b) => a - b)
+  const xN = xs.length - 1
+  const yN = ys.length - 1
+  if (xN <= 0 || yN <= 0) return null
+
+  const filled: boolean[][] = []
+  for (let r = 0; r < yN; r++) {
+    const row: boolean[] = []
+    for (let c = 0; c < xN; c++) {
+      const cx = (xs[c] + xs[c + 1]) / 2
+      const cy = (ys[r] + ys[r + 1]) / 2
+      let inside = false
+      for (const cl of cluster) {
+        if (
+          cx >= cl.bbox.x - tol &&
+          cx <= cl.bbox.right + tol &&
+          cy >= cl.bbox.y - tol &&
+          cy <= cl.bbox.bottom + tol
+        ) {
+          inside = true
+          break
+        }
+      }
+      row.push(inside)
+    }
+    filled.push(row)
+  }
+  return { filled, xs, ys }
+}
+
+/**
+ * Compute the perimeter of a cluster of axis-aligned rects as an
+ * SVG path "d" string. Handles ANY shape — rectangle, L, T, U, ring
+ * with hole, even disjoint islands — because we work from a cell
+ * grid, not from edge cancellation. For each filled cell we emit a
+ * directed edge (clockwise) on every side whose neighbour is empty
+ * or off-grid. Those edges are the perimeter. We then chain them
+ * into one or more closed loops (`M…Z` per loop) — multiple loops
+ * naturally fall out for shapes with holes.
  *
- *   1. Emitting all 4 directed edges of every rect (clockwise).
- *   2. Cancelling out edge pairs that point in opposite directions
- *      along the same segment — those are interior shared edges
- *      between adjacent rects.
- *   3. Chaining the surviving (perimeter) edges into a closed loop
- *      by following endpoint connectivity.
- *
- * Two collinear segments may meet at a corner with no cancellation;
- * the resulting path simply has co-linear `L` segments which render
- * fine. Tolerance covers floating-point drift in the projected
- * bboxes (we work in outer-g coords).
+ * The previous implementation used edge cancellation that only
+ * fired on EXACT mirror edges. For Nicky's 3 for 10 — a wide
+ * top-row booth meeting a narrow right-column booth — the bottom
+ * edge of the top-row (122 wide) only partially overlapped the top
+ * edge of the right-column (44 wide), so neither cancelled and the
+ * resulting `d` contained an interior crossing line. The grid
+ * approach sidesteps that whole class of bug.
  */
 function computeClusterPath(
   cluster: Array<{ bbox: MergedBBox }>,
   tol: number,
 ): string | null {
-  if (cluster.length === 0) return null
+  const grid = buildClusterGrid(cluster, tol)
+  if (!grid) return null
+  const { filled, xs, ys } = grid
+  const yN = filled.length
+  const xN = filled[0].length
 
   type Edge = { x1: number; y1: number; x2: number; y2: number }
   const edges: Edge[] = []
-  for (const c of cluster) {
-    const { x, y, w, h } = c.bbox
-    // Clockwise winding so opposing-edge cancellation works.
-    edges.push({ x1: x, y1: y, x2: x + w, y2: y })           // top →
-    edges.push({ x1: x + w, y1: y, x2: x + w, y2: y + h })   // right ↓
-    edges.push({ x1: x + w, y1: y + h, x2: x, y2: y + h })   // bottom ←
-    edges.push({ x1: x, y1: y + h, x2: x, y2: y })           // left ↑
+  for (let r = 0; r < yN; r++) {
+    for (let c = 0; c < xN; c++) {
+      if (!filled[r][c]) continue
+      const x1 = xs[c],
+        x2 = xs[c + 1]
+      const y1 = ys[r],
+        y2 = ys[r + 1]
+      if (r === 0 || !filled[r - 1][c]) {
+        edges.push({ x1, y1, x2, y2: y1 }) // top →
+      }
+      if (c === xN - 1 || !filled[r][c + 1]) {
+        edges.push({ x1: x2, y1, x2, y2 }) // right ↓
+      }
+      if (r === yN - 1 || !filled[r + 1][c]) {
+        edges.push({ x1: x2, y1: y2, x2: x1, y2 }) // bottom ←
+      }
+      if (c === 0 || !filled[r][c - 1]) {
+        edges.push({ x1, y1: y2, x2: x1, y2: y1 }) // left ↑
+      }
+    }
   }
+  if (edges.length === 0) return null
 
+  // Chain edges into closed loops. A cluster with a hole produces
+  // two loops (outer + inner); disjoint islands produce one loop
+  // each.
   const close = (a: number, b: number) => Math.abs(a - b) < tol
-  const isOpposing = (a: Edge, b: Edge) =>
-    close(a.x1, b.x2) &&
-    close(a.y1, b.y2) &&
-    close(a.x2, b.x1) &&
-    close(a.y2, b.y1)
+  const used = new Array<boolean>(edges.length).fill(false)
+  const parts: string[] = []
+  for (let start = 0; start < edges.length; start++) {
+    if (used[start]) continue
+    const loop: Edge[] = [edges[start]]
+    used[start] = true
+    while (true) {
+      const last = loop[loop.length - 1]
+      let next = -1
+      for (let i = 0; i < edges.length; i++) {
+        if (used[i]) continue
+        if (
+          close(edges[i].x1, last.x2) &&
+          close(edges[i].y1, last.y2)
+        ) {
+          next = i
+          break
+        }
+      }
+      if (next === -1) break
+      loop.push(edges[next])
+      used[next] = true
+    }
+    parts.push(`M ${loop[0].x1} ${loop[0].y1}`)
+    for (const e of loop) parts.push(`L ${e.x2} ${e.y2}`)
+    parts.push('Z')
+  }
+  return parts.length ? parts.join(' ') : null
+}
 
-  const removed = new Array<boolean>(edges.length).fill(false)
-  for (let i = 0; i < edges.length; i++) {
-    if (removed[i]) continue
-    for (let j = i + 1; j < edges.length; j++) {
-      if (removed[j]) continue
-      if (isOpposing(edges[i], edges[j])) {
-        removed[i] = true
-        removed[j] = true
-        break
+/**
+ * Find the BEST axis-aligned rectangle inscribed in the cluster's
+ * union for label placement. "Best" = a width-biased score that
+ * prefers landscape rectangles over portrait — the label is
+ * horizontal so a 60×25 row reads better than a 25×50 column even
+ * though the column has slightly less raw area.
+ *
+ * Score: `area × aspectFactor`, where aspectFactor = 1 for
+ * landscape (w ≥ h) and `0.4 + 0.6 × (w/h)` for portrait. So a
+ * square gets 1.0, a 1:2 portrait gets 0.7, a 1:4 portrait gets
+ * 0.55. This nudges the picker toward the wider arm of an L/T
+ * cluster without disqualifying portrait when it's the only option
+ * (e.g. Camp Hill, a single narrow column).
+ *
+ * Brute-force O(N⁴) over grid cells, but our N is small (≤ ~10
+ * unique booth edges per cluster) so this runs in microseconds.
+ */
+type InscribedRect = { x1: number; y1: number; x2: number; y2: number }
+function findLargestInscribedRect(
+  cluster: Array<{ bbox: MergedBBox }>,
+  tol: number,
+): InscribedRect | null {
+  const grid = buildClusterGrid(cluster, tol)
+  if (!grid) return null
+  const { filled, xs, ys } = grid
+  const yN = filled.length
+  const xN = filled[0].length
+
+  let bestScore = 0
+  let best: InscribedRect | null = null
+  for (let r1 = 0; r1 < yN; r1++) {
+    for (let r2 = r1; r2 < yN; r2++) {
+      for (let c1 = 0; c1 < xN; c1++) {
+        // Walk c2 from c1 forward; the moment any cell in the
+        // current column is empty, no larger c2 can possibly form
+        // a covered rect with this c1, so break.
+        for (let c2 = c1; c2 < xN; c2++) {
+          let columnFilled = true
+          for (let i = r1; i <= r2; i++) {
+            if (!filled[i][c2]) {
+              columnFilled = false
+              break
+            }
+          }
+          if (!columnFilled) break
+          const w = xs[c2 + 1] - xs[c1]
+          const h = ys[r2 + 1] - ys[r1]
+          const aspectFactor =
+            w >= h ? 1 : 0.4 + 0.6 * (w / h)
+          const score = w * h * aspectFactor
+          if (score > bestScore) {
+            bestScore = score
+            best = {
+              x1: xs[c1],
+              y1: ys[r1],
+              x2: xs[c2 + 1],
+              y2: ys[r2 + 1],
+            }
+          }
+        }
       }
     }
   }
-
-  const perimeter = edges.filter((_, i) => !removed[i])
-  if (perimeter.length === 0) return null
-
-  const used = new Array<boolean>(perimeter.length).fill(false)
-  const ordered: Edge[] = [perimeter[0]]
-  used[0] = true
-  while (ordered.length < perimeter.length) {
-    const last = ordered[ordered.length - 1]
-    let next = -1
-    for (let i = 0; i < perimeter.length; i++) {
-      if (used[i]) continue
-      if (close(perimeter[i].x1, last.x2) && close(perimeter[i].y1, last.y2)) {
-        next = i
-        break
-      }
-    }
-    if (next === -1) break // disconnected (shouldn't happen for a connected cluster)
-    ordered.push(perimeter[next])
-    used[next] = true
-  }
-
-  let d = `M ${ordered[0].x1} ${ordered[0].y1}`
-  for (const e of ordered) d += ` L ${e.x2} ${e.y2}`
-  d += ' Z'
-  return d
+  return best
 }
 
 /**
@@ -965,6 +1143,15 @@ function formatBoothRange(numbers: string[]): string {
  * Shrink a text element's font-size until its bounding box fits
  * `maxWidth` OR hits `minSize`. If still overflowing at minSize,
  * truncate with a trailing ellipsis.
+ *
+ * Width measurement is robust: prefer `getComputedTextLength` (the
+ * SVG-native method), fall back to `getBBox().width`, and if both
+ * return 0 \u2014 which happens when the SVG hasn't been laid out yet
+ * (text inside a not-yet-rendered region, fonts still warming up,
+ * etc.) \u2014 fall back to a char-count \u00d7 font-size estimate. Without
+ * the estimate, we'd accept a 0-width measurement as "fits", and
+ * the label would render at full length AT runtime, protruding
+ * past its booth.
  */
 function fitTextWidth(
   text: SVGTextElement,
@@ -972,16 +1159,52 @@ function fitTextWidth(
   maxSize: number,
   minSize: number,
 ) {
+  // DM Sans bold (weight 700) average glyph advance is ~0.58 \u00d7 size.
+  // We use the LARGER of the real-measured width and this estimate
+  // so we still truncate correctly when:
+  //   - getBBox / getComputedTextLength returns 0 (SVG not yet
+  //     laid out \u2014 happens for offscreen/large SVGs)
+  //   - DM Sans hasn't loaded yet and the browser measures with a
+  //     narrower fallback font (the dev console actually reports
+  //     `document.fonts.status === "loaded"` but the SVG text
+  //     element gets stale measurements until next paint)
+  // Over-truncating slightly when the real font happens to be narrow
+  // is a much better failure mode than under-truncating and having
+  // labels protrude into neighbouring booths.
+  const charRatio = 0.58
+
+  const widthAt = (): number => {
+    const content = text.textContent ?? ''
+    const size =
+      parseFloat(text.getAttribute('font-size') ?? String(maxSize)) ||
+      maxSize
+    const charEst = content.length * size * charRatio
+    let measured = 0
+    try {
+      measured = text.getComputedTextLength()
+    } catch {
+      /* not yet attached / no layout */
+    }
+    if (!measured) {
+      try {
+        measured = text.getBBox().width
+      } catch {
+        /* same */
+      }
+    }
+    return Math.max(measured, charEst)
+  }
+
   let size = maxSize
   text.setAttribute('font-size', String(size))
-  while (size > minSize && text.getBBox().width > maxWidth) {
+  while (size > minSize && widthAt() > maxWidth) {
     size -= 1
     text.setAttribute('font-size', String(size))
   }
-  if (text.getBBox().width > maxWidth) {
+  if (widthAt() > maxWidth) {
     const original = text.textContent ?? ''
     let trimmed = original
-    while (trimmed.length > 3 && text.getBBox().width > maxWidth) {
+    while (trimmed.length > 3 && widthAt() > maxWidth) {
       trimmed = trimmed.slice(0, -1)
       text.textContent = trimmed.replace(/\s+$/, '') + '\u2026'
     }
@@ -1029,6 +1252,12 @@ function renderMergedCluster({
 
   const primary = cluster[0]
   const booth = primary.booth
+  // List of every booth number in this cluster, joined for use as
+  // a single attribute. The filter effect uses this to decide
+  // whether the merged path / its label should highlight: a search
+  // for booth "1702" should light up the merged path even if the
+  // primary's number is "1700".
+  const clusterBooths = cluster.map((c) => c.number).join(',')
 
   const merged = document.createElementNS(
     'http://www.w3.org/2000/svg',
@@ -1037,6 +1266,7 @@ function renderMergedCluster({
   merged.setAttribute('d', d)
   merged.setAttribute('data-fp-merged', '1')
   merged.setAttribute('data-booth', primary.number)
+  merged.setAttribute('data-cluster-booths', clusterBooths)
   merged.setAttribute('data-status', 'rented')
   merged.setAttribute(
     'aria-label',
@@ -1049,64 +1279,45 @@ function renderMergedCluster({
   outerG.appendChild(merged)
 
   if (mode === 'homepage' || mode === 'vendors') {
-    // Area-weighted centroid: stays inside an L/T-shape's actual
-    // mass, never lands in the empty corner like a bbox centre would.
-    const totalArea = cluster.reduce(
-      (s, c) => s + c.bbox.w * c.bbox.h,
-      0,
-    )
-    const cx =
-      cluster.reduce(
-        (s, c) =>
-          s + (c.bbox.x + c.bbox.w / 2) * (c.bbox.w * c.bbox.h),
-        0,
-      ) / totalArea
-    const cy =
-      cluster.reduce(
-        (s, c) =>
-          s + (c.bbox.y + c.bbox.h / 2) * (c.bbox.w * c.bbox.h),
-        0,
-      ) / totalArea
+    // Place the label at the centre of the LARGEST INSCRIBED
+    // RECTANGLE — the biggest axis-aligned sub-rect that lies
+    // entirely inside the cluster's union shape.
+    //
+    // Why not just bbox centre? For a rectangular cluster these
+    // ARE the same answer. For an L/T/U cluster the bbox centre
+    // can land in the empty arm OR in a narrow part of the
+    // cluster where the label width has nowhere to expand without
+    // bleeding into empty space. The LIR centre always sits inside
+    // the cluster AND has at least LIR.width room for the label,
+    // so the dead-centre intent is preserved when the cluster is
+    // a simple rectangle, and a sensible fallback kicks in when
+    // it isn't. No per-cluster tuning required — the layout can
+    // change at any time and the rule still gives a clean result.
+    const lir =
+      findLargestInscribedRect(cluster, 2) ??
+      // Defensive fallback (shouldn't normally trigger): use the
+      // overall bbox so SOMETHING renders.
+      (() => {
+        const mnx = Math.min(...cluster.map((c) => c.bbox.x))
+        const mxx = Math.max(...cluster.map((c) => c.bbox.right))
+        const mny = Math.min(...cluster.map((c) => c.bbox.y))
+        const mxy = Math.max(...cluster.map((c) => c.bbox.bottom))
+        return { x1: mnx, y1: mny, x2: mxx, y2: mxy }
+      })()
+    const cx = (lir.x1 + lir.x2) / 2
+    const cy = (lir.y1 + lir.y2) / 2
+    const localW = lir.x2 - lir.x1
+    const localH = lir.y2 - lir.y1
 
-    // Sizing reference: the booth at the centroid is the tightest
-    // local constraint (text shouldn't bleed across a gap if the
-    // cluster has one). Fall back to the smallest booth.
-    const containingBooth =
-      cluster.find(
-        (c) =>
-          cx >= c.bbox.x &&
-          cx <= c.bbox.right &&
-          cy >= c.bbox.y &&
-          cy <= c.bbox.bottom,
-      ) ??
-      cluster.reduce((a, b) =>
-        a.bbox.w * a.bbox.h <= b.bbox.w * b.bbox.h ? a : b,
-      )
-    const localW = containingBooth.bbox.w
-    const localH = containingBooth.bbox.h
-
-    const nameText = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'text',
-    ) as SVGTextElement
-    nameText.setAttribute('data-fp-merged', '1')
-    nameText.setAttribute('data-merged-label', 'name')
-    nameText.setAttribute('x', String(cx))
-    nameText.setAttribute('y', String(cy))
-    nameText.setAttribute('text-anchor', 'middle')
-    nameText.setAttribute('dominant-baseline', 'central')
-    nameText.setAttribute('font-family', 'DM Sans, sans-serif')
-    nameText.setAttribute('font-weight', '700')
-    nameText.setAttribute('fill', '#2C2C2C')
-    nameText.setAttribute('pointer-events', 'none')
-    nameText.textContent = displayName(booth.vendor?.name ?? '')
-    outerG.appendChild(nameText)
-    fitTextWidth(
-      nameText,
-      localW * 1.6, // can extend slightly past the centroid booth
-      Math.min(14, localH * 0.55),
-      6,
-    )
+    addClusterNameLabel({
+      outerG,
+      x: cx,
+      y: cy,
+      width: localW,
+      height: localH,
+      text: displayName(booth.vendor?.name ?? ''),
+      clusterBooths,
+    })
   }
 }
 
@@ -1124,6 +1335,185 @@ function renderMergedCluster({
 function displayName(name: string): string {
   const stripped = name.replace(/\s*\([^)]*\)\s*/g, ' ').trim()
   return stripped || name.trim()
+}
+
+/** Clamp `v` to the inclusive range [lo, hi]. */
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, v))
+}
+
+/**
+ * Greedy word-wrap fitter. Finds the LARGEST font-size at which the
+ * text wraps to fit on word boundaries inside a (maxWidth × maxHeight)
+ * box. Three-pass strategy:
+ *
+ *   1. Pure word-wrap, no truncation — try sizes from max down to
+ *      min, return the first size whose wrapped layout fits.
+ *   2. Word-wrap with last-word truncation — if a single word
+ *      (e.g. "Jewellers") is too wide for the cluster at every size,
+ *      truncate THAT word with an ellipsis on its own line instead
+ *      of bailing entirely. Preserves the other words intact.
+ *   3. Final fallback — single line truncated to fit at minSize.
+ *
+ * Char-width measurement is the deterministic 0.58 × size estimate
+ * (same factor used elsewhere) so the fitter is reproducible across
+ * font-loading states.
+ */
+function fitMultilineText({
+  text,
+  maxWidth,
+  maxHeight,
+  maxSize,
+  minSize,
+}: {
+  text: string
+  maxWidth: number
+  maxHeight: number
+  maxSize: number
+  minSize: number
+}): { lines: string[]; size: number } {
+  const charRatio = 0.58
+  const lineHeight = 1.15
+  const trimmed = text.trim()
+  const words = trimmed.split(/\s+/).filter(Boolean)
+  if (words.length === 0) return { lines: [''], size: minSize }
+
+  const wrap = (
+    size: number,
+    allowTruncate: boolean,
+  ): string[] | null => {
+    const lines: string[] = []
+    let line = ''
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i]
+      const candidate = line ? line + ' ' + w : w
+      if (candidate.length * size * charRatio <= maxWidth) {
+        line = candidate
+        continue
+      }
+      if (line) lines.push(line)
+      if (w.length * size * charRatio > maxWidth) {
+        if (!allowTruncate) return null
+        // Truncate the offending word and stop — any remaining
+        // words after a truncated one would just clutter the label.
+        let trunc = w
+        while (
+          trunc.length > 1 &&
+          (trunc.length + 1) * size * charRatio > maxWidth
+        ) {
+          trunc = trunc.slice(0, -1)
+        }
+        lines.push(trunc.replace(/\s+$/, '') + '…')
+        line = ''
+        break
+      }
+      line = w
+    }
+    if (line) lines.push(line)
+    if (lines.length === 0) return null
+    if (lines.length * size * lineHeight > maxHeight) return null
+    return lines
+  }
+
+  // Pass 1: pure word-wrap, no truncation.
+  for (let size = Math.floor(maxSize); size >= minSize; size--) {
+    const lines = wrap(size, false)
+    if (lines) return { lines, size }
+  }
+  // Pass 2: allow last-word truncation.
+  for (let size = Math.floor(maxSize); size >= minSize; size--) {
+    const lines = wrap(size, true)
+    if (lines) return { lines, size }
+  }
+  // Pass 3: degrade to a single truncated line at minSize.
+  let s = trimmed
+  while (
+    s.length > 1 &&
+    (s.length + 1) * minSize * charRatio > maxWidth
+  ) {
+    s = s.slice(0, -1)
+  }
+  return {
+    lines: [s.replace(/\s+$/, '') + '…'],
+    size: minSize,
+  }
+}
+
+/**
+ * Render a centred multi-line text label inside a cluster's largest
+ * inscribed rectangle. The label gets a small INSET on each side so
+ * it never visually touches the cluster's boundary stroke. Lines
+ * are emitted as `<tspan>` children of one `<text>` so all share
+ * the same font attributes; their `dy` values shift each line down
+ * by `size × lineHeight` from the previous, with the first line
+ * bumped UP by half the total block height so the block as a whole
+ * is centred on (x, y).
+ */
+function addClusterNameLabel({
+  outerG,
+  x,
+  y,
+  width,
+  height,
+  text: content,
+  clusterBooths,
+}: {
+  outerG: SVGGElement
+  x: number
+  y: number
+  width: number
+  height: number
+  text: string
+  /** Comma-joined cluster booth numbers, used by the filter effect
+   *  to dim/match this label in lockstep with its merged path. */
+  clusterBooths: string
+}) {
+  // Adaptive padding: scales with the LIR so big clusters get
+  // generous breathing room while tiny clusters don't sacrifice all
+  // their writable area to insets. Vertical inset is a touch larger
+  // (multi-line labels need top/bottom space to read clearly).
+  const INSET_X = clamp(width * 0.10, 2.5, 6)
+  const INSET_Y = clamp(height * 0.12, 3, 6)
+  const lineHeight = 1.15
+  const fit = fitMultilineText({
+    text: content,
+    maxWidth: Math.max(8, width - INSET_X * 2),
+    maxHeight: Math.max(8, height - INSET_Y * 2),
+    maxSize: 14,
+    minSize: 5,
+  })
+  const blockHeight = (fit.lines.length - 1) * fit.size * lineHeight
+  const firstDy = -blockHeight / 2
+  const stepDy = fit.size * lineHeight
+
+  const textEl = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text',
+  ) as SVGTextElement
+  textEl.setAttribute('data-fp-merged', '1')
+  textEl.setAttribute('data-merged-label', 'name')
+  textEl.setAttribute('data-cluster-booths', clusterBooths)
+  textEl.setAttribute('x', String(x))
+  textEl.setAttribute('y', String(y))
+  textEl.setAttribute('text-anchor', 'middle')
+  textEl.setAttribute('dominant-baseline', 'central')
+  textEl.setAttribute('font-family', 'DM Sans, sans-serif')
+  textEl.setAttribute('font-weight', '700')
+  textEl.setAttribute('font-size', String(fit.size))
+  textEl.setAttribute('fill', '#2C2C2C')
+  textEl.setAttribute('pointer-events', 'none')
+
+  for (let i = 0; i < fit.lines.length; i++) {
+    const tspan = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'tspan',
+    ) as SVGTSpanElement
+    tspan.setAttribute('x', String(x))
+    tspan.setAttribute('dy', String(i === 0 ? firstDy : stepDy))
+    tspan.textContent = fit.lines[i]
+    textEl.appendChild(tspan)
+  }
+  outerG.appendChild(textEl)
 }
 
 /**
@@ -1184,6 +1574,12 @@ function addRectLabel({
   text.setAttribute('fill', '#2C2C2C')
   text.setAttribute('pointer-events', 'none')
   text.setAttribute('data-fp-rect-label', '1')
+  // Mirror the rect's data-booth onto the label so the filter
+  // effect can dim/match this text alongside its booth. Without
+  // this, single-booth vendor labels (Olivia, Golden, Vekalat)
+  // stayed at full opacity while their booth dimmed around them.
+  const boothNum = rect.getAttribute('data-booth')
+  if (boothNum) text.setAttribute('data-booth', boothNum)
   text.textContent = content.trim()
   outerG.appendChild(text)
   fitTextWidth(

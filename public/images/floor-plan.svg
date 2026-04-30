@@ -19,11 +19,23 @@
       stroke: #2C2C2C;
       stroke-width: 1;
       vector-effect: non-scaling-stroke;
-      /* Transition stroke only — animating fill here was causing
-         Chrome to pin the computed fill at the start value when the
-         page-level mode class flipped the cascade target, leaving
-         become-a-vendor available booths stuck on white. */
-      transition: stroke-width 120ms ease;
+      /* Transitions live on the base rule (not on
+         [data-filter="dim/match"]) so they fire BOTH into AND out
+         of the filtered state. When React removes data-filter on
+         clear, the element falls back to base styles — and base
+         is where the transition has to live or the snap-back is
+         instant. Deliberately NOT transitioning stroke color:
+         when the orange match stroke fades back to black at the
+         same time as opacity, you get a brown mid-transition
+         that looks broken. Color flips instantly, opacity and
+         stroke-width fade smoothly. */
+      transition: opacity 500ms ease, stroke-width 500ms ease;
+    }
+    path {
+      transition: opacity 500ms ease, stroke-width 500ms ease;
+    }
+    text {
+      transition: opacity 500ms ease;
     }
 
     /* Interactive states driven by data-status on the rect. */
@@ -55,7 +67,12 @@
        worry about. */
     .fp-mode-become-a-vendor rect[data-booth][data-status="available"] {
       fill: #F7D117 !important;
-      stroke: #2C2C2C !important;
+      /* Stroke deliberately NOT set here. The default rect rule
+         already supplies #2C2C2C, and pinning it again with
+         !important + a 0,3,2-specificity selector would beat the
+         filter-match orange outline — which made "Available
+         booth" highlights render with a black stroke instead of
+         the expected mango. */
     }
     .fp-mode-become-a-vendor rect[data-booth][data-status="rented"] {
       fill: #FFFFFF !important;
@@ -103,14 +120,15 @@
     }
 
     /* Merged adjacent-booth shape — a polygon path tracing the
-       cluster's outer perimeter (handles L/T/U-shapes). Slightly
-       thicker stroke so it reads as one unit, no internal borders
-       between the cluster's component booths. */
+       cluster's outer perimeter (handles L/T/U-shapes). Same
+       stroke width as a single booth so the whole map reads with
+       a consistent line weight regardless of which booths are
+       grouped. */
     path[data-fp-merged],
     rect[data-fp-merged] {
       fill: #F7D117;
       stroke: #2C2C2C;
-      stroke-width: 1.5;
+      stroke-width: 1;
       vector-effect: non-scaling-stroke;
       cursor: pointer;
     }
@@ -123,23 +141,35 @@
        a mango stroke and gently pulse; dimmed elements fade to 25% so
        the map reads as a dimmed backdrop behind the spotlighted
        results. */
+    /* Filter opacity wins via !important because the mode-level
+       become-a-vendor rule (rented at 0.55) has higher selector
+       specificity. Without these the orange match outline rendered
+       at 0.55 on rented booths in become-a-vendor — the user
+       clicking "Active vendors" got a sad, washed-out highlight
+       instead of the clean pop they expected.
+       Transitions live on the base rect/path/text rules so they
+       fire on filter clear too. */
     [data-filter="dim"] {
-      opacity: 0.22;
-      transition: opacity 200ms ease;
+      opacity: 0.22 !important;
     }
     [data-filter="match"] {
-      opacity: 1;
-      transition: opacity 200ms ease, stroke-width 200ms ease;
+      opacity: 1 !important;
     }
+    /* !important here because the rented-booth defaults have higher
+       specificity (rect[data-booth][data-status="rented"]) than the
+       match selector — without it, single rented rects keep their
+       dark stroke while merged paths get the orange one, producing
+       a mix of black and orange outlines when "Rented" is clicked.
+       Static stroke-width (no pulse) so every matched shape reads
+       at the SAME width — pulsing produced visibly different stroke
+       widths per element because each element animation started
+       at the moment data-filter=match was stamped, and rects vs
+       cluster paths get the attribute in slightly different
+       React-effect ticks, leaving the pulses out of phase. */
     rect[data-filter="match"],
     path[data-filter="match"] {
-      stroke: #E57200;
-      stroke-width: 3;
-      animation: fp-filter-pulse 1.8s infinite ease-in-out;
-    }
-    @keyframes fp-filter-pulse {
-      0%, 100% { stroke-width: 3; }
-      50%      { stroke-width: 5; }
+      stroke: #E57200 !important;
+      stroke-width: 3 !important;
     }
     /* When a filter is active, dim the outer wall + dev labels so the
        contrast between match and miss really pops. */
@@ -150,22 +180,25 @@
     [data-amenity] { cursor: help; }
 
     /* Food-court booths — same status palette as regular booths plus a
-       mango stroke so the whole zone reads as one block. */
+       mango stroke so the whole zone reads as one block. Same
+       stroke-width as every other booth for visual consistency. */
     .fp-food-court-booth {
       fill: #FFFFFF;
       stroke: #E57200;
-      stroke-width: 0.8;
+      stroke-width: 1;
       vector-effect: non-scaling-stroke;
     }
     .fp-food-court-booth[data-status="rented"]   { fill: #F7D117; }
     .fp-food-court-booth[data-status="reserved"] { fill: #F7941D; }
 
     /* FOOD COURT label — dropped in at step 4 below, positioned over
-       the Food-Court1 zone rect. */
+       the Food-Court1 zone rect. Dark fill so it's legible against
+       the cream floor; weight 900 for a chunkier, easier-to-read
+       headline. */
     .fp-food-court-label {
-      fill: #E57200;
-      font-family: 'METAFORA', 'DM Sans', sans-serif;
-      font-weight: 700;
+      fill: #2C2C2C;
+      font-family: var(--font-metafora), 'METAFORA', 'DM Sans', sans-serif;
+      font-weight: 900;
       letter-spacing: 0.1em;
       text-anchor: middle;
       dominant-baseline: central;
@@ -1120,7 +1153,7 @@
             <rect class="fp-food-court-booth" id="_1705" serif:id="1705" data-booth="1705" x="402.88" y="421.239" width="73.099" height="35.361"/>
             <rect class="fp-food-court-booth" id="_1704" serif:id="1704" data-booth="1704" x="367.622" y="421.239" width="35.258" height="35.361"/>
         
-        <text class="fp-food-court-label" x="584.066" y="477" font-size="12">FOOD COURT</text></g>
+        <text class="fp-food-court-label" x="584.066" y="472" font-size="16">FOOD COURT</text></g>
         <g id="_2100" serif:id="2100">
             <rect id="_2101" serif:id="2101" data-booth="2101" x="549.577" y="159.392" width="33.763" height="37.674"/>
             <rect id="_2102" serif:id="2102" data-booth="2102" x="549.577" y="197.066" width="33.763" height="37.014"/>

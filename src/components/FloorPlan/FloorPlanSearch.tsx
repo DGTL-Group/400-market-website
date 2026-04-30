@@ -20,17 +20,29 @@ type Props = {
 export function FloorPlanSearch({ onQueryChange, matchCount }: Props) {
   const [value, setValue] = useState('')
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Tracks the trimmed value we've already reported to the parent.
+  // Without this, every parent re-render hands us a new
+  // `onQueryChange` identity, the effect fires, and 150 ms later we
+  // call `onQueryChange("")` — which clobbers any other filter the
+  // parent has set (e.g. a clicked legend chip). With it, we only
+  // fire when the user's input actually changes.
+  const lastFiredRef = useRef<string>('')
 
   useEffect(() => {
+    const trimmed = value.trim()
+    if (trimmed === lastFiredRef.current) return
     if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => onQueryChange(value.trim()), 150)
+    timerRef.current = setTimeout(() => {
+      lastFiredRef.current = trimmed
+      onQueryChange(trimmed)
+    }, 150)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [value, onQueryChange])
 
   return (
-    <div className="relative w-full max-w-md mx-auto mb-4">
+    <div className="relative w-full max-w-md mx-auto">
       <label htmlFor="fp-search" className="sr-only">
         Search vendors, categories, or booth numbers
       </label>
@@ -66,9 +78,13 @@ export function FloorPlanSearch({ onQueryChange, matchCount }: Props) {
           </button>
         )}
       </div>
-      {/* Live region — polite so it doesn't interrupt typing */}
+      {/* Live region — polite so it doesn't interrupt typing.
+          Positioned absolutely so it doesn't reserve vertical
+          space in the layout: the search bar's wrapper padding
+          stays symmetric above and below regardless of whether
+          a "N matches" message is showing. */}
       <div
-        className="mt-1 text-caption text-text-subtle h-4"
+        className="absolute left-0 right-0 top-full mt-1 text-caption text-text-subtle"
         aria-live="polite"
       >
         {matchCount !== null &&

@@ -31,10 +31,13 @@ type Item = {
   swatch: 'yellow' | 'white' | 'orange' | 'gray-restroom' | 'dark' | 'green' | 'food-zone'
 }
 
+// Public modes (homepage, vendors directory) — no "Reserved" entry.
+// Visitors browsing vendors don't care about the rental pipeline; the
+// orange "Reserved" booth still renders on the map but doesn't get its
+// own legend chip on these pages.
 const PUBLIC_ITEMS: Item[] = [
-  { key: 'rented', label: 'Rented booth', swatch: 'yellow' },
+  { key: 'rented', label: 'Active vendors', swatch: 'yellow' },
   { key: 'available', label: 'Available booth', swatch: 'white' },
-  { key: 'reserved', label: 'Reserved', swatch: 'orange' },
   { key: 'food-court', label: 'Food court', swatch: 'food-zone' },
   { key: 'mens-restroom', label: "Men's restroom", swatch: 'gray-restroom' },
   { key: 'womens-restroom', label: "Women's restroom", swatch: 'gray-restroom' },
@@ -47,7 +50,7 @@ const PUBLIC_ITEMS: Item[] = [
 // is hunting for.
 const BECOME_A_VENDOR_ITEMS: Item[] = [
   { key: 'available', label: 'Available booth', swatch: 'yellow' },
-  { key: 'rented', label: 'Rented booth', swatch: 'white' },
+  { key: 'rented', label: 'Active vendors', swatch: 'white' },
   { key: 'reserved', label: 'Reserved', swatch: 'orange' },
   { key: 'food-court', label: 'Food court', swatch: 'food-zone' },
   { key: 'mens-restroom', label: "Men's restroom", swatch: 'gray-restroom' },
@@ -77,7 +80,7 @@ export function FloorPlanLegend({ active, onToggle, mode }: Props) {
   const items =
     mode === 'become-a-vendor' ? BECOME_A_VENDOR_ITEMS : PUBLIC_ITEMS
   return (
-    <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
+    <div className="flex flex-wrap gap-2 justify-center mb-4">
       {items.map((item) => {
         const isActive = active === item.key
         return (
@@ -86,7 +89,7 @@ export function FloorPlanLegend({ active, onToggle, mode }: Props) {
             type="button"
             onClick={() => onToggle(isActive ? null : item.key)}
             aria-pressed={isActive}
-            className={`group flex items-center gap-2 px-3 py-1.5 rounded-button border text-caption font-body font-semibold transition-colors duration-200 ${
+            className={`group flex items-center gap-2 px-3 py-1.5 rounded-button border text-caption font-body font-semibold transition-colors duration-500 ${
               isActive
                 ? 'bg-brand-dark text-white border-brand-dark'
                 : 'bg-white text-text-secondary border-surface-light hover:border-brand-mango hover:text-brand-dark'
